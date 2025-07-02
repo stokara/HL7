@@ -1,69 +1,22 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Efferent.HL7.V2
-{
-    public class Component : MessageElement
-    {
-        internal List<SubComponent> SubComponentList { get; set; }
-
-        public bool IsSubComponentized { get; set; } = false;
-
-        private bool isDelimiter = false;
-
-        public Component(HL7Encoding encoding, bool isDelimiter = false)
-        {
-            this.isDelimiter = isDelimiter;
-            this.SubComponentList = new List<SubComponent>();
-            this.Encoding = encoding;
-        }
-
-        public Component(string pValue, HL7Encoding encoding)
-        {
-            this.SubComponentList = new List<SubComponent>();
-            this.Encoding = encoding;
-            this.Value = pValue;
-        }
-
-        protected override void ProcessValue()
-        {
-            string[] allSubComponents;
-
-            if (this.isDelimiter)
-                allSubComponents = [this.Value];
-            else
-                allSubComponents = _value.Split(this.Encoding.SubComponentDelimiter);
-
-            if (allSubComponents.Length > 1)
-                this.IsSubComponentized = true;
-
-            SubComponentList.Clear(); // in case there's existing data in there
-            SubComponentList.Capacity = allSubComponents.Length;
-
-            foreach (string strSubComponent in allSubComponents)
-            {
-                SubComponent subComponent = new SubComponent(strSubComponent, this.Encoding);
-                SubComponentList.Add(subComponent);
-            }
-        }
-
-        public SubComponent SubComponents(int position)
-        {
-            position--;
-
-            try
-            {
-                return SubComponentList[position];
-            }
-            catch (Exception ex)
-            {
-                throw new HL7Exception("SubComponent not available Error-" + ex.Message, ex);
-            }
-        }
-
-        public List<SubComponent> SubComponents()
-        {
-            return SubComponentList;
-        }
+public sealed record Component {
+    public bool HasSubComponents => SubComponents.Count > 0;
+    public IReadOnlyCollection<SubComponent> SubComponents { get;  }
+    public string Value { get; }
+    
+    private Component(IReadOnlyCollection<SubComponent> SubComponents, string Value) {
+        this.SubComponents = SubComponents;
+        this.Value = Value;
     }
+
+    public static Component Parse(Hl7Encoding encoding, string value) {
+        var subComponents = value.Split(encoding.SubComponentDelimiter);
+        var components = subComponents.Select(strSubComponent => new SubComponent(strSubComponent)).ToList().AsReadOnly();
+        return new Component(components, value);
+    }
+
+    public static Component CreateDelimiterComponent(string value) => new([], value);
 }
+

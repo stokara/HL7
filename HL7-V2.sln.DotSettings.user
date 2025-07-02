@@ -1,0 +1,18 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=0cfdf843_002D2ec4_002D4198_002Db5d8_002Da85546730981/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CustomDelimiterTest #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::Efferent.HL7.V2.Test.EncodingTests.CustomDelimiterTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=16117137_002Dedbb_002D480b_002D8feb_002Df9bf907283c5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CustomDelimiterTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::Efferent.HL7.V2.Test.EncodingTests.CustomDelimiterTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a1fe0dba_002Dcee1_002D4675_002D83a3_002Dd528086cb3a2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CustomDelimiterTest #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;MSTest::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::Efferent.HL7.V2.Test.EncodingTests.CustomDelimiterTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

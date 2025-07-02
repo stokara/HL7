@@ -1,34 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Lightweight HL7 V2 library</Description>
-    <Copyright>(c) Efferent Health, LLC</Copyright>
-    <VersionPrefix>3.5</VersionPrefix>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
     <AssemblyName>HL7-V2</AssemblyName>
     <PackageId>HL7-V2</PackageId>
     <PackageTags>hl7;hl7-v2;hl7-parser</PackageTags>
-    <PackageProjectUrl>https://github.com/Efferent-Health/HL7-V2</PackageProjectUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Efferent-Health/HL7-V2</RepositoryUrl>
-    <Configuration>Release</Configuration> <!-- Set to Debug for debugging -->
-    <Optimize>true</Optimize> <!-- Set to false for debugging -->
-    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <AnalysisMode>Recommended</AnalysisMode>
-    <NoWarn>CA1805,CA1865</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Include="../LICENSE.txt" Pack="true" PackagePath="$(PackageLicenseFile)" />
-    <None Include="../README.md" Pack="true" PackagePath="$(PackageReadmeFile)" />
+    <PackageReference Include="NodaTime" Version="3.2.2" />
   </ItemGroup>
 </Project>

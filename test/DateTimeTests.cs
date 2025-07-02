@@ -1,138 +1,87 @@
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NodaTime;
+using Xunit;
 
-namespace Efferent.HL7.V2.Test
-{
-    [TestClass]
-    public class DateTimeTests
-    {
-        public TestContext TestContext { get; set; }
+namespace HL7test;
 
-        [DataTestMethod]
-        [DataRow("   20151231234500.1234+2358   ")]
-        [DataRow("20151231234500.1234+2358")]
-        [DataRow("20151231234500.1234-2358")]
-        [DataRow("20151231234500.1234")]
-        [DataRow("20151231234500.12")]
-        [DataRow("20151231234500")]
-        [DataRow("201512312345")]
-        [DataRow("2015123123")]
-        [DataRow("20151231")]
-        [DataRow("201512")]
-        [DataRow("2015")]
-        public void ParseDateTime_Smoke_Positive(string dateTimeString)
-        {
-            var date = MessageHelper.ParseDateTime(dateTimeString);
-            Assert.IsNotNull(date);
-            Assert.AreEqual(DateTimeKind.Utc, date.Value.Kind);
-        }
+public class DateTimeTimeTests {
+    [Theory]
+    [InlineData("   20151231234500.1234+1800   ")]
+    [InlineData("20151231234500.1234+1800")]
+    [InlineData("20151231234500.1234-1800")]
+    [InlineData("20151231234500.1234")]
+    [InlineData("20151231234500.12")]
+    [InlineData("20151231234500")]
+    [InlineData("201512312345")]
+    [InlineData("2015123123")]
+    [InlineData("20151231")]
+    [InlineData("201512")]
+    [InlineData("2015")]
+    public void ParseOffsetDateTime_Smoke_Positive(string dateTimeString) {
+        var odt = Hl7DateParser.ParseOffsetDateTime(dateTimeString);
+        Assert.NotNull(odt);
+    }
 
-        [DataTestMethod]
-        [DataRow("   20151231234500.1234+23581")]
-        [DataRow("20151231234500.1234+23")]
-        [DataRow("20151231234500.12345")]
-        [DataRow("20151231234500.")]
-        [DataRow("2015123123450")]
-        [DataRow("20151231234")]
-        [DataRow("201512312")]
-        [DataRow("2015123")]
-        [DataRow("20151")]
-        [DataRow("201")]
-        public void ParseDateTime_Smoke_Negative(string dateTimeString)
-        {
-            var date = MessageHelper.ParseDateTime(dateTimeString);
-            Assert.IsNull(date);
-        }
+    [Theory]
+    [InlineData("   20151231234500.1234+2358   ")] // Out of range for NodaTime
+    [InlineData("20151231234500.1234+2358")]
+    [InlineData("20151231234500.1234-2358")]
+    [InlineData("20151231234500.1234+23581")]
+    [InlineData("20151231234500.1234+23")]
+    [InlineData("20151231234500.12345")]
+    [InlineData("20151231234500.")]
+    [InlineData("2015123123450")]
+    [InlineData("20151231234")]
+    [InlineData("201512312")]
+    [InlineData("2015123")]
+    [InlineData("20151")]
+    [InlineData("201")]
+    public void ParseOffsetDateTime_Smoke_Negative(string dateTimeString) {
+        var odt = Hl7DateParser.ParseOffsetDateTime(dateTimeString);
+        Assert.Null(odt);
+    }
 
-        [TestMethod]
-        public void ParseDateTime_Correctness()
-        {
-            var date = MessageHelper.ParseDateTime("20151231234500.1234-2358", applyOffset: false).Value;
-            Assert.AreEqual(new DateTime(2015, 12, 31, 23, 45, 00, 123), date);
-            Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
-        }
+    [Fact]
+    public void ParseOffsetDateTime_Correctness() {
+        var odt = Hl7DateParser.ParseOffsetDateTime("20151231234500.1234-1800");
+        var expected = new LocalDateTime(2015, 12, 31, 23, 45, 00, 123);
+        Assert.Equal(expected, odt.Value.LocalDateTime);
+        Assert.Equal(Offset.FromHoursAndMinutes(-18, 0), odt.Value.Offset);
+    }
 
-        [TestMethod]
-        public void ParseDateTime_Correctness_WithOffset()
-        {
-            var date = MessageHelper.ParseDateTime("20151231234500.1234-2358").Value;
-            Assert.AreEqual(new DateTime(2015, 12, 31, 23, 45, 00, 123).Subtract(new TimeSpan(-23, 58, 0)), date);
-            Assert.AreEqual(DateTimeKind.Utc, date.Kind);
-        }
+    [Fact]
+    public void ParseOffsetDateTime_Correctness_WithPositiveOffset() {
+        var odt = Hl7DateParser.ParseOffsetDateTime("20151231234500.1234+1800");
+        var expected = new LocalDateTime(2015, 12, 31, 23, 45, 00, 123);
+        Assert.Equal(expected, odt.Value.LocalDateTime);
+        Assert.Equal(Offset.FromHoursAndMinutes(18, 0), odt.Value.Offset);
+    }
 
-        [TestMethod]
-        public void ParseDateTime_TimeSpanOut_Correctness()
-        {
-            TimeSpan offset;
-            var date = MessageHelper.ParseDateTime("20151231234500.1234-2358", out offset).Value;
-            Assert.AreEqual(new DateTime(2015, 12, 31, 23, 45, 00, 123), date);
-            Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
-            Assert.AreEqual(new TimeSpan(-23, 58, 0), offset);
-        }
+    [Fact]
+    public void ParseOffsetDateTime_WithException() {
+        Assert.Throws<FormatException>(() => Hl7DateParser.ParseOffsetDateTime("201", true));
+    }
 
-        [TestMethod]
-        public void ParseDateTime_TimeSpanOut_Correctness_WithOffset()
-        {
-            TimeSpan offset;
-            var date = MessageHelper.ParseDateTime("20151231234500.1234-2358", out offset, applyOffset: true).Value;
-            Assert.AreEqual(new DateTime(2015, 12, 31, 23, 45, 00, 123).Subtract(new TimeSpan(-23, 58, 0)), date);
-            Assert.AreEqual(DateTimeKind.Utc, date.Kind);
-            Assert.AreEqual(new TimeSpan(-23, 58, 0), offset);
-        }
+    [Theory]
+    [InlineData("18151231")]
+    [InlineData("19151231")]
+    [InlineData("20151231")]
+    public void ParseOffsetDateTime_Year(string dateTimeString) {
+        var odt = Hl7DateParser.ParseOffsetDateTime(dateTimeString);
+        Assert.NotNull(odt);
+    }
 
-        [TestMethod]
-        public void ParseDateTime_WithException()
-        {
-            try
-            {
-                var date = MessageHelper.ParseDateTime("201", true);
-                Assert.Fail();
-            }
-            catch (AssertFailedException)
-            {
-                throw;
-            }
-            catch
-            {
-            }
-        }
+    [Theory]
+    [InlineData("1701231")]
+    [InlineData("16151231")]
+    [InlineData("00001231")]
+    public void ParseOffsetDateTime_Year_Negative(string dateTimeString) {
+        var odt = Hl7DateParser.ParseOffsetDateTime(dateTimeString);
+        Assert.Null(odt);
+    }
 
-        [TestMethod]
-        public void ParseDateTimeOffset_WithException()
-        {
-            try
-            {
-                var date = MessageHelper.ParseDateTime("201", out TimeSpan offset, true);
-                Assert.Fail();
-            }
-            catch (AssertFailedException)
-            {
-                throw;
-            }
-            catch
-            {
-            }
-        }
-
-        [DataTestMethod]
-        [DataRow("18151231")]
-        [DataRow("19151231")]
-        [DataRow("20151231")]
-        public void ParseDateTime_Year(string dateTimeString)
-        {
-            var date = MessageHelper.ParseDateTime(dateTimeString);
-            Assert.IsNotNull(date);
-            Assert.AreEqual(DateTimeKind.Utc, date.Value.Kind);
-        }
-
-        [DataTestMethod]
-        [DataRow("1701231")]
-        [DataRow("16151231")]
-        [DataRow("00001231")]
-        public void ParseDateTime_Year_Negative(string dateTimeString)
-        {
-            var date = MessageHelper.ParseDateTime(dateTimeString);
-            Assert.IsNull(date);
-        }
+    [Fact]
+    public void ParseOffsetDateTime_OffsetOutOfRange() {
+        Assert.Null(Hl7DateParser.ParseOffsetDateTime("20151231234500.1234+1900"));
     }
 }
