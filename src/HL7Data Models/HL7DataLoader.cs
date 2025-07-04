@@ -9,7 +9,7 @@ using System.Reflection;
 namespace HL7;
 
 public static class HL7DataLoader {
-    private const bool IsUseRegistrationScanning = true;
+    private const bool IsUseRegistrationScanning = false;
     private static readonly Dictionary<string, Func<Segment, IHL7Data>> registry = new();
 
     static HL7DataLoader() {
