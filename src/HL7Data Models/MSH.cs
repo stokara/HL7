@@ -18,7 +18,7 @@ public sealed record MSH : HL7Data<MSH> {
     public MSH(Message message) : base(message.Segments[0]) {
         var segment = message.Segments[0];
 
-        Delimiters = segment.Fields[0].Value;
+        Delimiters = segment.Fields[1].Value;
         SendingApplication = segment.Fields.Count > 2 ? segment.Fields[2].Value : string.Empty;
         SendingFacility = segment.Fields.Count > 3 ? segment.Fields[3].Value : string.Empty;
         ReceivingApplication = segment.Fields.Count > 4 ? segment.Fields[4].Value : string.Empty;
