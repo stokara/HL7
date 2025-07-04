@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>Lightweight HL7 V2 library</Description>
+    <Description>Lightweight HL7 library</Description>
     <TargetFramework>net9.0</TargetFramework>
-    <AssemblyName>HL7-V2</AssemblyName>
-    <PackageId>HL7-V2</PackageId>
+    <AssemblyName>HL7</AssemblyName>
+    <PackageId>HL7</PackageId>
     <PackageTags>hl7;hl7-v2;hl7-parser</PackageTags>
     <Nullable>enable</Nullable>
   </PropertyGroup>

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+namespace HL7;
+
 public sealed record Field {
     public bool IsDelimitersField { get; init; }
     public string Value { get; init; }
@@ -21,7 +23,7 @@ public sealed record Field {
         return new Field(value, [component]) { IsDelimitersField = true };
     }
 
-    public static Field Parse(Hl7Encoding encoding, string value) {
+    public static Field Parse(HL7Encoding encoding, string value) {
         var hasRepetitions = value.Contains(encoding.RepeatDelimiter);
         if (hasRepetitions) {
             var repeatFields = value.Split(encoding.RepeatDelimiter);
@@ -40,7 +42,7 @@ public sealed record Field {
         return new Field(value);
     }
 
-    public string Serialize(Hl7Encoding encoding) {
+    public string Serialize(HL7Encoding encoding) {
         if (HasRepetitions)
             return string.Join(encoding.RepeatDelimiter, Repetitions!.Select(rf => rf.Serialize(encoding)));
         if (!HasComponents) return encoding.Encode(this.Value);

@@ -2,7 +2,9 @@ using System;
 using System.Linq;
 using System.Text;
 
-public record Hl7Encoding {
+namespace HL7;
+
+public record HL7Encoding {
     public char FieldDelimiter { get; init; }
     public char ComponentDelimiter { get; init; }
     public char RepeatDelimiter { get; init; }
@@ -13,7 +15,7 @@ public record Hl7Encoding {
 
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
-    public Hl7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
+    public HL7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
         char subComponentDelimiter, string segmentDelimiter = "\r", string presentButNull = "\"\"") {
         FieldDelimiter = fieldDelimiter;
         ComponentDelimiter = componentDelimiter;
@@ -24,18 +26,18 @@ public record Hl7Encoding {
         PresentButNull = presentButNull;
     }
 
-    public static Hl7Encoding FromString(string delimiters) {
+    public static HL7Encoding FromString(string delimiters) {
         var fieldDelimiter = delimiters[0];
         var componentDelimiter = delimiters[1];
         var repeatDelimiter = delimiters[2];
         var escapeCharacter = delimiters[3];
         var subComponentDelimiter = delimiters[4];
         var segmentDelimiter = SegmentDelimiters.FirstOrDefault(delimiters.Contains) ?? "\r\n";
-        return new Hl7Encoding(fieldDelimiter, componentDelimiter, repeatDelimiter, escapeCharacter,
+        return new HL7Encoding(fieldDelimiter, componentDelimiter, repeatDelimiter, escapeCharacter,
             subComponentDelimiter, segmentDelimiter);
     }
 
-    public static Hl7Encoding FromMessage(string hl7Message) => FromString(hl7Message.Substring(3, 5));
+    public static HL7Encoding FromMessage(string hl7Message) => FromString(hl7Message.Substring(3, 5));
 
     public string Encode(string val) {
         if (string.IsNullOrEmpty(val)) return val;

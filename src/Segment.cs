@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
+namespace HL7;
 
 public sealed record Segment {
     public string Name => Fields.First().Value;
@@ -13,23 +12,29 @@ public sealed record Segment {
         this.Fields = Fields;
     }
 
-    public static Segment Parse(Hl7Encoding encoding, string value, int sequenceNo = 0) {
+    public static bool TryParse(HL7Encoding encoding, string value, out Segment? segment, int sequenceNo = 0) {
+        segment = null;
         try {
-            var isMshSegment = value[..3] == "MSH";
-            var rawFields = splitFields(isMshSegment ? value[9..] : value, encoding.FieldDelimiter,
-                encoding.EscapeCharacter);
-            var fields = new List<Field>(rawFields.Count + (isMshSegment ? 2 : 0));
-
-            if (isMshSegment) {
-                fields.Add(Field.Parse(encoding, "MSH"));
-                fields.Add(Field.CreateDelimiterField(value[4..8]));
-            }
-
-            fields.AddRange(rawFields.Select(strField => Field.Parse(encoding, strField)));
-            return new Segment(fields.AsReadOnly());
-        } catch (Exception ex) {
-            throw;
+            segment = Parse(encoding, value, sequenceNo);
+            return true;
+        } catch {
+            return false;
         }
+    }
+
+    public static Segment Parse(HL7Encoding encoding, string value, int sequenceNo = 0) {
+        var isMshSegment = value[..3] == "MSH";
+        var rawFields = splitFields(isMshSegment ? value[9..] : value, encoding.FieldDelimiter,
+            encoding.EscapeCharacter);
+        var fields = new List<Field>(rawFields.Count + (isMshSegment ? 2 : 0));
+
+        if (isMshSegment) {
+            fields.Add(Field.Parse(encoding, "MSH"));
+            fields.Add(Field.CreateDelimiterField(value[4..8]));
+        }
+
+        fields.AddRange(rawFields.Select(strField => Field.Parse(encoding, strField)));
+        return new Segment(fields.AsReadOnly());
     }
 
     private static List<string> splitFields(string value, char fieldDelimiter, char escapeCharacter) {
@@ -57,7 +62,7 @@ public sealed record Segment {
         return fields;
     }
 
-    public string Serialize(Hl7Encoding encoding) {
+    public string Serialize(HL7Encoding encoding) {
         StringBuilder sb = new();
         for (var i = 0; i < this.Fields.Count; i++) {
             if (i > 0) sb.Append(encoding.FieldDelimiter);

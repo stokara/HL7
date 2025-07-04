@@ -1,9 +1,9 @@
-﻿using NodaTime;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using NodaTime;
 
-
+namespace HL7;
 
 public static class Hl7DateParser {
     private static readonly string Hl7DateRegex =

@@ -1,12 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using HL7;
 using Xunit;
 
 namespace HL7test;
 
 public class EncodingTests {
-    public EncodingTests() {}
-
-    private readonly Hl7Encoding defaultEncoder = new Hl7Encoding(
+    private readonly HL7Encoding defaultEncoder = new(
         fieldDelimiter: '|',
         componentDelimiter: '^',
         repeatDelimiter: '~',
@@ -84,12 +84,12 @@ public class EncodingTests {
         var message = Message.Parse("MSH124531FIRST1SECOND1THIRD1FOURTH1FIFTH1ORU2R05F5SIXTH1ADT2A081T1.81VERSION");
         var result = message.SerializeMessage();
 
-        Assert.Equal("MSH124531FIRST1SECOND1", result.Substring(0, 22));
+        Assert.Equal("MSH124531FIRST1SECOND1", result[..22]);
     }
 
     [Fact]
     public void SegmentParse_StandardDelimiters() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = "PID|1|12345|DOE^JOHN";
         var segment = Segment.Parse(encoding, segmentStr);
 
@@ -102,7 +102,7 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_NonStandardDelimiters() {
-        var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
+        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
         var segmentStr = "ZZZ!A!B@C$D%E";
         var segment = Segment.Parse(encoding, segmentStr);
 
@@ -114,7 +114,7 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_EscapedDelimiter() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = @"OBX|1|TX|Some\F\Value|End";
         var segment = Segment.Parse(encoding, segmentStr);
 
@@ -126,7 +126,7 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_MSH_WithStandardDelimiters() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = @"MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202407021200||ADT^A01|123456|P|2.5";
         var segment = Segment.Parse(encoding, segmentStr);
 
@@ -140,7 +140,7 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_MSH_WithNonStandardDelimiters() {
-        var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
+        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
         var segmentStr = @"MSH!@#$%!App1!Fac1!App2!Fac2!202507021200!!ADT@A01!654321!P!2.8";
         var segment = Segment.Parse(encoding, segmentStr);
 
@@ -154,7 +154,7 @@ public class EncodingTests {
 
     [Fact]
     public void FieldParse_SimpleValue() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var value = "SIMPLE";
         var field = Field.Parse(encoding, value);
         Assert.Equal("SIMPLE", field.Value);
@@ -164,50 +164,50 @@ public class EncodingTests {
 
     [Fact]
     public void FieldParse_WithComponents() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
-        var value = "DOE^JOHN^A";
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        const string value = "DOE^JOHN^A";
         var field = Field.Parse(encoding, value);
         Assert.Equal("DOE^JOHN^A", field.Value);
         Assert.True(field.HasComponents);
         Assert.False(field.HasRepetitions);
-        Assert.Equal(3, field.Components.Count);
-        Assert.Equal("DOE", field.Components[0].Value);
+        Assert.Equal(3, field.Components?.Count);
+        Assert.Equal("DOE", field.Components![0].Value);
         Assert.Equal("JOHN", field.Components[1].Value);
         Assert.Equal("A", field.Components[2].Value);
     }
 
     [Fact]
     public void FieldParse_WithRepetitions() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var value = "A~B~C";
         var field = Field.Parse(encoding, value);
         Assert.Equal("A~B~C", field.Value);
         Assert.False(field.HasComponents);
         Assert.True(field.HasRepetitions);
-        Assert.Equal(3, field.Repetitions.Count);
-        Assert.Equal("A", field.Repetitions[0].Value);
+        Assert.Equal(3, field.Repetitions?.Count);
+        Assert.Equal("A", field.Repetitions![0].Value);
         Assert.Equal("B", field.Repetitions[1].Value);
         Assert.Equal("C", field.Repetitions[2].Value);
     }
 
     [Fact]
     public void FieldParse_WithComponentsAndRepetitions() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
-        var value = "A^B~C^D";
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        const string value = "A^B~C^D";
         var field = Field.Parse(encoding, value);
         Assert.Equal("A^B~C^D", field.Value);
         Assert.True(field.HasRepetitions);
-        Assert.Equal(2, field.Repetitions.Count);
-        Assert.Equal("A^B", field.Repetitions[0].Value);
+        Assert.Equal(2, field.Repetitions?.Count);
+        Assert.Equal("A^B", field.Repetitions![0].Value);
         Assert.Equal("C^D", field.Repetitions[1].Value);
         Assert.True(field.Repetitions[0].HasComponents);
-        Assert.Equal("A", field.Repetitions[0].Components[0].Value);
+        Assert.Equal("A", field.Repetitions[0].Components![0].Value);
         Assert.Equal("B", field.Repetitions[0].Components[1].Value);
     }
 
     [Fact]
     public void FieldParse_WithEscapedDelimiter() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var value = @"A\F\B";
         var field = Field.Parse(encoding, value);
         Assert.Equal(@"A\F\B", field.Value);
@@ -217,12 +217,12 @@ public class EncodingTests {
 
     [Fact]
     public void FieldParse_CustomDelimiters() {
-        var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
+        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
         var value = "A@B@C";
         var field = Field.Parse(encoding, value);
         Assert.Equal("A@B@C", field.Value);
         Assert.True(field.HasComponents);
-        Assert.Equal(3, field.Components.Count);
+        Assert.Equal(3, field.Components!.Count);
         Assert.Equal("A", field.Components[0].Value);
         Assert.Equal("B", field.Components[1].Value);
         Assert.Equal("C", field.Components[2].Value);
@@ -281,7 +281,7 @@ public class EncodingTests {
 
     [Fact]
     public void EncodeDecode_HexEscape_Newline() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var input = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         Assert.Contains("\\X0A\\", encoded);
@@ -291,7 +291,7 @@ public class EncodingTests {
 
     [Fact]
     public void EncodeDecode_HexEscape_OA() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var input = @"1380 SAMPLE STREET^\X0A^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         Assert.Contains("\\X0A\\", encoded);
@@ -301,7 +301,7 @@ public class EncodingTests {
 
     [Fact]
     public void Decode_HexEscape_Newline() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var encoded = @"1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055";
         var expected = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var decoded = encoding.Decode(encoded);
@@ -310,10 +310,32 @@ public class EncodingTests {
 
     [Fact]
     public void Encode_HexEscape_Newline() {
-        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
         var input = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         var expected = "1380 SAMPLE STREET\\S\\\\X0A\\\\S\\NEW YORK\\S\\NY\\S\\55755-5055";
         Assert.Equal(expected, encoded);
+    }
+
+    [Fact]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    public void Decode_MalformedEscapeSequences() {
+        // Missing closing escape
+        const string input1 = @"ABC\FDEF";
+        const string expected1 = @"ABC\FDEF";
+        var decoded1 = defaultEncoder.Decode(input1);
+        Assert.Equal(expected1, decoded1);
+
+        // Unknown escape code
+        const string input2 = @"ABC\Z\DEF";
+        const string expected2 = "ABCZDEF";
+        var decoded2 = defaultEncoder.Decode(input2);
+        Assert.Equal(expected2, decoded2);
+
+        // Empty escape sequence
+        const string input3 = @"ABC\\DEF";
+        const string expected3 = "ABCDEF";
+        var decoded3 = defaultEncoder.Decode(input3);
+        Assert.Equal(expected3, decoded3);
     }
 }

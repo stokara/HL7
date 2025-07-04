@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using HL7;
 using Xunit;
 
 namespace HL7test;

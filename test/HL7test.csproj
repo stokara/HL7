@@ -25,6 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\HL7-V2.csproj" />
+    <ProjectReference Include="..\src\HL7.csproj" />
   </ItemGroup>
 </Project>

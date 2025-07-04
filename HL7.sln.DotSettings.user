@@ -15,4 +15,16 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;MSTest::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::Efferent.HL7.V2.Test.EncodingTests.CustomDelimiterTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f8342483_002D9788_002D4675_002D9bc6_002D4c62f2d6ded9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="SegmentLoaderLoadAllHl7DataTypes" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.SegmentLoaderLoadAllHl7DataTypes&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.SegmentLoaderLoadsFT1Segment&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.SegmentLoaderLoadsPV1Segment&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.SegmentLoaderLoadsPV1Segment_&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.SegmentLoaderLoadsPV1Segment_ConstructorWorks&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.IN1Segment_ConstructorWorks&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.IN2Segment_ConstructorWorks&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.EncodingTests.Decode_MalformedEscapeSequences&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
