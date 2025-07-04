@@ -29,7 +29,7 @@ public class SegmentBuilderTests {
     [Fact]
     public void SegmentLoaderLoadsPV1Segment_PropertySet() {
         var segment = Segment.Parse(defaultEncoder, "PV1|1|I|W^101^1^A|||1234^Smith^John^A|||SUR||||1|A0|");
-        PV1 pv1 = (PV1)HL7DataLoader.Create(segment);
+        var pv1 = (PV1)HL7DataLoader.Create(segment);
         Assert.Equal("1", pv1.SetId);
     }
 
