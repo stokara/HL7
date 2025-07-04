@@ -26,5 +26,6 @@
     &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.IN1Segment_ConstructorWorks&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.SegmentBuilderTests.IN2Segment_ConstructorWorks&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.EncodingTests.Decode_MalformedEscapeSequences&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::910F6F49-6AD7-45EF-8FA0-E141C77D81DA::net9.0::HL7test.IntegrationTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

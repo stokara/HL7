@@ -90,6 +90,10 @@ Run with your preferred test runner (e.g., `dotnet test`).
 
 ---
 
+## License
+
+[MIT](LICENSE) (or specify your license here)
+
 ---
 
 ## Contributing
