@@ -30,10 +30,6 @@ A modern, robust C# library for parsing, serializing, and working with HL7 v2.x 
 - .NET 9 or later
 - C# 13.0
 
-### Installation
-
-Add the project to your solution or reference the compiled DLL.
-
 ### Usage
 
 #### Parse an HL7 Message
@@ -87,12 +83,6 @@ Run with your preferred test runner (e.g., `dotnet test`).
 
 - Add new segment models by inheriting from `HL7Data<T>`.
 - Customize encoding by creating new `HL7Encoding` instances.
-
----
-
-## License
-
-[MIT](LICENSE) (or specify your license here)
 
 ---
 
