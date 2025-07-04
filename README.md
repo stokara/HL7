@@ -90,10 +90,6 @@ Run with your preferred test runner (e.g., `dotnet test`).
 
 ---
 
-## License
-
-[MIT](LICENSE) (or specify your license here)
-
 ---
 
 ## Contributing
@@ -105,3 +101,4 @@ Pull requests and issues are welcome!
 ## Acknowledgments
 
 - HL7  and Health Level Seven  are registered trademarks of Health Level Seven International.
+- Started from Fork of Efferent.HL7.V2 but rewrote close to 100% of the code.
