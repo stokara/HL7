@@ -1,5 +1,6 @@
-public record IN1 : HL7Data {
-    public override string Name => "IN1";
+namespace HL7;
+
+public record IN1 : HL7Data<IN1> {
     public string SetId { get; private set; }
     public string InsurancePlanId { get; private set; }
     public string InsuranceCompanyId { get; private set; }
@@ -14,7 +15,7 @@ public record IN1 : HL7Data {
     public string InsuredsEmployerName { get; private set; }
     public string InsuredsSSN { get; private set; }
 
-    protected IN1(Segment segment) : base(segment) {
+    public IN1(Segment segment) : base(segment) {
         SetId = segment.Fields.Count > 1 ? segment.Fields[1].Value : string.Empty;
         InsurancePlanId = segment.Fields.Count > 2 ? segment.Fields[2].Value : string.Empty;
         InsuranceCompanyId = segment.Fields.Count > 3 ? segment.Fields[3].Value : string.Empty;
@@ -28,10 +29,6 @@ public record IN1 : HL7Data {
         InsuredsSex = segment.Fields.Count > 11 ? segment.Fields[11].Value : string.Empty;
         InsuredsEmployerName = segment.Fields.Count > 13 ? segment.Fields[13].Value : string.Empty;
         InsuredsSSN = segment.Fields.Count > 16 ? segment.Fields[16].Value : string.Empty;
-    }
-
-    static IN1() {
-        SegmentLoader.Register("IN1", segment => new IN1(segment));
     }
 
 }

@@ -1,5 +1,6 @@
-public sealed record FT1 : HL7Data {
-    public override string Name => nameof(FT1);
+namespace HL7;
+
+public sealed record FT1 : HL7Data<FT1> {
     public string SetId { get; private set; }
     public string TransactionDate { get; private set; }
     public string PostingDate { get; private set; }
@@ -10,7 +11,7 @@ public sealed record FT1 : HL7Data {
     public string Amount { get; private set; }
     public string PerformingProvider { get; private set; }
 
-    private FT1(Segment segment) : base(segment) {
+    public FT1(Segment segment) : base(segment) {
         SetId = segment.Fields.Count > 1 ? segment.Fields[1].Value : string.Empty;
         TransactionDate = segment.Fields.Count > 2 ? segment.Fields[2].Value : string.Empty;
         PostingDate = segment.Fields.Count > 3 ? segment.Fields[3].Value : string.Empty;
@@ -25,9 +26,5 @@ public sealed record FT1 : HL7Data {
         Quantity = segment.Fields.Count > 8 ? segment.Fields[8].Value : string.Empty;
         Amount = segment.Fields.Count > 9 ? segment.Fields[9].Value : string.Empty;
         PerformingProvider = segment.Fields.Count > 12 ? segment.Fields[12].Value : string.Empty;
-    }
-
-    static FT1() {
-        SegmentLoader.Register("FT1", segment => new FT1(segment));
     }
 }
