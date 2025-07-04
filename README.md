@@ -55,14 +55,14 @@ string sendingApp = msh?.Fields[2].Value;
 string serialized = message.SerializeMessage();
 ```
 
-#### Work with Data Models (e.g., FT1)
+#### Converts HL7 to c# classes (e.g., FT1)
 
 ```
-var ft1Segment = message.Segments.FirstOrDefault(s => s.Name == "FT1");
-if (ft1Segment != null)
-{
-    var ft1 = new FT1(ft1Segment);
-    Console.WriteLine($"Procedure Code: {ft1.ProcedureCode}");
+var isSuccess = HL7Message.TryCreate(message, out var hl7Message);
+if (isSuccess) {
+  var msh = hl7Message.MSH;
+  var versionId = msh.VersionId;
+ var FT1s = hl7Message.GetRecords<FT1>();
 }
 ```
 
