@@ -7,10 +7,10 @@ namespace HL7;
 
 public sealed record Message {
     public IReadOnlyList<Segment> Segments { get; init; }
-    public string HL7Message { get; init; }
+    public string HL7RawMessage { get; init; }
     public string Version { get; init; }
     public Instant? MessageDateTime { get; init; }
-    public string MessageStructure { get; init; }
+    public string MessageType { get; init; }
     public string MessageControlId { get; init; }
     public string ProcessingId { get; init; }
     public HL7Encoding Encoding { get; init; }
@@ -19,26 +19,26 @@ public sealed record Message {
 
     private record MetaData(
         string Version,
-        string MessageStructure,
+        string MessageType,
         string MessageControlId,
         string ProcessingId,
         Instant? MessageDateTime
     );
 
-    private Message(IReadOnlyList<Segment> Segments, string hl7Message, string Version, string MessageStructure,
+    private Message(IReadOnlyList<Segment> Segments, string hl7RawMessage, string Version, string MessageType,
         string MessageControlId, string ProcessingId, HL7Encoding Encoding, Instant? messageDateTime) {
         this.Segments = Segments;
-        HL7Message = hl7Message;
+        HL7RawMessage = hl7RawMessage;
         this.Version = Version;
-        this.MessageStructure = MessageStructure;
+        this.MessageType = MessageType;
         this.MessageControlId = MessageControlId;
         this.ProcessingId = ProcessingId;
         this.Encoding = Encoding;
         this.MessageDateTime = messageDateTime;
     }
 
-    private Message(IReadOnlyList<Segment> Segments, string hl7Message, HL7Encoding Encoding, MetaData meta)
-        : this(Segments, hl7Message, meta.Version, meta.MessageStructure, meta.MessageControlId, meta.ProcessingId, Encoding, meta.MessageDateTime) {
+    private Message(IReadOnlyList<Segment> Segments, string hl7RawMessage, HL7Encoding Encoding, MetaData meta)
+        : this(Segments, hl7RawMessage, meta.Version, meta.MessageType, meta.MessageControlId, meta.ProcessingId, Encoding, meta.MessageDateTime) {
     }
 
     public static Message Parse(string hL7Message) {
