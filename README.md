@@ -4,6 +4,12 @@ A modern, robust C# library for parsing, serializing, and working with HL7 v2.x 
 
 ---
 
+
+> **Note:**  
+> This library currently supports only single HL7 v2.x messages.  
+> **Batch and file-level segments** (such as `FHS`, `BHS`, `BTS`, `FTS`) are **not supported** at this time.
+
+
 ## Features
 
 - **HL7 Message Parsing & Serialization**  
