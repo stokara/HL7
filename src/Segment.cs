@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -23,18 +24,29 @@ public sealed record Segment {
     }
 
     public static Segment Parse(HL7Encoding encoding, string value, int sequenceNo = 0) {
-        var isMshSegment = value[..3] == "MSH";
-        var rawFields = splitFields(isMshSegment ? value[9..] : value, encoding.FieldDelimiter,
-            encoding.EscapeCharacter);
-        var fields = new List<Field>(rawFields.Count + (isMshSegment ? 2 : 0));
-
-        if (isMshSegment) {
-            fields.Add(Field.Parse(encoding, "MSH"));
-            fields.Add(Field.CreateDelimiterField(value[4..8]));
-        }
-
-        fields.AddRange(rawFields.Select(strField => Field.Parse(encoding, strField)));
+        var rawFields = splitFields(value, encoding.FieldDelimiter, encoding.EscapeCharacter);
+        var fields = rawFields.Select(strField => Field.Parse(encoding, strField)).ToList();
         return new Segment(fields.AsReadOnly());
+    }
+
+    public static (Segment mshSegment, HL7Encoding encoding) ParseMSH(string value, int sequenceNo = 0) {
+        if (!value.StartsWith("MSH", StringComparison.Ordinal)) throw new HL7Exception("MSH segment not found at the beginning of the message", HL7Exception.BadMessage);
+        var fieldDelimiter = value[3];
+        var delimiterFieldEnd = value.IndexOf(fieldDelimiter, 4);
+        if (delimiterFieldEnd < 0) throw new HL7Exception("Invalid MSH segment: delimiter field not terminated", HL7Exception.BadMessage);
+
+        var delimiterField = value[3..delimiterFieldEnd];
+        var encoding = HL7Encoding.FromString(delimiterField);
+        var remainingStr = value[(delimiterFieldEnd + 1)..];
+
+        var fields = new List<Field> {
+            Field.Parse(encoding, "MSH"),
+            Field.CreateDelimiterField(delimiterField)
+        };
+        var rawFields = splitFields(remainingStr, encoding.FieldDelimiter, encoding.EscapeCharacter);
+        fields.AddRange(rawFields.Select(strField => Field.Parse(encoding, strField)));
+        var mshSegment = new Segment(fields.AsReadOnly());
+        return (mshSegment, encoding);
     }
 
     private static List<string> splitFields(string value, char fieldDelimiter, char escapeCharacter) {
