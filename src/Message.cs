@@ -38,41 +38,65 @@ public sealed record Message {
     }
 
     private Message(IReadOnlyList<Segment> Segments, string hl7RawMessage, HL7Encoding Encoding, MetaData meta)
-        : this(Segments, hl7RawMessage, meta.Version, meta.MessageType, meta.MessageControlId, meta.ProcessingId, Encoding, meta.MessageDateTime) {
-    }
+        : this(Segments, hl7RawMessage, meta.Version, meta.MessageType, meta.MessageControlId, meta.ProcessingId, Encoding, meta.MessageDateTime) { }
 
-    public static Message Parse(string hL7Message) {
+    public static Message Parse(string rawMessage) {
         try {
-            if (string.IsNullOrEmpty(hL7Message)) throw new HL7Exception("No Message Found", HL7Exception.BadMessage);
-            if (hL7Message.Length < 20) throw new HL7Exception($"Message Length too short: {hL7Message.Length} chars.", HL7Exception.BadMessage);
-            if (!hL7Message.StartsWith("MSH", StringComparison.Ordinal)) throw new HL7Exception("MSH segment not found at the beginning of the message", HL7Exception.BadMessage);
+            var hL7Message = getMessage(rawMessage);
+            var firstSegment = getFirstSegment(hL7Message);
+            var (mshSegment, encoding) = Segment.ParseMSH(firstSegment);
 
-            var encoding = HL7Encoding.FromMessage(hL7Message);
-            var segments = hL7Message
+            var rawSegments = hL7Message
                 .Split(SegmentDelimiters, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => !string.IsNullOrWhiteSpace(s))
-                .Select((rawSegment, idx) => Segment.Parse(encoding, rawSegment, idx))
-                .ToArray();
-            if (segments.Length == 0) throw new HL7Exception("No segments found in message", HL7Exception.BadMessage);
+                .Skip(1);
+            var segments = new List<Segment> { mshSegment };
+            segments.AddRange(rawSegments.Select((t, i) => Segment.Parse(encoding, t, i + 1)));
 
-            var mshSegment = segments.First();
             var meta = getMetaData(mshSegment, encoding);
 
             return new Message(segments.AsReadOnly(), hL7Message, encoding, meta);
         } catch (Exception? ex) {
             throw new HL7Exception("Failed to validate the message with error - " + ex.Message, HL7Exception.ParsingError, ex);
         }
+
+        static string getMessage(string rawMessage) {
+            var start = 0;
+            var end = rawMessage.Length;
+
+            var vtIndex = rawMessage.IndexOf('\x0B');
+            if (vtIndex >= 0) start = vtIndex + 1;
+
+            var fsIndex = rawMessage.IndexOf('\x1C', start);
+            if (fsIndex >= 0) end = fsIndex;
+
+            var cleaned = rawMessage[start..end];
+
+            if (string.IsNullOrEmpty(cleaned)) throw new HL7Exception("No Message Found", HL7Exception.BadMessage);
+            if (cleaned.Length < 20) throw new HL7Exception($"Message Length too short: {cleaned.Length} chars.", HL7Exception.BadMessage);
+
+            return cleaned;
+        }
+
+        static string getFirstSegment(string hl7Message) {
+            var firstSegmentEnd = -1;
+            foreach (var d in SegmentDelimiters) {
+                var idx = hl7Message.IndexOf(d, StringComparison.Ordinal);
+                if (idx >= 0 && (firstSegmentEnd == -1 || idx < firstSegmentEnd)) {
+                    firstSegmentEnd = idx;
+                }
+            }
+            if (firstSegmentEnd <= 0) throw new HL7Exception("Missing MSH segment.", HL7Exception.BadMessage);
+            return hl7Message[..firstSegmentEnd];
+        }
     }
 
     private static MetaData getMetaData(Segment mshSegment, HL7Encoding encoding) {
         if (mshSegment.Name != "MSH") throw new HL7Exception("First segment is not MSH", HL7Exception.BadMessage);
-        if (mshSegment.Fields.Count < 11)
-            throw new HL7Exception("MSH segment doesn't contain all the required fields", HL7Exception.BadMessage);
+        if (mshSegment.Fields.Count < 11) throw new HL7Exception("MSH segment doesn't contain all the required fields", HL7Exception.BadMessage);
 
         string version;
-        string messageStructure;
-        string messageControlId;
-        string processingId;
+        string messageStructure = "";
         Instant? messageDateTime = null;
 
         if (mshSegment.Fields.Count >= 12)
@@ -82,34 +106,19 @@ public sealed record Message {
 
         try {
             var msh9 = encoding.Decode(mshSegment.Fields[8].Value);
-            if (string.IsNullOrEmpty(msh9)) throw new HL7Exception("MSH.9 not available", HL7Exception.UnsupportedMessageType);
-
-            var msh9Comps = msh9.Split(encoding.ComponentDelimiter);
-            if (msh9Comps.Length >= 3) messageStructure = msh9Comps[2];
-            else if (msh9Comps.Length > 0 && msh9Comps[0].Equals("ACK", StringComparison.Ordinal)) messageStructure = "ACK";
-            else if (msh9Comps.Length == 2) messageStructure = msh9Comps[0] + "_" + msh9Comps[1];
-            else throw new HL7Exception("Message Type & Trigger Event value not found in message", HL7Exception.UnsupportedMessageType);
+            if (!string.IsNullOrEmpty(msh9)) {
+                var msh9Comps = msh9.Split(encoding.ComponentDelimiter);
+                if (msh9Comps.Length >= 3) messageStructure = msh9Comps[2];
+                else if (msh9Comps.Length > 0 && msh9Comps[0].Equals("ACK", StringComparison.Ordinal)) messageStructure = "ACK";
+                else if (msh9Comps.Length == 2) messageStructure = msh9Comps[0] + "_" + msh9Comps[1];
+                else throw new HL7Exception("Message Type & Trigger Event value not found in message", HL7Exception.UnsupportedMessageType);
+            }
         } catch (IndexOutOfRangeException? e) {
             throw new HL7Exception("Can't find message structure (MSH.9.3) - " + e.Message, HL7Exception.UnsupportedMessageType, e);
         }
 
-        try {
-            messageControlId = encoding.Decode(mshSegment.Fields[9].Value);
-            if (string.IsNullOrEmpty(messageControlId))
-                throw new HL7Exception("MSH.10 - Message Control ID not found", HL7Exception.RequiredFieldMissing);
-        } catch (Exception? ex) {
-            throw new HL7Exception("Error occured while accessing MSH.10 - " + ex.Message,
-                HL7Exception.RequiredFieldMissing, ex);
-        }
-
-        try {
-            processingId = encoding.Decode(mshSegment.Fields[10].Value);
-            if (string.IsNullOrEmpty(processingId))
-                throw new HL7Exception("MSH.11 - Processing ID not found", HL7Exception.RequiredFieldMissing);
-        } catch (Exception? ex) {
-            throw new HL7Exception("Error occured while accessing MSH.11 - " + ex.Message,
-                HL7Exception.RequiredFieldMissing, ex);
-        }
+        var messageControlId = encoding.Decode(mshSegment.Fields[9].Value);
+        var processingId = encoding.Decode(mshSegment.Fields[10].Value);
 
         // Parse MSH-7 (Date/Time of Message) if present
         try {
