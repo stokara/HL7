@@ -37,8 +37,6 @@ public record HL7Encoding {
             subComponentDelimiter, segmentDelimiter);
     }
 
-    public static HL7Encoding FromMessage(string hl7Message) => FromString(hl7Message.Substring(3, 5));
-
     public string Encode(string val) {
         if (string.IsNullOrEmpty(val)) return val;
 
