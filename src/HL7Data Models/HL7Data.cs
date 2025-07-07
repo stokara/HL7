@@ -2,7 +2,7 @@
 
 namespace HL7;
 
-public interface IHL7Data {}
+public interface IHL7Data { }
 
 public abstract record HL7Data<T> : IHL7Data {
     protected HL7Data(Segment segment) {

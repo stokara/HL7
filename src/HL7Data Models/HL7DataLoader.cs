@@ -4,17 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 // ReSharper disable HeuristicUnreachableCode
-#pragma warning disable CS0162 // Unreachable code detected
 
 namespace HL7;
 
 public static class HL7DataLoader {
-    private const bool IsUseRegistrationScanning = false;
+    private static readonly bool IsUseRegistrationScanning = false;
     private static readonly Dictionary<string, Func<Segment, IHL7Data>> registry = new();
 
     static HL7DataLoader() {
         if (IsUseRegistrationScanning) ScanAndRegisterSegmentFactories();
-        else RegisterHL7Factories();
+        else {
+            RegisterHL7Factories();
+            var missing = GetUnregisteredSegmentTypes();
+            if (missing.Count > 0) {
+                var message = "The following segment types are not registered: " + string.Join(", ", missing);
+                throw new InvalidDataException(message);
+            }
+        }
     }
 
     public static void Register(string segmentType, Func<Segment, IHL7Data> factory) => registry[segmentType] = factory;
@@ -51,7 +57,7 @@ public static class HL7DataLoader {
 
     public static IReadOnlyCollection<string> GetUnregisteredSegmentTypes() {
         var types = getAllHl7DataTypes();
-        return (from type in types where !registry.ContainsKey(type.Name) select type.Name).ToArray().AsReadOnly();
+        return (types.Where(type => !registry.ContainsKey(type.Name)).Select(type => type.Name)).ToArray().AsReadOnly();
     }
 
     private static IEnumerable<Type> getAllHl7DataTypes() {
@@ -61,7 +67,8 @@ public static class HL7DataLoader {
             .Where(t =>
                 t.BaseType is { IsGenericType: true } &&
                 t.BaseType.GetGenericTypeDefinition() == baseGenericType &&
-                t != baseGenericType);
+                t != baseGenericType &&
+                t != typeof(MSH));
         return types;
     }
 }

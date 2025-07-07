@@ -10,7 +10,7 @@ public class AckNackTests {
     private readonly string HL7_ADT;
 
     public AckNackTests() {
-        var path = Path.GetDirectoryName(typeof(HL7Test).GetTypeInfo().Assembly.Location) + "/";
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Sample Files") + "\\";
         this.HL7_ORM = File.ReadAllText(path + "Sample-ORM.txt");
         this.HL7_ADT = File.ReadAllText(path + "Sample-ADT.txt");
     }
@@ -31,7 +31,7 @@ public class AckNackTests {
 
     [Fact]
     public void GenerateAckNoEscapeDelimiterTest() {
-        var sampleMessage = @"MSH|^~&|EPIC||||20191107134803|ALEVIB01|ORM^O01|23|T|2.3|||||||||||";
+        var sampleMessage = "MSH|^~&|EPIC||||20191107134803|ALEVIB01|ORM^O01|23|T|2.3|||||||||||";
         sampleMessage = $"{sampleMessage}\nPID|1||MRN_123^^^IDX^MRN||Smith F S R E T^John||19600101|M";
         var message = Message.Parse(sampleMessage);
         Assert.NotNull(message);

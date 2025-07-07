@@ -3,7 +3,7 @@ using Xunit;
 
 namespace HL7test;
 
-public class IntegrationTests {
+public class MessageTests {
     [Fact]
     public void LoadHL7Message_ReturnsTrue_AndPopulatesRecords_OnValidMessage() {
         // Minimal valid HL7 message with two segments of the same type (e.g., FT1)
