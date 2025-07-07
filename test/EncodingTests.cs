@@ -81,7 +81,7 @@ public class EncodingTests {
 
     [Fact]
     public void CustomDelimiterTest() {
-        var message = Message.Parse("MSH124531FIRST1SECOND1THIRD1FOURTH1FIFTH1ORU2R05F5SIXTH1ADT2A081T1.81VERSION");
+        var message = Message.Parse("MSH124531FIRST1SECOND1THIRD1FOURTH1FIFTH1ORU2R05F5SIXTH1ADT2A081T1.81VERSION||\r\n");
         var result = message.SerializeMessage();
 
         Assert.Equal("MSH124531FIRST1SECOND1", result[..22]);
@@ -126,12 +126,12 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_MSH_WithStandardDelimiters() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
-        var segmentStr = @"MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202407021200||ADT^A01|123456|P|2.5";
-        var segment = Segment.Parse(encoding, segmentStr);
+        var segmentStr = @"MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202407021200||ADT^A01|123456|P|2.5|\r\n";
+        var result = Segment.ParseMSH(segmentStr);
 
+        var segment = result.mshSegment;
         Assert.Equal("MSH", segment.Name);
-        Assert.Equal("^~\\&", segment.Fields[1].Value);
+        Assert.Equal("|^~\\&", segment.Fields[1].Value);
         Assert.Equal("SendingApp", segment.Fields[2].Value);
         Assert.Equal("ReceivingApp", segment.Fields[4].Value);
         Assert.Equal("ADT^A01", segment.Fields[8].Value);
@@ -140,16 +140,15 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_MSH_WithNonStandardDelimiters() {
-        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
-        var segmentStr = @"MSH!@#$%!App1!Fac1!App2!Fac2!202507021200!!ADT@A01!654321!P!2.8";
-        var segment = Segment.Parse(encoding, segmentStr);
+        var segmentStr = @"MSH!@#$%!App1!Fac1!App2!Fac2!202507021200!!ADT@A01!654321!P!2.8!\r\n";
+        var result = Segment.ParseMSH(segmentStr);
 
-        Assert.Equal("MSH", segment.Name);
-        Assert.Equal("@#$%", segment.Fields[1].Value);
-        Assert.Equal("App1", segment.Fields[2].Value);
-        Assert.Equal("App2", segment.Fields[4].Value);
-        Assert.Equal("ADT@A01", segment.Fields[8].Value);
-        Assert.Equal("2.8", segment.Fields[11].Value);
+        Assert.Equal("MSH", result.mshSegment.Name);
+        Assert.Equal("!@#$%", result.mshSegment.Fields[1].Value);
+        Assert.Equal("App1", result.mshSegment.Fields[2].Value);
+        Assert.Equal("App2", result.mshSegment.Fields[4].Value);
+        Assert.Equal("ADT@A01", result.mshSegment.Fields[8].Value);
+        Assert.Equal("2.8", result.mshSegment.Fields[11].Value);
     }
 
     [Fact]

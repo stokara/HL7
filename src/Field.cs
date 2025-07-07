@@ -27,7 +27,7 @@ public sealed record Field {
         var hasRepetitions = value.Contains(encoding.RepeatDelimiter);
         if (hasRepetitions) {
             var repeatFields = value.Split(encoding.RepeatDelimiter);
-            var repetitions = repeatFields.Select(fieldValue => Parse(encoding, fieldValue)).ToList().AsReadOnly();
+            var repetitions = repeatFields.Select(fieldValue => Parse(encoding, fieldValue)).ToArray();
             return new Field(value, Repetitions: repetitions);
         }
 
@@ -35,7 +35,7 @@ public sealed record Field {
         if (hasComponents) {
             var components = value
                 .Split(encoding.ComponentDelimiter)
-                .Select(c => Component.Parse(encoding, c)).ToArray().AsReadOnly();
+                .Select(c => Component.Parse(encoding, c)).ToArray();
             return new Field(value, components);
         }
 

@@ -23,6 +23,7 @@ public sealed record FT1 : HL7Data<FT1> {
             ProcedureCode = segment.Fields.Count > 7 ? segment.Fields[7].Value : string.Empty;
             ProcedureDescription = string.Empty;
         }
+
         Quantity = segment.Fields.Count > 8 ? segment.Fields[8].Value : string.Empty;
         Amount = segment.Fields.Count > 9 ? segment.Fields[9].Value : string.Empty;
         PerformingProvider = segment.Fields.Count > 12 ? segment.Fields[12].Value : string.Empty;

@@ -1,4 +1,5 @@
-﻿using NodaTime;
+﻿using System.Linq;
+using NodaTime;
 
 namespace HL7;
 
@@ -16,7 +17,7 @@ public sealed record MSH : HL7Data<MSH> {
     public string VersionId { get; private set; }
 
     public MSH(Message message) : base(message.Segments[0]) {
-        var segment = message.Segments[0];
+        var segment = message.Segments.Single(s => s.Name == "MSH");
 
         Delimiters = segment.Fields[1].Value;
         SendingApplication = segment.Fields.Count > 2 ? segment.Fields[2].Value : string.Empty;

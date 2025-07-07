@@ -30,5 +30,4 @@ public record IN1 : HL7Data<IN1> {
         InsuredsEmployerName = segment.Fields.Count > 13 ? segment.Fields[13].Value : string.Empty;
         InsuredsSSN = segment.Fields.Count > 16 ? segment.Fields[16].Value : string.Empty;
     }
-
 }
