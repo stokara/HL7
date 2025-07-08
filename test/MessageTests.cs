@@ -1,4 +1,6 @@
 ﻿using HL7;
+using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace HL7test;
@@ -22,13 +24,13 @@ public class MessageTests {
 
         var ft1_1 = (FT1)ft1List[0];
         Assert.Equal("1", ft1_1.SetId);
-        Assert.Equal("1234", ft1_1.ProcedureCode);
-        Assert.Equal("ProcedureDesc", ft1_1.ProcedureDescription);
+        Assert.Equal("1234", ft1_1.Procedures.First().Code);
+        Assert.Equal("ProcedureDesc", ft1_1.Procedures.First().Description);
 
         var ft1_2 = (FT1)ft1List[1];
         Assert.Equal("2", ft1_2.SetId);
-        Assert.Equal("5678", ft1_2.ProcedureCode);
-        Assert.Equal("AnotherProc", ft1_2.ProcedureDescription);
+        Assert.Equal("5678", ft1_2.Procedures.First().Code);
+        Assert.Equal("AnotherProc", ft1_2.Procedures.First().Description);
     }
 
     [Fact]
@@ -36,10 +38,7 @@ public class MessageTests {
         // Invalid HL7 message (missing MSH)
         const string message = "FT1|1|20250101|20250101|||CG|1234^ProcedureDesc|1|100|USD||||Provider1";
 
-        var result = HL7Message.TryCreate(message, out var hl7Message);
-
-        Assert.False(result);
-        Assert.Null(hl7Message);
+        Assert.Throws<HL7Exception>(() => HL7Message.TryCreate(message, out var hl7Message));
     }
 
     [Fact]

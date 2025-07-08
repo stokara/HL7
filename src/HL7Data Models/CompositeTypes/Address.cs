@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using HL7.Address;
+using System.Linq;
 
 namespace HL7;
 
 /// <summary>
 ///     XAD - Extended Address (HL7 v2.3.1)
 /// </summary>
-public sealed record ExtendedAddress : IAddress {
+public sealed record Address : IComposite {
+    public string SimpleAddress => StreetAddress;
     public string StreetAddress { get; }
     public string OtherDesignation { get; }
     public string City { get; }
@@ -22,7 +23,12 @@ public sealed record ExtendedAddress : IAddress {
     public string EffectiveDate { get; }
     public string ExpirationDate { get; }
 
-    public ExtendedAddress(IReadOnlyList<Component> components) {
+    public Address(string addressString) {
+        StreetAddress = addressString;
+        IsExtended = false;
+    }
+
+    public Address(IReadOnlyList<Component> components) {
         var cnt = components.Count;
         StreetAddress = cnt > 0 ? components[0].Value : string.Empty;
         OtherDesignation = cnt > 1 ? components[1].Value : string.Empty;
@@ -40,5 +46,20 @@ public sealed record ExtendedAddress : IAddress {
         ExpirationDate = cnt > 13 ? components[13].Value : string.Empty;
     }
 
-    public AddressKind AddressKind => AddressKind.Extended;
+    public bool IsExtended { get; init; }
+
+    public static HL7Property<Address> CreateHL7Property(Segment segment, int fieldNumber) {
+        var field = segment.GetField(fieldNumber);
+        if (field is null) {
+            return new HL7Property<Address>([new Address(string.Empty)]);
+        }
+
+        return field.HasRepetitions
+            ? new HL7Property<Address>(field.Repetitions!.Select(rep => parse(rep)).ToList())
+            : new HL7Property<Address>(parse(field));
+
+        static Address parse(Field field) {
+            return field.HasComponents ? new Address(field.Components!) : new Address(field.Value);
+        }
+    }
 }

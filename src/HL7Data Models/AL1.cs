@@ -1,3 +1,5 @@
+using NodaTime;
+
 namespace HL7;
 
 /// <summary>
@@ -9,16 +11,14 @@ public sealed record AL1 : HL7Data<AL1> {
     public string AllergyCodeMnemonicDescription { get; }
     public string AllergySeverity { get; }
     public string AllergyReaction { get; }
-    public string IdentificationDate { get; }
+    public Instant? IdentificationDate { get; }
 
     public AL1(Segment segment) : base(segment) {
-        var fields = segment.Fields;
-        var cnt = fields.Count;
-        SetId = cnt > 1 ? fields[1].Value : string.Empty;
-        AllergyType = cnt > 2 ? fields[2].Value : string.Empty;
-        AllergyCodeMnemonicDescription = cnt > 3 ? fields[3].Value : string.Empty;
-        AllergySeverity = cnt > 4 ? fields[4].Value : string.Empty;
-        AllergyReaction = cnt > 5 ? fields[5].Value : string.Empty;
-        IdentificationDate = cnt > 6 ? fields[6].Value : string.Empty;
+        SetId = segment.GetFieldString(1);
+        AllergyType = segment.GetFieldString(2);
+        AllergyCodeMnemonicDescription = segment.GetFieldString(3);
+        AllergySeverity = segment.GetFieldString(4);
+        AllergyReaction = segment.GetFieldString(5);
+        IdentificationDate = segment.GetFieldInstant(6);
     }
 }

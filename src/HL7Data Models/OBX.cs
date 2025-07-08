@@ -1,6 +1,6 @@
-using HL7.Elements;
 using System.Collections.Generic;
 using System.Linq;
+using NodaTime;
 
 namespace HL7;
 
@@ -16,39 +16,37 @@ public sealed record OBX : HL7Data<OBX> {
     public string Units { get; }
     public string ReferencesRange { get; }
     public string AbnormalFlags { get; }
-    public string Probability { get; }
+    public decimal? Probability { get; }
     public string NatureOfAbnormalTest { get; }
     public string ObservationResultStatus { get; }
-    public string DateLastObsNormalValues { get; }
+    public Instant? DateLastObsNormalValues { get; }
     public string UserDefinedAccessChecks { get; }
-    public string DateTimeOfObservation { get; }
+    public Instant? DateTimeOfObservation { get; }
     public string ProducerId { get; }
     public string ResponsibleObserver { get; }
     public string ObservationMethod { get; }
 
     public OBX(Segment segment) : base(segment) {
-        var fields = segment.Fields;
-        var cnt = fields.Count;
-        SetId = cnt > 1 ? fields[1].Value : string.Empty;
-        ValueType = cnt > 2 ? fields[2].Value : string.Empty;
-        ObservationIdentifier = cnt > 3 ? fields[3].Value : string.Empty;
-        ObservationSubId = cnt > 4 ? fields[4].Value : string.Empty;
-        ObservationValue = cnt > 5
-            ? fields[5].HasRepetitions
-                ? [..fields[5].Repetitions!.Select(ObservationValueElement.Parse)]
-                : [ObservationValueElement.Parse(fields[5])]
-            : [];
-        Units = cnt > 6 ? fields[6].Value : string.Empty;
-        ReferencesRange = cnt > 7 ? fields[7].Value : string.Empty;
-        AbnormalFlags = cnt > 8 ? fields[8].Value : string.Empty;
-        Probability = cnt > 9 ? fields[9].Value : string.Empty;
-        NatureOfAbnormalTest = cnt > 10 ? fields[10].Value : string.Empty;
-        ObservationResultStatus = cnt > 11 ? fields[11].Value : string.Empty;
-        DateLastObsNormalValues = cnt > 12 ? fields[12].Value : string.Empty;
-        UserDefinedAccessChecks = cnt > 13 ? fields[13].Value : string.Empty;
-        DateTimeOfObservation = cnt > 14 ? fields[14].Value : string.Empty;
-        ProducerId = cnt > 15 ? fields[15].Value : string.Empty;
-        ResponsibleObserver = cnt > 16 ? fields[16].Value : string.Empty;
-        ObservationMethod = cnt > 17 ? fields[17].Value : string.Empty;
+        SetId = segment.GetFieldString(1);
+        ValueType = segment.GetFieldString(2);
+        ObservationIdentifier = segment.GetFieldString(3);
+        ObservationSubId = segment.GetFieldString(4);
+        ObservationValue = segment.Fields.Count > 5
+            ? segment.Fields[5].HasRepetitions
+                ? segment.Fields[5].Repetitions!.Select(ObservationValueElement.Parse).ToArray()
+                : new[] { ObservationValueElement.Parse(segment.Fields[5]) }
+            : new ObservationValueElement[0];
+        Units = segment.GetFieldString(6);
+        ReferencesRange = segment.GetFieldString(7);
+        AbnormalFlags = segment.GetFieldString(8);
+        Probability = segment.GetFieldDecimal(9);
+        NatureOfAbnormalTest = segment.GetFieldString(10);
+        ObservationResultStatus = segment.GetFieldString(11);
+        DateLastObsNormalValues = segment.GetFieldInstant(12);
+        UserDefinedAccessChecks = segment.GetFieldString(13);
+        DateTimeOfObservation = segment.GetFieldInstant(14);
+        ProducerId = segment.GetFieldString(15);
+        ResponsibleObserver = segment.GetFieldString(16);
+        ObservationMethod = segment.GetFieldString(17);
     }
 }

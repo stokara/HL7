@@ -1,5 +1,3 @@
-using HL7.Elements;
-
 namespace HL7;
 
 /// <summary>
@@ -7,28 +5,26 @@ namespace HL7;
 /// </summary>
 public sealed record RXC : HL7Data<RXC> {
     public string RxComponentType { get; }
-    public CodedElement ComponentCode { get; }
-    public string ComponentAmount { get; }
-    public CodedElement ComponentUnits { get; }
-    public string ComponentStrength { get; }
-    public CodedElement ComponentStrengthUnits { get; }
-    public CodedElement SupplementaryCode { get; }
-    public string ComponentDrugStrengthVolume { get; }
-    public CodedElement ComponentDrugStrengthVolumeUnits { get; }
+    public HL7Property<CodedElement> ComponentCode { get; }
+    public decimal? ComponentAmount { get; }
+    public HL7Property<CodedElement> ComponentUnits { get; }
+    public decimal? ComponentStrength { get; }
+    public HL7Property<CodedElement> ComponentStrengthUnits { get; }
+    public HL7Property<CodedElement> SupplementaryCode { get; }
+    public decimal? ComponentDrugStrengthVolume { get; }
+    public HL7Property<CodedElement> ComponentDrugStrengthVolumeUnits { get; }
     public string ComponentBarcode { get; }
 
     public RXC(Segment segment) : base(segment) {
-        var fields = segment.Fields;
-        var cnt = fields.Count;
-        RxComponentType = cnt > 1 ? fields[1].Value : string.Empty;
-        ComponentCode = cnt > 2 ? CodedElement.Parse(fields[2]) : CodedElement.Empty;
-        ComponentAmount = cnt > 3 ? fields[3].Value : string.Empty;
-        ComponentUnits = cnt > 4 ? CodedElement.Parse(fields[4]) : CodedElement.Empty;
-        ComponentStrength = cnt > 5 ? fields[5].Value : string.Empty;
-        ComponentStrengthUnits = cnt > 6 ? CodedElement.Parse(fields[6]) : CodedElement.Empty;
-        SupplementaryCode = cnt > 7 ? CodedElement.Parse(fields[7]) : CodedElement.Empty;
-        ComponentDrugStrengthVolume = cnt > 8 ? fields[8].Value : string.Empty;
-        ComponentDrugStrengthVolumeUnits = cnt > 9 ? CodedElement.Parse(fields[9]) : CodedElement.Empty;
-        ComponentBarcode = cnt > 10 ? fields[10].Value : string.Empty;
+        RxComponentType = segment.GetField(1)?.Value ?? "";
+        ComponentCode = CodedElement.CreateHL7Property(segment, 2);
+        ComponentAmount = segment.GetFieldDecimal(3);
+        ComponentUnits = CodedElement.CreateHL7Property(segment, 4);
+        ComponentStrength = segment.GetFieldDecimal(5);
+        ComponentStrengthUnits = CodedElement.CreateHL7Property(segment, 6);
+        SupplementaryCode = CodedElement.CreateHL7Property(segment, 7);
+        ComponentDrugStrengthVolume = segment.GetFieldDecimal(8);
+        ComponentDrugStrengthVolumeUnits = CodedElement.CreateHL7Property(segment, 9);
+        ComponentBarcode = segment.GetFieldString(10);
     }
 }

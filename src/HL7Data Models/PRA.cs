@@ -1,36 +1,36 @@
+using NodaTime;
+
 namespace HL7;
 
 /// <summary>
 ///     PRA - Practitioner Detail Segment (HL7 v2.3.1)
 /// </summary>
 public sealed record PRA : HL7Data<PRA> {
-    public string PrimaryKeyValuePRA { get; }
-    public string PractitionerGroup { get; }
-    public string PractitionerCategory { get; }
-    public string ProviderBilling { get; }
-    public string Specialty { get; }
-    public string PractitionerIdNumbers { get; }
-    public string Privileges { get; }
-    public string DateEnteredPractice { get; }
-    public string Institution { get; }
-    public string DateLeftPractice { get; }
-    public string GovernmentReimbursementBillingEligibility { get; }
-    public string SetId { get; }
+    public HL7Property<EntityIdentifier> PrimaryKeyValuePRA { get; }
+    public HL7Property<CodedElement> PractitionerGroup { get; }
+    public HL7Property<CodedElement> PractitionerCategory { get; }
+    public HL7Property<CodedElement> ProviderBilling { get; }
+    public HL7Property<CodedElement> Specialty { get; }
+    public HL7Property<EntityIdentifier> PractitionerIdNumbers { get; }
+    public HL7Property<CodedElement> Privileges { get; }
+    public Instant? DateEnteredPractice { get; }
+    public HL7Property<CodedElement> Institution { get; }
+    public Instant? DateLeftPractice { get; }
+    public HL7Property<CodedElement> GovernmentReimbursementBillingEligibility { get; }
+    public int? SetId { get; }
 
     public PRA(Segment segment) : base(segment) {
-        var fields = segment.Fields;
-        var cnt = fields.Count;
-        PrimaryKeyValuePRA = cnt > 1 ? fields[1].Value : string.Empty;
-        PractitionerGroup = cnt > 2 ? fields[2].Value : string.Empty;
-        PractitionerCategory = cnt > 3 ? fields[3].Value : string.Empty;
-        ProviderBilling = cnt > 4 ? fields[4].Value : string.Empty;
-        Specialty = cnt > 5 ? fields[5].Value : string.Empty;
-        PractitionerIdNumbers = cnt > 6 ? fields[6].Value : string.Empty;
-        Privileges = cnt > 7 ? fields[7].Value : string.Empty;
-        DateEnteredPractice = cnt > 8 ? fields[8].Value : string.Empty;
-        Institution = cnt > 9 ? fields[9].Value : string.Empty;
-        DateLeftPractice = cnt > 10 ? fields[10].Value : string.Empty;
-        GovernmentReimbursementBillingEligibility = cnt > 11 ? fields[11].Value : string.Empty;
-        SetId = cnt > 12 ? fields[12].Value : string.Empty;
+        PrimaryKeyValuePRA = EntityIdentifier.CreateHL7Property(segment, 1);
+        PractitionerGroup = CodedElement.CreateHL7Property(segment, 2);
+        PractitionerCategory = CodedElement.CreateHL7Property(segment, 3);
+        ProviderBilling = CodedElement.CreateHL7Property(segment, 4);
+        Specialty = CodedElement.CreateHL7Property(segment, 5);
+        PractitionerIdNumbers = EntityIdentifier.CreateHL7Property(segment, 6);
+        Privileges = CodedElement.CreateHL7Property(segment, 7);
+        DateEnteredPractice = segment.GetFieldInstant(8);
+        Institution = CodedElement.CreateHL7Property(segment, 9);
+        DateLeftPractice = segment.GetFieldInstant(10);
+        GovernmentReimbursementBillingEligibility = CodedElement.CreateHL7Property(segment, 11);
+        SetId = segment.GetFieldInt(12);
     }
 }

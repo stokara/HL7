@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NodaTime;
 
 namespace HL7;
 
@@ -118,5 +119,25 @@ public sealed record Segment {
         int index = fieldNumber - 1;
         if (index < 0 || index >= Fields.Count) return null;
         return Fields[index];
+    }
+    
+    public string GetFieldString(int fieldNumber) {
+        var field = GetField(fieldNumber);
+        return field is null ? string.Empty : field.Value;
+    }
+
+    public Instant? GetFieldInstant(int fieldNumber) {
+        var field = GetField(fieldNumber);
+        return field is null ? null : Hl7DateParser.ParseInstant(field.Value);
+    }
+    
+    public int? GetFieldInt(int fieldNumber) {
+        var field = GetField(fieldNumber);
+        return field is null ? null : Int32.Parse(field.Value);
+    }
+
+    public decimal? GetFieldDecimal(int fieldNumber) {
+        var field = GetField(fieldNumber);
+        return field is null ? null : decimal.Parse(field.Value);
     }
 }

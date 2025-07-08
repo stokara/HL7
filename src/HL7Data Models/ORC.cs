@@ -1,3 +1,5 @@
+using NodaTime;
+
 namespace HL7;
 
 /// <summary>
@@ -5,46 +7,44 @@ namespace HL7;
 /// </summary>
 public sealed record ORC : HL7Data<ORC> {
     public string OrderControl { get; }
-    public string PlacerOrderNumber { get; }
-    public string FillerOrderNumber { get; }
-    public string PlacerGroupNumber { get; }
+    public HL7Property<EntityIdentifier> PlacerOrderNumber { get; }
+    public HL7Property<EntityIdentifier> FillerOrderNumber { get; }
+    public HL7Property<EntityIdentifier> PlacerGroupNumber { get; }
     public string OrderStatus { get; }
     public string ResponseFlag { get; }
     public string QuantityTiming { get; }
     public string Parent { get; }
-    public string DateTimeOfTransaction { get; }
-    public string EnteredBy { get; }
-    public string VerifiedBy { get; }
-    public string OrderingProvider { get; }
+    public Instant? DateTimeOfTransaction { get; }
+    public HL7Property<PersonName> EnteredBy { get; }
+    public HL7Property<PersonName> VerifiedBy { get; }
+    public HL7Property<PersonName> OrderingProvider { get; }
     public string EntererLocation { get; }
-    public string CallBackPhoneNumber { get; }
-    public string OrderEffectiveDateTime { get; }
+    public HL7Property<Phone> CallBackPhoneNumber { get; }
+    public Instant? OrderEffectiveDateTime { get; }
     public string OrderControlCodeReason { get; }
     public string EnteringOrganization { get; }
     public string EnteringDevice { get; }
-    public string ActionBy { get; }
+    public HL7Property<PersonName> ActionBy { get; }
 
     public ORC(Segment segment) : base(segment) {
-        var fields = segment.Fields;
-        var cnt = fields.Count;
-        OrderControl = cnt > 1 ? fields[1].Value : string.Empty;
-        PlacerOrderNumber = cnt > 2 ? fields[2].Value : string.Empty;
-        FillerOrderNumber = cnt > 3 ? fields[3].Value : string.Empty;
-        PlacerGroupNumber = cnt > 4 ? fields[4].Value : string.Empty;
-        OrderStatus = cnt > 5 ? fields[5].Value : string.Empty;
-        ResponseFlag = cnt > 6 ? fields[6].Value : string.Empty;
-        QuantityTiming = cnt > 7 ? fields[7].Value : string.Empty;
-        Parent = cnt > 8 ? fields[8].Value : string.Empty;
-        DateTimeOfTransaction = cnt > 9 ? fields[9].Value : string.Empty;
-        EnteredBy = cnt > 10 ? fields[10].Value : string.Empty;
-        VerifiedBy = cnt > 11 ? fields[11].Value : string.Empty;
-        OrderingProvider = cnt > 12 ? fields[12].Value : string.Empty;
-        EntererLocation = cnt > 13 ? fields[13].Value : string.Empty;
-        CallBackPhoneNumber = cnt > 14 ? fields[14].Value : string.Empty;
-        OrderEffectiveDateTime = cnt > 15 ? fields[15].Value : string.Empty;
-        OrderControlCodeReason = cnt > 16 ? fields[16].Value : string.Empty;
-        EnteringOrganization = cnt > 17 ? fields[17].Value : string.Empty;
-        EnteringDevice = cnt > 18 ? fields[18].Value : string.Empty;
-        ActionBy = cnt > 19 ? fields[19].Value : string.Empty;
+        OrderControl = segment.GetFieldString(1);
+        PlacerOrderNumber = EntityIdentifier.CreateHL7Property(segment, 2);
+        FillerOrderNumber = EntityIdentifier.CreateHL7Property(segment, 3);
+        PlacerGroupNumber = EntityIdentifier.CreateHL7Property(segment, 4);
+        OrderStatus = segment.GetFieldString(5);
+        ResponseFlag = segment.GetFieldString(6);
+        QuantityTiming = segment.GetFieldString(7);
+        Parent = segment.GetFieldString(8);
+        DateTimeOfTransaction = segment.GetFieldInstant(9);
+        EnteredBy = PersonName.CreateHL7Property(segment, 10);
+        VerifiedBy = PersonName.CreateHL7Property(segment, 11);
+        OrderingProvider = PersonName.CreateHL7Property(segment, 12);
+        EntererLocation = segment.GetFieldString(13);
+        CallBackPhoneNumber = Phone.CreateHL7Property(segment, 14);
+        OrderEffectiveDateTime = segment.GetFieldInstant(15);
+        OrderControlCodeReason = segment.GetFieldString(16);
+        EnteringOrganization = segment.GetFieldString(17);
+        EnteringDevice = segment.GetFieldString(18);
+        ActionBy = PersonName.CreateHL7Property(segment, 19);
     }
 }

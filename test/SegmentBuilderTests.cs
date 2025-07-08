@@ -44,7 +44,7 @@ public class SegmentBuilderTests {
     public void IN1Segment_ConstructorWorks() {
         var segment = Segment.Parse(defaultEncoder, "IN1|1|BLUECROSS|BLUE CROSS|PO BOX 5678^CITY^ST^67890||(800)555-1111|987654321|WHITE^CAROL^E|SELF|19780322|F|||987654321|123-45-6789\r\n");
         var in1 = new IN1(segment);
-        Assert.Equal("BLUECROSS", in1.InsurancePlanId);
+        Assert.Equal("BLUECROSS", in1.InsuranceCompanyId.SingleItem.Id);
     }
 
 
@@ -52,7 +52,7 @@ public class SegmentBuilderTests {
     public void IN2Segment_ConstructorWorks() {
         var segment = Segment.Parse(defaultEncoder, "IN2|1|SECONDARY|SECONDARY INSURANCE|PO BOX 9999^CITY^ST^99999||(800)555-2222|555555555|WHITE^CAROL^E|SELF|19780322|F|||555555555|321-54-9876");
         var in2 = new IN2(segment);
-        Assert.Equal("SECONDARY", in2.InsurancePlanId);
+        Assert.Equal("SECONDARY", in2.InsuranceCompanyId.SingleItem.Id);
     }
     
 
