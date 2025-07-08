@@ -40,4 +40,19 @@ public sealed record TXA : HL7Data<TXA> {
         TranscriptionDateTime = segment.GetFieldInstant(7);
         EditDateTime = segment.GetFieldInstant(8);
         OriginatorCodeName = PersonName.CreateHL7Property(segment, 9);
-        AssignedDocumentAuthenticator = PersonName.CreateHL7Property(segment,
+        AssignedDocumentAuthenticator = PersonName.CreateHL7Property(segment, 10);
+        TranscriptionistCodeName = PersonName.CreateHL7Property(segment, 11);
+        UniqueDocumentNumber = EntityIdentifier.CreateHL7Property(segment, 12);
+        ParentDocumentNumber = EntityIdentifier.CreateHL7Property(segment, 13);
+        PlacerOrderNumber = EntityIdentifier.CreateHL7Property(segment, 14);
+        FillerOrderNumber = EntityIdentifier.CreateHL7Property(segment, 15);
+        UniqueDocumentFileName = segment.GetFieldString(16);
+        DocumentCompletionStatus = segment.GetFieldString(17);
+        DocumentConfidentialityStatus = segment.GetFieldString(18);
+        DocumentAvailabilityStatus = segment.GetFieldString(19);
+        DocumentStorageStatus = segment.GetFieldString(20);
+        DocumentChangeReason = segment.GetFieldString(21);
+        AuthenticatedByCodeName = PersonName.CreateHL7Property(segment, 22);
+        TranscriptionistOrderNumber = EntityIdentifier.CreateHL7Property(segment, 23);
+    }
+}

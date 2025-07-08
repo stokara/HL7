@@ -1,5 +1,3 @@
-using NodaTime;
-
 namespace HL7;
 
 /// <summary>
@@ -18,7 +16,7 @@ public sealed record NK1 : HL7Data<NK1> {
         SetId = segment.GetFieldString(1);
         Name = PersonName.CreateHL7Property(segment, 2);
         Relationship = segment.GetFieldString(3);
-        Address = Address.CreateHL7Property(segment, 4);
+        Address = HL7.Address.CreateHL7Property(segment, 4);
         PhoneNumber = Phone.CreateHL7Property(segment, 5);
         ContactRole = segment.GetFieldString(7);
         SSN = segment.GetFieldString(33);

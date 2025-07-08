@@ -33,7 +33,7 @@ public sealed record STF : HL7Data<STF> {
         ActiveInactiveFlag = segment.GetFieldString(7);
         Department = CodedElement.CreateHL7Property(segment, 8);
         Service = CodedElement.CreateHL7Property(segment, 9);
-        Phone = Phone.CreateHL7Property(segment, 10);
+        Phone = HL7.Phone.CreateHL7Property(segment, 10);
         OfficeHomeAddressBirthplace = Address.CreateHL7Property(segment, 11);
         InstitutionActivationDate = segment.GetFieldInstant(12);
         InstitutionInactivationDate = segment.GetFieldInstant(13);
