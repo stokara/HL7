@@ -1,3 +1,5 @@
+using HL7.Elements;
+
 namespace HL7;
 
 /// <summary>
@@ -7,16 +9,16 @@ public sealed record RXE : HL7Data<RXE> {
     public string GiveSubIdCounter { get; }
     public string DispenseSubIdCounter { get; }
     public string QuantityTiming { get; }
-    public string GiveCode { get; }
+    public CodedElement GiveCode { get; }
     public string GiveAmountMinimum { get; }
     public string GiveAmountMaximum { get; }
-    public string GiveUnits { get; }
-    public string GiveDosageForm { get; }
+    public CodedElement GiveUnits { get; }
+    public CodedElement GiveDosageForm { get; }
     public string ProviderSAdministrationInstructions { get; }
     public string DeliverToLocation { get; }
     public string SubstitutionStatus { get; }
     public string DispenseAmount { get; }
-    public string DispenseUnits { get; }
+    public CodedElement DispenseUnits { get; }
     public string NumberOfRefills { get; }
     public string OrderingProviderSDEANumber { get; }
     public string PharmacistTreatmentSupplierSVerifierId { get; }
@@ -29,14 +31,14 @@ public sealed record RXE : HL7Data<RXE> {
     public string PharmacyTreatmentSupplierSSpecialDispensingInstructions { get; }
     public string GivePerTimeUnit { get; }
     public string GiveRateAmount { get; }
-    public string GiveRateUnits { get; }
+    public CodedElement GiveRateUnits { get; }
     public string GiveStrength { get; }
-    public string GiveStrengthUnits { get; }
+    public CodedElement GiveStrengthUnits { get; }
     public string GiveIndication { get; }
     public string DispensePackageSize { get; }
-    public string DispensePackageSizeUnit { get; }
+    public CodedElement DispensePackageSizeUnit { get; }
     public string DispensePackageMethod { get; }
-    public string SupplementaryCode { get; }
+    public CodedElement SupplementaryCode { get; }
     public string OriginalOrderDateTime { get; }
 
     public RXE(Segment segment) : base(segment) {
@@ -45,16 +47,16 @@ public sealed record RXE : HL7Data<RXE> {
         GiveSubIdCounter = cnt > 1 ? fields[1].Value : string.Empty;
         DispenseSubIdCounter = cnt > 2 ? fields[2].Value : string.Empty;
         QuantityTiming = cnt > 3 ? fields[3].Value : string.Empty;
-        GiveCode = cnt > 4 ? fields[4].Value : string.Empty;
+        GiveCode = cnt > 4 ? CodedElement.Parse(fields[4]) : CodedElement.Empty;
         GiveAmountMinimum = cnt > 5 ? fields[5].Value : string.Empty;
         GiveAmountMaximum = cnt > 6 ? fields[6].Value : string.Empty;
-        GiveUnits = cnt > 7 ? fields[7].Value : string.Empty;
-        GiveDosageForm = cnt > 8 ? fields[8].Value : string.Empty;
+        GiveUnits = cnt > 7 ? CodedElement.Parse(fields[7]) : CodedElement.Empty;
+        GiveDosageForm = cnt > 8 ? CodedElement.Parse(fields[8]) : CodedElement.Empty;
         ProviderSAdministrationInstructions = cnt > 9 ? fields[9].Value : string.Empty;
         DeliverToLocation = cnt > 10 ? fields[10].Value : string.Empty;
         SubstitutionStatus = cnt > 11 ? fields[11].Value : string.Empty;
         DispenseAmount = cnt > 12 ? fields[12].Value : string.Empty;
-        DispenseUnits = cnt > 13 ? fields[13].Value : string.Empty;
+        DispenseUnits = cnt > 13 ? CodedElement.Parse(fields[13]) : CodedElement.Empty;
         NumberOfRefills = cnt > 14 ? fields[14].Value : string.Empty;
         OrderingProviderSDEANumber = cnt > 15 ? fields[15].Value : string.Empty;
         PharmacistTreatmentSupplierSVerifierId = cnt > 16 ? fields[16].Value : string.Empty;
@@ -67,14 +69,14 @@ public sealed record RXE : HL7Data<RXE> {
         PharmacyTreatmentSupplierSSpecialDispensingInstructions = cnt > 23 ? fields[23].Value : string.Empty;
         GivePerTimeUnit = cnt > 24 ? fields[24].Value : string.Empty;
         GiveRateAmount = cnt > 25 ? fields[25].Value : string.Empty;
-        GiveRateUnits = cnt > 26 ? fields[26].Value : string.Empty;
+        GiveRateUnits = cnt > 26 ? CodedElement.Parse(fields[26]) : CodedElement.Empty;
         GiveStrength = cnt > 27 ? fields[27].Value : string.Empty;
-        GiveStrengthUnits = cnt > 28 ? fields[28].Value : string.Empty;
+        GiveStrengthUnits = cnt > 28 ? CodedElement.Parse(fields[28]) : CodedElement.Empty;
         GiveIndication = cnt > 29 ? fields[29].Value : string.Empty;
         DispensePackageSize = cnt > 30 ? fields[30].Value : string.Empty;
-        DispensePackageSizeUnit = cnt > 31 ? fields[31].Value : string.Empty;
+        DispensePackageSizeUnit = cnt > 31 ? CodedElement.Parse(fields[31]) : CodedElement.Empty;
         DispensePackageMethod = cnt > 32 ? fields[32].Value : string.Empty;
-        SupplementaryCode = cnt > 33 ? fields[33].Value : string.Empty;
+        SupplementaryCode = cnt > 33 ? CodedElement.Parse(fields[33]) : CodedElement.Empty;
         OriginalOrderDateTime = cnt > 34 ? fields[34].Value : string.Empty;
     }
 }

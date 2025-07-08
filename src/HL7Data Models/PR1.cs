@@ -1,3 +1,7 @@
+using HL7.Elements;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace HL7;
 
 /// <summary>
@@ -6,8 +10,7 @@ namespace HL7;
 public sealed record PR1 : HL7Data<PR1> {
     public string SetId { get; }
     public string ProcedureCodingMethod { get; }
-    public string ProcedureCode { get; }
-    public string ProcedureDescription { get; }
+    public IReadOnlyList<CptProcedure> Procedures { get; }
     public string ProcedureDateTime { get; }
     public string ProcedureType { get; }
     public string ProcedureMinutes { get; }
@@ -25,8 +28,11 @@ public sealed record PR1 : HL7Data<PR1> {
         var cnt = fields.Count;
         SetId = cnt > 1 ? fields[1].Value : string.Empty;
         ProcedureCodingMethod = cnt > 2 ? fields[2].Value : string.Empty;
-        ProcedureCode = cnt > 3 ? fields[3].Value : string.Empty;
-        ProcedureDescription = cnt > 4 ? fields[4].Value : string.Empty;
+        Procedures = cnt > 3
+            ? fields[3].HasRepetitions
+                ? [..fields[3].Repetitions!.Select(CptProcedure.Parse)]
+                : [CptProcedure.Parse(fields[3])]
+            : [];
         ProcedureDateTime = cnt > 5 ? fields[5].Value : string.Empty;
         ProcedureType = cnt > 6 ? fields[6].Value : string.Empty;
         ProcedureMinutes = cnt > 7 ? fields[7].Value : string.Empty;

@@ -1,3 +1,7 @@
+using HL7.Elements;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace HL7;
 
 /// <summary>
@@ -8,7 +12,7 @@ public sealed record OBX : HL7Data<OBX> {
     public string ValueType { get; }
     public string ObservationIdentifier { get; }
     public string ObservationSubId { get; }
-    public string ObservationValue { get; }
+    public IReadOnlyList<ObservationValueElement> ObservationValue { get; }
     public string Units { get; }
     public string ReferencesRange { get; }
     public string AbnormalFlags { get; }
@@ -29,7 +33,11 @@ public sealed record OBX : HL7Data<OBX> {
         ValueType = cnt > 2 ? fields[2].Value : string.Empty;
         ObservationIdentifier = cnt > 3 ? fields[3].Value : string.Empty;
         ObservationSubId = cnt > 4 ? fields[4].Value : string.Empty;
-        ObservationValue = cnt > 5 ? fields[5].Value : string.Empty;
+        ObservationValue = cnt > 5
+            ? fields[5].HasRepetitions
+                ? [..fields[5].Repetitions!.Select(ObservationValueElement.Parse)]
+                : [ObservationValueElement.Parse(fields[5])]
+            : [];
         Units = cnt > 6 ? fields[6].Value : string.Empty;
         ReferencesRange = cnt > 7 ? fields[7].Value : string.Empty;
         AbnormalFlags = cnt > 8 ? fields[8].Value : string.Empty;
