@@ -116,9 +116,8 @@ public sealed record Segment {
     public override int GetHashCode() => Fields.Aggregate(17, (current, field) => current * 31 + field.GetHashCode());
 
     public Field? GetField(int fieldNumber) {
-        int index = fieldNumber - 1;
-        if (index < 0 || index >= Fields.Count) return null;
-        return Fields[index];
+        if (fieldNumber < 0 || fieldNumber >= Fields.Count-1) return null;
+        return Fields[fieldNumber];
     }
     
     public string GetFieldString(int fieldNumber) {
@@ -128,16 +127,16 @@ public sealed record Segment {
 
     public Instant? GetFieldInstant(int fieldNumber) {
         var field = GetField(fieldNumber);
-        return field is null ? null : Hl7DateParser.ParseInstant(field.Value);
+        return string.IsNullOrWhiteSpace(field?.Value) ? null : Hl7DateParser.ParseInstant(field.Value);
     }
     
     public int? GetFieldInt(int fieldNumber) {
         var field = GetField(fieldNumber);
-        return field is null ? null : Int32.Parse(field.Value);
+        return string.IsNullOrWhiteSpace(field?.Value) ? null : Int32.Parse(field.Value);
     }
 
     public decimal? GetFieldDecimal(int fieldNumber) {
         var field = GetField(fieldNumber);
-        return field is null ? null : decimal.Parse(field.Value);
+        return string.IsNullOrWhiteSpace(field?.Value) ? null : decimal.Parse(field.Value);
     }
 }
