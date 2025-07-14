@@ -2,7 +2,7 @@
 
 namespace HL7;
 
-public class HL7Exception : Exception {
+public class Hl7Exception : Exception {
     public const string RequiredFieldMissing = "Validation Error - Required field missing in message";
     public const string UnsupportedMessageType = "Validation Error - Message Type not supported by this implementation";
     public const string BadMessage = "Validation Error - Bad Message";
@@ -11,9 +11,9 @@ public class HL7Exception : Exception {
 
     public string ErrorCode { get; set; } = "";
 
-    public HL7Exception(string message, Exception? inner = null) : base(message, inner) { }
+    public Hl7Exception(string message, Exception? inner = null) : base(message, inner) { }
 
-    public HL7Exception(string message, string code, Exception? inner = null) : base(message, inner) {
+    public Hl7Exception(string message, string code, Exception? inner = null) : base(message, inner) {
         ErrorCode = code;
     }
 

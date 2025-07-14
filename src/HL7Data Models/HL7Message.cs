@@ -6,13 +6,13 @@ using System.Linq;
 namespace HL7;
 
 public class HL7Message {
-    public IImmutableDictionary<Type, IImmutableList<IHL7Data>> HL7Records { get; private set; } = null!;
+    public IImmutableDictionary<Type, IImmutableList<IHl7Segment>> HL7Records { get; private set; } = null!;
     public MSH MSH => (MSH)HL7Records[typeof(MSH)].Single();
-    private readonly Dictionary<Type, List<IHL7Data>> dict = new();
+    private readonly Dictionary<Type, List<IHl7Segment>> dict = new();
 
     private HL7Message() { }
 
-    public ICollection<T> GetRecords<T>() where T : IHL7Data {
+    public ICollection<T> GetRecords<T>() where T : IHl7Segment {
         return HL7Records.TryGetValue(typeof(T), out var records) ? records.Cast<T>().ToArray() : [];
     }
 
@@ -34,19 +34,19 @@ public class HL7Message {
 
     private bool loadHL7Message(string hl7Message) {
         var message = Message.Parse(hl7Message);
-        var msh = new MSH(message);
+        var msh = new MSH(message.Segments[0]);
         dict.Add(typeof(MSH), [msh]);
         foreach (var segment in message.Segments.Where(s => s.Name != "MSH")) {
-            var hl7Data = HL7DataLoader.Create(segment);
-            var list = ensureTypeIsInDictionary(hl7Data);
-            list.Add(hl7Data);
+            var hl7Segment = Hl7DataLoader.Create(segment);
+            var list = ensureTypeIsInDictionary(hl7Segment);
+            list.Add(hl7Segment);
         }
 
-        HL7Records = dict.ToImmutableDictionary(kvp => kvp.Key, IImmutableList<IHL7Data> (kvp) => kvp.Value.ToImmutableList());
+        HL7Records = dict.ToImmutableDictionary(kvp => kvp.Key, IImmutableList<IHl7Segment> (kvp) => kvp.Value.ToImmutableList());
         return true;
 
-        List<IHL7Data> ensureTypeIsInDictionary(IHL7Data hl7Data) {
-            var type = hl7Data.GetType();
+        List<IHl7Segment> ensureTypeIsInDictionary(IHl7Segment segment) {
+            var type = segment.GetType();
             return dict.TryGetValue(type, out var list)
                 ? list
                 : dict[type] = [];

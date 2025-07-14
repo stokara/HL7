@@ -6,7 +6,7 @@ using Xunit;
 namespace HL7test;
 
 public class EncodingTests {
-    private readonly HL7Encoding defaultEncoder = new(
+    private readonly Hl7Encoding defaultEncoder = new(
         fieldDelimiter: '|',
         componentDelimiter: '^',
         repeatDelimiter: '~',
@@ -89,39 +89,39 @@ public class EncodingTests {
 
     [Fact]
     public void SegmentParse_StandardDelimiters() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = "PID|1|12345|DOE^JOHN";
         var segment = Segment.Parse(encoding, segmentStr);
 
         Assert.Equal("PID", segment.Name);
         Assert.Equal(4, segment.Fields.Count);
-        Assert.Equal("1", segment.Fields[1].Value);
-        Assert.Equal("12345", segment.Fields[2].Value);
-        Assert.Equal("DOE^JOHN", segment.Fields[3].Value);
+        Assert.Equal("1", segment.Fields[1].StringValue);
+        Assert.Equal("12345", segment.Fields[2].StringValue);
+        Assert.Equal("DOE^JOHN", segment.Fields[3].StringValue);
     }
 
     [Fact]
     public void SegmentParse_NonStandardDelimiters() {
-        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
+        var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
         var segmentStr = "ZZZ!A!B@C$D%E";
         var segment = Segment.Parse(encoding, segmentStr);
 
         Assert.Equal("ZZZ", segment.Name);
         Assert.Equal(3, segment.Fields.Count);
-        Assert.Equal("A", segment.Fields[1].Value);
-        Assert.Equal("B@C$D%E", segment.Fields[2].Value);
+        Assert.Equal("A", segment.Fields[1].StringValue);
+        Assert.Equal("B@C$D%E", segment.Fields[2].StringValue);
     }
 
     [Fact]
     public void SegmentParse_EscapedDelimiter() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
-        var segmentStr = @"OBX|1|TX|Some\F\Value|End";
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
+        var segmentStr = @"OBX|1|TX|Some\F\StringValue|End";
         var segment = Segment.Parse(encoding, segmentStr);
 
         Assert.Equal("OBX", segment.Name);
         Assert.Equal(5, segment.Fields.Count);
-        Assert.Equal(@"Some\F\Value", segment.Fields[3].Value);
-        Assert.Equal("End", segment.Fields[4].Value);
+        Assert.Equal(@"Some\F\StringValue", segment.Fields[3].StringValue);
+        Assert.Equal("End", segment.Fields[4].StringValue);
     }
 
     [Fact]
@@ -131,11 +131,11 @@ public class EncodingTests {
 
         var segment = result.mshSegment;
         Assert.Equal("MSH", segment.Name);
-        Assert.Equal("|^~\\&", segment.Fields[1].Value);
-        Assert.Equal("SendingApp", segment.Fields[2].Value);
-        Assert.Equal("ReceivingApp", segment.Fields[4].Value);
-        Assert.Equal("ADT^A01", segment.Fields[8].Value);
-        Assert.Equal("2.5", segment.Fields[11].Value);
+        Assert.Equal("|^~\\&", segment.Fields[1].StringValue);
+        Assert.Equal("SendingApp", segment.Fields[2].StringValue);
+        Assert.Equal("ReceivingApp", segment.Fields[4].StringValue);
+        Assert.Equal("ADT^A01", segment.Fields[8].StringValue);
+        Assert.Equal("2.5", segment.Fields[11].StringValue);
     }
 
     [Fact]
@@ -144,30 +144,30 @@ public class EncodingTests {
         var result = Segment.ParseMSH(segmentStr);
 
         Assert.Equal("MSH", result.mshSegment.Name);
-        Assert.Equal("!@#$%", result.mshSegment.Fields[1].Value);
-        Assert.Equal("App1", result.mshSegment.Fields[2].Value);
-        Assert.Equal("App2", result.mshSegment.Fields[4].Value);
-        Assert.Equal("ADT@A01", result.mshSegment.Fields[8].Value);
-        Assert.Equal("2.8", result.mshSegment.Fields[11].Value);
+        Assert.Equal("!@#$%", result.mshSegment.Fields[1].StringValue);
+        Assert.Equal("App1", result.mshSegment.Fields[2].StringValue);
+        Assert.Equal("App2", result.mshSegment.Fields[4].StringValue);
+        Assert.Equal("ADT@A01", result.mshSegment.Fields[8].StringValue);
+        Assert.Equal("2.8", result.mshSegment.Fields[11].StringValue);
     }
 
     [Fact]
     public void FieldParse_SimpleValue() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var value = "SIMPLE";
         var field = Field.Parse(encoding, value);
-        Assert.Equal("SIMPLE", field.Value);
-        Assert.False(field.HasComponents);
+        Assert.Equal("SIMPLE", field.StringValue);
+        Assert.False(field.IsComposite);
         Assert.False(field.HasRepetitions);
     }
 
     [Fact]
     public void FieldParse_WithComponents() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         const string value = "DOE^JOHN^A";
         var field = Field.Parse(encoding, value);
-        Assert.Equal("DOE^JOHN^A", field.Value);
-        Assert.True(field.HasComponents);
+        Assert.Equal("DOE^JOHN^A", field.StringValue);
+        Assert.True(field.IsComposite);
         Assert.False(field.HasRepetitions);
         Assert.Equal(3, field.Components?.Count);
         Assert.Equal("DOE", field.Components![0].Value);
@@ -177,50 +177,50 @@ public class EncodingTests {
 
     [Fact]
     public void FieldParse_WithRepetitions() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var value = "A~B~C";
         var field = Field.Parse(encoding, value);
-        Assert.Equal("A~B~C", field.Value);
-        Assert.False(field.HasComponents);
+        Assert.Equal("A~B~C", field.StringValue);
+        Assert.False(field.IsComposite);
         Assert.True(field.HasRepetitions);
         Assert.Equal(3, field.Repetitions?.Count);
-        Assert.Equal("A", field.Repetitions![0].Value);
-        Assert.Equal("B", field.Repetitions[1].Value);
-        Assert.Equal("C", field.Repetitions[2].Value);
+        Assert.Equal("A", field.Repetitions![0].StringValue);
+        Assert.Equal("B", field.Repetitions[1].StringValue);
+        Assert.Equal("C", field.Repetitions[2].StringValue);
     }
 
     [Fact]
     public void FieldParse_WithComponentsAndRepetitions() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         const string value = "A^B~C^D";
         var field = Field.Parse(encoding, value);
-        Assert.Equal("A^B~C^D", field.Value);
+        Assert.Equal("A^B~C^D", field.StringValue);
         Assert.True(field.HasRepetitions);
         Assert.Equal(2, field.Repetitions?.Count);
-        Assert.Equal("A^B", field.Repetitions![0].Value);
-        Assert.Equal("C^D", field.Repetitions[1].Value);
-        Assert.True(field.Repetitions[0].HasComponents);
+        Assert.Equal("A^B", field.Repetitions![0].StringValue);
+        Assert.Equal("C^D", field.Repetitions[1].StringValue);
+        Assert.True(field.Repetitions[0].IsComposite);
         Assert.Equal("A", field.Repetitions[0].Components![0].Value);
         Assert.Equal("B", field.Repetitions[0].Components[1].Value);
     }
 
     [Fact]
     public void FieldParse_WithEscapedDelimiter() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var value = @"A\F\B";
         var field = Field.Parse(encoding, value);
-        Assert.Equal(@"A\F\B", field.Value);
-        Assert.False(field.HasComponents);
+        Assert.Equal(@"A\F\B", field.StringValue);
+        Assert.False(field.IsComposite);
         Assert.False(field.HasRepetitions);
     }
 
     [Fact]
     public void FieldParse_CustomDelimiters() {
-        var encoding = new HL7Encoding('!', '@', '#', '$', '%');
+        var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
         var value = "A@B@C";
         var field = Field.Parse(encoding, value);
-        Assert.Equal("A@B@C", field.Value);
-        Assert.True(field.HasComponents);
+        Assert.Equal("A@B@C", field.StringValue);
+        Assert.True(field.IsComposite);
         Assert.Equal(3, field.Components!.Count);
         Assert.Equal("A", field.Components[0].Value);
         Assert.Equal("B", field.Components[1].Value);
@@ -244,7 +244,7 @@ public class EncodingTests {
             var seg2 = message2.Segments[i];
             Assert.Equal(seg1.Fields.Count, seg2.Fields.Count);
             for (int j = 0; j < seg1.Fields.Count; j++) {
-                Assert.Equal(seg1.Fields[j].Value, seg2.Fields[j].Value);
+                Assert.Equal(seg1.Fields[j].StringValue, seg2.Fields[j].StringValue);
             }
             Assert.Equal(seg1.Name, seg2.Name);
         }
@@ -261,7 +261,7 @@ public class EncodingTests {
         var message = Message.Parse(sampleMessage);
         var msa = message.Segments.FirstOrDefault(s => s.Name == "MSA");
         Assert.NotNull(msa);
-        Assert.Equal(@"\E\T\E\", msa.Fields[3].Value);
+        Assert.Equal(@"\E\T\E\", msa.Fields[3].StringValue);
     }
 
 
@@ -275,12 +275,12 @@ public class EncodingTests {
         var message = Message.Parse(sampleMessage);
         var msa = message.Segments.FirstOrDefault(s => s.Name == "MSA");
         Assert.NotNull(msa);
-        Assert.Equal(string.Empty, msa.Fields[4].Value);
+        Assert.Equal(string.Empty, msa.Fields[4].StringValue);
     }
 
     [Fact]
     public void EncodeDecode_HexEscape_Newline() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var input = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         Assert.Contains("\\X0A\\", encoded);
@@ -290,7 +290,7 @@ public class EncodingTests {
 
     [Fact]
     public void EncodeDecode_HexEscape_OA() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var input = @"1380 SAMPLE STREET^\X0A^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         Assert.Contains("\\X0A\\", encoded);
@@ -300,7 +300,7 @@ public class EncodingTests {
 
     [Fact]
     public void Decode_HexEscape_Newline() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var encoded = @"1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055";
         var expected = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var decoded = encoding.Decode(encoded);
@@ -309,7 +309,7 @@ public class EncodingTests {
 
     [Fact]
     public void Encode_HexEscape_Newline() {
-        var encoding = new HL7Encoding('|', '^', '~', '\\', '&');
+        var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var input = "1380 SAMPLE STREET^\n^NEW YORK^NY^55755-5055";
         var encoded = encoding.Encode(input);
         var expected = "1380 SAMPLE STREET\\S\\\\X0A\\\\S\\NEW YORK\\S\\NY\\S\\55755-5055";

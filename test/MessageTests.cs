@@ -27,7 +27,7 @@ public class MessageTests {
         // Invalid HL7 message (missing MSH)
         const string message = "FT1|1|20250101|20250101|||CG|1234^ProcedureDesc|1|100|USD||||Provider1";
 
-        Assert.Throws<HL7Exception>(() => HL7Message.TryCreate(message, out var hl7Message));
+        Assert.Throws<Hl7Exception>(() => HL7Message.TryCreate(message, out var hl7Message));
     }
 
     [Fact]

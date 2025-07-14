@@ -8,11 +8,11 @@ using System.Reflection;
 
 namespace HL7;
 
-public static class HL7DataLoader {
-    private static readonly bool IsUseRegistrationScanning = false;
-    private static readonly Dictionary<string, Func<Segment, IHL7Data>> registry = new();
+public static class Hl7DataLoader {
+    private static readonly bool IsUseRegistrationScanning = true;
+    private static readonly Dictionary<string, Func<Segment, Hl7Segment>> registry = new();
 
-    static HL7DataLoader() {
+    static Hl7DataLoader() {
         if (IsUseRegistrationScanning) {
             ScanAndRegisterSegmentFactories();
         } else {
@@ -25,19 +25,13 @@ public static class HL7DataLoader {
         }
     }
 
-    public static void Register(string segmentType, Func<Segment, IHL7Data> factory) {
+    public static void Register(string segmentType, Func<Segment, Hl7Segment> factory) {
         registry[segmentType] = factory;
     }
 
-    public static IHL7Data Create(Segment segment) {
-        if (segment is null) {
-            throw new ArgumentNullException(nameof(segment));
-        }
-
-        if (registry.TryGetValue(segment.Name, out var factory)) {
-            return factory(segment);
-        }
-
+    public static Hl7Segment Create(Segment segment) {
+        if (segment is null) throw new ArgumentNullException(nameof(segment), new Hl7Exception("segment null"));
+        if (registry.TryGetValue(segment.Name, out var factory)) return factory(segment);
         throw new InvalidDataException($"Unknown segment type: {segment.Name}");
     }
 
@@ -50,8 +44,6 @@ public static class HL7DataLoader {
         Register("PV1", seg => new PV1(seg));
         Register("PV2", seg => new PV2(seg));
         Register("NTE", seg => new NTE(seg));
-        Register("QBE", seg => new QBE(seg));
-        Register("QRC", seg => new QRC(seg));
         Register("PD1", seg => new PD1(seg));
         Register("FHS", seg => new FHS(seg));
         Register("BHS", seg => new BHS(seg));
@@ -65,7 +57,6 @@ public static class HL7DataLoader {
         Register("BTS", seg => new BTS(seg));
         Register("FTS", seg => new FTS(seg));
         Register("EVN", seg => new EVN(seg));
-        Register("GT1", seg => new GT1(seg));
         Register("AL1", seg => new AL1(seg));
         Register("ORC", seg => new ORC(seg));
         Register("OBR", seg => new OBR(seg));
@@ -81,8 +72,6 @@ public static class HL7DataLoader {
         Register("OBX", seg => new OBX(seg));
         Register("TQ1", seg => new TQ1(seg));
         Register("SPM", seg => new SPM(seg));
-        Register("ZVI", seg => new ZVI(seg));
-        Register("ZAL", seg => new ZAL(seg));
         Register("SCH", seg => new SCH(seg));
         Register("RGS", seg => new RGS(seg));
         Register("AIG", seg => new AIG(seg));
@@ -90,7 +79,6 @@ public static class HL7DataLoader {
         Register("AIP", seg => new AIP(seg));
         Register("STF", seg => new STF(seg));
         Register("PRA", seg => new PRA(seg));
-        Register("ZRX", seg => new ZRX(seg));
     }
 
     public static void ScanAndRegisterSegmentFactories() {
@@ -103,7 +91,7 @@ public static class HL7DataLoader {
                 continue;
             }
 
-            registry[type.Name] = segment => (IHL7Data)ctor.Invoke([segment]);
+            registry[type.Name] = segment => (Hl7Segment)ctor.Invoke([segment]);
         }
     }
 
@@ -112,15 +100,9 @@ public static class HL7DataLoader {
         return types.Where(type => !registry.ContainsKey(type.Name)).Select(type => type.Name).ToArray().AsReadOnly();
     }
 
-    private static IEnumerable<Type> getAllHl7DataTypes() {
-        var baseGenericType = typeof(HL7Data<>);
-        var types = Assembly.GetExecutingAssembly()
+    private static IEnumerable<Type> getAllHl7DataTypes() =>
+         typeof(Hl7Segment).Assembly
             .GetTypes()
-            .Where(t =>
-                t.BaseType is { IsGenericType: true } &&
-                t.BaseType.GetGenericTypeDefinition() == baseGenericType &&
-                t != baseGenericType &&
-                t != typeof(MSH));
-        return types;
-    }
+            .Where(t => t.IsSubclassOf(typeof(Hl7Segment)) && t is { IsSealed: true, IsPublic: true });
+ 
 }

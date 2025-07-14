@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HL7;
 
-public record HL7Encoding {
+public record Hl7Encoding {
     public char FieldDelimiter { get; init; }
     public char ComponentDelimiter { get; init; }
     public char RepeatDelimiter { get; init; }
@@ -15,7 +15,7 @@ public record HL7Encoding {
 
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
-    public HL7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
+    public Hl7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
         char subComponentDelimiter, string segmentDelimiter = "\r", string presentButNull = "\"\"") {
         FieldDelimiter = fieldDelimiter;
         ComponentDelimiter = componentDelimiter;
@@ -26,19 +26,19 @@ public record HL7Encoding {
         PresentButNull = presentButNull;
     }
 
-    public static HL7Encoding FromString(string delimiters) {
+    public static Hl7Encoding FromString(string delimiters) {
         var fieldDelimiter = delimiters[0];
         var componentDelimiter = delimiters[1];
         var repeatDelimiter = delimiters[2];
         var escapeCharacter = delimiters[3];
         var subComponentDelimiter = delimiters[4];
         var segmentDelimiter = SegmentDelimiters.FirstOrDefault(delimiters.Contains) ?? "\r\n";
-        return new HL7Encoding(fieldDelimiter, componentDelimiter, repeatDelimiter, escapeCharacter,
+        return new Hl7Encoding(fieldDelimiter, componentDelimiter, repeatDelimiter, escapeCharacter,
             subComponentDelimiter, segmentDelimiter);
     }
 
-    public string Encode(string val) {
-        if (string.IsNullOrEmpty(val)) return val;
+    public string Encode(string? val) {
+        if (string.IsNullOrEmpty(val)) return ""; //May need a value for PresentButNull
 
         var sb = new StringBuilder();
 

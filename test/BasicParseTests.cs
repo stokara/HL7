@@ -42,7 +42,7 @@ public class HL7Test {
     public void ReadFieldTest() {
         var message = Message.Parse(this.HL7_ADT);
         var mshSegment = message.Segments[0];
-        var msh9 = mshSegment.Fields[8].Value;
+        var msh9 = mshSegment.Fields[8].StringValue;
         Assert.Equal("ADT^O01", msh9);
     }
 }
