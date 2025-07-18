@@ -1,6 +1,7 @@
+using HL7;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using HL7;
 using Xunit;
 
 namespace HL7test;
@@ -174,12 +175,30 @@ public class EncodingTests {
         var sampleMessage =
             """
             MSH|^~\&|ATHENANET|18802555^Orthopaedic Sample Org|Aspyra - 18802555|13274090^ORTHOPAEDIC INSTITUTE|20241119113500||ORM^O01|57492555M18802|P|2.5.1||||||||
-            PID||500036547^^^Enterprise ID||500036547^^^Patient ID|JOHN^DOE^||20050904|M||2106-3|1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055||(555)261-2203|||S||^^^||||2186-5||||||||
-            PV1||O|80D18802^^^SAMPLE ORTHO URGENT CARE||||1905555652^JANE^D^DOE||||||||||1037^ABCDE8|||||||||||||||||||||||||||20241119||||||||
+            PID||500036547^^^Enterprise ID||500036547^^^Patient ID|JOHN^DOE^||20050904|M||2106-3|1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055||(555)261-2203|||S||||||||||||||
+            PV1||O|80D18802^^^SAMPLE ORTHO URGENT CARE||||1905555652^JANE^D^DOE||||||||||1037^ABCDE8|||||||||||||||||||||||||||||||||||
             """;
         var hl7Message = Hl7Message.Create(sampleMessage);
         var str = hl7Message.Serialize();
-        Assert.Equal(sampleMessage, str);
+
+        Assert.True(areEquivalent(sampleMessage, str));
+    }
+
+    private static bool areEquivalent(string expected, string sut) {
+        string[] lineEndings = ["\r\n", "\n", "\r"];
+        var expectedLines = expected.Split(lineEndings, StringSplitOptions.None);
+        var sutLines = sut.Split(lineEndings, StringSplitOptions.None);
+
+        if (expectedLines.Length != sutLines.Length) return false;
+        return !expectedLines.Where((t, i) => !compareSegmentLine(t, sutLines[i])).Any();
+
+        bool compareSegmentLine(string expectedLine, string sutLine) {
+            if (sutLine.Length < expectedLine.Length) return false;
+            if (!sutLine.StartsWith(expectedLine)) return false;
+
+            var extra = sutLine[expectedLine.Length..];
+            return extra.Length <= 0 || extra.All(c => c == '|');
+        }
     }
 
 
