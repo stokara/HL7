@@ -1,67 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NodaTime;
 
 namespace HL7;
 
-public sealed record Segment {
-    public string Name => fields[0].StringValue;
-    public IReadOnlyList<Field> Fields => fields;
+public record Segment {
+    protected IReadOnlyList<RawField> RawFields { get; set; }
+    public int FieldCount => RawFields.Count;
 
-    private readonly Field[] fields;
-    public Hl7Encoding HL7Encoding { get; }
+    public string Name { get; protected set; }
 
-    private Segment(Hl7Encoding HL7Encoding, Field[] fields) {
-        this.fields = fields;
-        this.HL7Encoding = HL7Encoding;
+    protected Segment() { }
+    
+    private Segment(string name, RawField[] rawFields) {
+        Name = name;
+        this.RawFields = rawFields;
     }
 
-    public static bool TryParse(Hl7Encoding encoding, string value, out Segment? segment, int sequenceNo = 0) {
+    public static bool TryParse(Hl7Encoding encoding, string value, out Segment? segment) {
         segment = null;
         try {
-            segment = Parse(encoding, value, sequenceNo);
+            segment = Parse(encoding, value);
             return true;
         } catch {
             return false;
         }
     }
 
-    public static Segment Parse(Hl7Encoding encoding, string value, int sequenceNo = 0) {
-        if (value.StartsWith("MSH", StringComparison.Ordinal)) throw new Hl7Exception("Use ParseMSH for MSH segment.", Hl7Exception.BadMessage);
+    public static Segment Parse(Hl7Encoding encoding, string value) {
+        var name = value[..3];
+        if (name == "MSH") throw new Hl7Exception("Use ParseMSH for MSH segment.", Hl7Exception.BadMessage);
 
-        var rawFields = splitFields(value, encoding.FieldDelimiter, encoding.EscapeCharacter);
-        var fields = new Field[rawFields.Count];
-        for (var i = 0; i < rawFields.Count; i++) {
-            fields[i] = Field.Parse(encoding, rawFields[i]);
-        }
-
-        return new Segment(encoding, fields);
+        var strings = SplitFields(value[3..], encoding.FieldDelimiter, encoding.EscapeCharacter);
+        var rawFields = strings.Select(s => new RawField(s, encoding)).ToArray();
+        return new Segment(name, rawFields);
     }
 
-    public static (Segment mshSegment, Hl7Encoding encoding) ParseMSH(string value, int sequenceNo = 0) {
-        if (!value.StartsWith("MSH", StringComparison.Ordinal)) throw new Hl7Exception("MSH segment not found at the beginning of the message", Hl7Exception.BadMessage);
-
-        var fieldDelimiter = value[3];
-        var delimiterFieldEnd = value.IndexOf(fieldDelimiter, 4);
-        if (delimiterFieldEnd < 0) throw new Hl7Exception("Invalid MSH segment: delimiter field not terminated", Hl7Exception.BadMessage);
-
-        var delimiterField = value[3..delimiterFieldEnd];
-        var encoding = Hl7Encoding.FromString(delimiterField);
-        var remainingStr = value[(delimiterFieldEnd + 1)..];
-
-        var fields = new List<Field> {
-            Field.Parse(encoding, "MSH"),
-            Field.CreateDelimiterField(delimiterField)
-        };
-        var rawFields = splitFields(remainingStr, encoding.FieldDelimiter, encoding.EscapeCharacter);
-        fields.AddRange(rawFields.Select(f => Field.Parse(encoding, f)));
-        var mshSegment = new Segment(encoding, fields.ToArray());
-        return (mshSegment, encoding);
-    }
-
-    private static List<string> splitFields(string value, char fieldDelimiter, char escapeCharacter) {
+    protected static List<string> SplitFields(string value, char fieldDelimiter, char escapeCharacter) {
         var fields = new List<string>();
         var sb = new StringBuilder();
         var inEscape = false;
@@ -86,117 +61,68 @@ public sealed record Segment {
         return fields;
     }
 
-    //public string Serialize(Hl7Encoding Hl7Encoding) {
-    //    StringBuilder sb = new();
-    //    for (var i = 0; i < this.Fields.Count; i++) {
-    //        var field = this.Fields[i];
-
-    //        if (field.IsDelimitersField) {
-    //            sb.Append(field.StringValue);
-    //            continue;
-    //        }
-
-    //        if (i > 0) sb.Append(Hl7Encoding.FieldDelimiter);
-
-    //        if (field.HasRepetitions) {
-    //            for (var j = 0; j < field.Repetitions!.Count; j++) {
-    //                if (j > 0) sb.Append(Hl7Encoding.RepeatDelimiter);
-    //                sb.Append(field.Repetitions[j].Serialize(Hl7Encoding));
-    //            }
-    //        } else sb.Append(field.Serialize(Hl7Encoding));
-    //    }
-
-    //    sb.Append(Hl7Encoding.SegmentDelimiter);
-    //    return sb.ToString();
-    //}
-
-    public bool Equals(Segment? other) {
-        if (ReferenceEquals(this, other)) return true;
-        if (other is null) return false;
-        if (Fields.Count != other.Fields.Count) return false;
-
-        var diff = Fields.Where((t, i) => !t.Equals(other.Fields[i]));
-        var result = !diff.Any();
-        return result;
-    }
-
-    public override int GetHashCode() => Fields.Aggregate(17, (current, field) => current * 31 + field.GetHashCode());
+    public override int GetHashCode() => RawFields.Aggregate(17, (current, field) => current * 31 + field.GetHashCode());
 
     public T? GetField<T>(int fieldNumber) where T : class, IHl7DataType {
-        var field = GetField(fieldNumber);
-        return field is null ? null : IHl7Field<T>.Parse(field, HL7Encoding);
+        var rawField = GetRawField(fieldNumber);
+        return rawField is null ? null : parseField<T>(rawField);
+    }
+    
+    public ICollection<T>? GetRepField<T>(int fieldNumber) where T : class, IHl7DataType {
+        var rawField = GetRawField(fieldNumber);
+        return rawField is null ? null : parseRepFields<T>(rawField);
+    }
+
+    public ICollection<T> GetRequiredRepField<T>(int fieldNumber) where T : class, IHl7DataType {
+        var rawField = GetRawField(fieldNumber);
+        return rawField is null ? [] : parseRepFields<T>(rawField);
     }
 
     public T GetRequiredField<T>(int fieldNumber) where T : class, IHl7DataType {
-        var field = GetField(fieldNumber, isRequired: true);
-        return IHl7Field<T>.Parse(field!, HL7Encoding);
-    }
-    
-    public RepField<T> GetRepField<T>(int fieldNumber) where T : class, IHl7DataType {
-        var field = GetField(fieldNumber);
-        if (field is null) return new RepField<T>([]);
-        if (!field.HasRepetitions) {
-            var singleItem = IHl7Field<T>.Parse(field, HL7Encoding);
-            return new RepField<T>([singleItem]);
-        }
-        var items = field.Repetitions!.Select(repetition => IHl7Field<T>.Parse(repetition, HL7Encoding)).ToArray();
-        return new RepField<T>(items);
+        var rawField = GetRawField(fieldNumber, isRequired: true);
+        return parseField<T>(rawField!);
     }
 
-    public Field? GetField(int fieldNumber, bool isRequired = false) {
-        // HL7 fields are 1-based after the segment name (Fields[0] is the segment name)
-        if (fieldNumber < 1 || fieldNumber >= Fields.Count) {
+    public RawField? GetRawField(int fieldNumber, bool isRequired = false) {
+        // HL7 rawFields are 1-based after the segment name (RepeatedFields[0] is the segment name)
+        if (fieldNumber < 1 || fieldNumber > RawFields.Count) {
             if (isRequired) throw new Hl7Exception($"Field {fieldNumber} is out of range for segment {Name}.", Hl7Exception.ParsingError);
 
             return null;
         }
 
-        var result = Fields[fieldNumber];
+        var result = RawFields[fieldNumber-1];
         if (result is null && isRequired) throw new Hl7Exception($"Field {fieldNumber} is required but missing in segment {Name}.", Hl7Exception.RequiredFieldMissing);
 
         return result;
     }
 
-    public string GetFieldString(int fieldNumber, bool isRequired = false) {
-        var field = GetField(fieldNumber, isRequired);
-        return field is null ? string.Empty : field.StringValue;
+    private static T? parseField<T>(RawField rawField) where T : class, IHl7DataType => rawField.RawComponent?.Parse<T>(Hl7Structure.Hl7Component);
+
+    private static ICollection<T> parseRepFields<T>(RawField rawField) where T : class, IHl7DataType => 
+        rawField.RepeatedFields.Select(rf => rf.Parse<T>(Hl7Structure.Hl7Component)).ToList();
+}
+
+public sealed record MshSegment : Segment {
+    public char FieldDelimiter { get; }
+    public Hl7Encoding Encoding { get; }
+
+    public MshSegment(string rawSegmentString) {
+        Name = rawSegmentString[..3];
+        if (Name != "MSH") throw new Hl7Exception("MSH not found at the beginning of the rawSegmentString", Hl7Exception.BadMessage);
+
+        FieldDelimiter = rawSegmentString[3];
+        var delimiterFieldEnd = rawSegmentString.IndexOf(FieldDelimiter, 4);
+        if (delimiterFieldEnd < 0) throw new Hl7Exception("Invalid MSH segment: delimiter field not terminated", Hl7Exception.BadMessage);
+
+        Encoding = Hl7Encoding.FromString(rawSegmentString[3..delimiterFieldEnd]);
+
+        var strings = SplitFields(rawSegmentString[(delimiterFieldEnd + 1)..], Encoding.FieldDelimiter, Encoding.EscapeCharacter);
+        var rawFields = strings.Select(s => new RawField(s, Encoding)).ToArray();
+        RawFields = rawFields;
     }
 
-    public Instant? GetFieldInstant(int fieldNumber) {
-        var field = GetField(fieldNumber);
-        return string.IsNullOrWhiteSpace(field?.StringValue) ? null : Hl7DateParser.ParseInstant(field.StringValue);
-    }
-
-    public Instant GetRequiredFieldInstant(int fieldNumber) {
-        var field = getRequiredField(fieldNumber);
-        return Hl7DateParser.ParseInstant(field.StringValue, true)!.Value;
-    }
-
-    public int? GetFieldInt(int fieldNumber) {
-        var field = GetField(fieldNumber);
-        return string.IsNullOrWhiteSpace(field?.StringValue) ? null : Int32.Parse(field.StringValue);
-    }
-
-    public int GetRequiredFieldInt(int fieldNumber) {
-        var field = getRequiredField(fieldNumber);
-        return Int32.Parse(field.StringValue);
-    }
-
-    private Field getRequiredField(int fieldNumber) {
-        var field = GetField(fieldNumber, true);
-        if (string.IsNullOrWhiteSpace(field?.StringValue))
-            throw new Hl7Exception($"Field {fieldNumber} is required but missing in segment {Name}.", Hl7Exception.RequiredFieldMissing);
-
-        return field;
-    }
-
-    public decimal? GetFieldDecimal(int fieldNumber) {
-        var field = GetField(fieldNumber);
-        return string.IsNullOrWhiteSpace(field?.StringValue) ? null : decimal.Parse(field.StringValue);
-    }
-
-    public decimal GetRequiredFieldDecimal(int fieldNumber) {
-        var field = getRequiredField(fieldNumber);
-        return decimal.Parse(field.StringValue);
+    public new RawField? GetRawField(int fieldNumber, bool isRequired = false) {
+        return base.GetRawField(fieldNumber-2, isRequired);
     }
 }

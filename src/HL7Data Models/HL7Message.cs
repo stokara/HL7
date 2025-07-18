@@ -1,55 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace HL7;
 
-public class HL7Message {
-    public IImmutableDictionary<Type, IImmutableList<IHl7Segment>> HL7Records { get; private set; } = null!;
-    public MSH MSH => (MSH)HL7Records[typeof(MSH)].Single();
-    private readonly Dictionary<Type, List<IHl7Segment>> dict = new();
+public record Hl7Message : Hl7DataType{
+    private readonly List<Hl7Segment> allSegments = [];
 
-    private HL7Message() { }
+    public MSH MSH => allSegments.OfType<MSH>().Single();
 
-    public ICollection<T> GetRecords<T>() where T : IHl7Segment {
-        return HL7Records.TryGetValue(typeof(T), out var records) ? records.Cast<T>().ToArray() : [];
+    private Hl7Message() { }
+
+    public void AddHl7Segment(Hl7Segment segment) => allSegments.Add(segment);
+
+    public ICollection<Hl7Segment> AllSegments => allSegments.AsReadOnly();
+
+    public ICollection<T> GetHl7Segments<T>() where T : Hl7Segment => allSegments.OfType<T>().ToArray();
+
+    public static Hl7Message Create(string rawMessageString) {
+        var msg = new Hl7Message();
+        msg.loadHL7Message(rawMessageString);
+        return msg;
     }
 
-    public static HL7Message? Create(string hl7Message) {
-        var msg = new HL7Message();
-        return msg.loadHL7Message(hl7Message) ? msg : null;
-    }
-
-    public static bool TryCreate(string hl7Message, out HL7Message? result) {
-        var msg = new HL7Message();
-        if (msg.loadHL7Message(hl7Message)) {
+    public static bool TryCreate(string rawMessageString, out Hl7Message? result) {
+        try {
+            var msg = new Hl7Message();
+            msg.loadHL7Message(rawMessageString);
             result = msg;
             return true;
+        } catch (Exception) {
+            result = null;
+            return false;
         }
 
-        result = null;
-        return false;
     }
 
-    private bool loadHL7Message(string hl7Message) {
-        var message = Message.Parse(hl7Message);
-        var msh = new MSH(message.Segments[0]);
-        dict.Add(typeof(MSH), [msh]);
-        foreach (var segment in message.Segments.Where(s => s.Name != "MSH")) {
-            var hl7Segment = Hl7DataLoader.Create(segment);
-            var list = ensureTypeIsInDictionary(hl7Segment);
-            list.Add(hl7Segment);
+    private void loadHL7Message(string rawMessageString) {
+        var message = Message.Parse(rawMessageString);
+        AddHl7Segment(new MSH(message.MshSegment));
+        foreach (var rawSegment in message.Segments.Where(s => s.Name != "MSH")) {
+            AddHl7Segment(Hl7DataLoader.CreateHl7Segment(rawSegment));
         }
+    }
 
-        HL7Records = dict.ToImmutableDictionary(kvp => kvp.Key, IImmutableList<IHl7Segment> (kvp) => kvp.Value.ToImmutableList());
-        return true;
+    public string Serialize() => Serialize(MSH.Encoding, Hl7Structure.Hl7Message);
 
-        List<IHl7Segment> ensureTypeIsInDictionary(IHl7Segment segment) {
-            var type = segment.GetType();
-            return dict.TryGetValue(type, out var list)
-                ? list
-                : dict[type] = [];
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure? sourceStructure = null) {
+        try {
+            return string.Join(encoding.SegmentDelimiter, AllSegments.Select(seg => seg.Serialize(encoding, Hl7Structure.Hl7Segment)));
+
+        } catch (Exception? ex) {
+            throw new Hl7Exception("Failed to serialize the message with error - " + ex.Message, Hl7Exception.SerializationError, ex);
         }
     }
 }

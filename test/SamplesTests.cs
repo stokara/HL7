@@ -43,9 +43,10 @@ public class SamplesTests {
             var hl7Text = File.ReadAllText(file);
 
             try {
-                var hl7Data = HL7Message.Create(hl7Text) ?? throw new Hl7Exception("Unable to Parse Message", Hl7Exception.ParsingError);
-                var typeCounts = hl7Data.HL7Records
-                    .Select(kvp => new { TypeName = kvp.Key.Name, Count = kvp.Value.Count })
+                var hl7Data = Hl7Message.Create(hl7Text) ?? throw new Hl7Exception("Unable to Parse Message", Hl7Exception.ParsingError);
+                var typeCounts = hl7Data.AllSegments
+                    .GroupBy(seg => seg.GetType())
+                    .Select(g => new { TypeName = g.Key.Name, Count = g.Count() })
                     .OrderBy(x => x.TypeName);
                 var summary = string.Join(", ", typeCounts.Select(entry => $"{entry.TypeName}: {entry.Count}"));
                 testOutputHelper.WriteLine($"Converted {Path.GetFileName(file)} {summary}");

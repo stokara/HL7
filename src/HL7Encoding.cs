@@ -185,9 +185,6 @@ public record Hl7Encoding {
         return str;
     }
 
-    public override string ToString() {
-        // Concatenate all delimiters in HL7 standard order: field, component, repeat, escape, subcomponent, segment
-        return
-            $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}{SegmentDelimiter}";
-    }
+    //  |^~\&
+    public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}";
 }

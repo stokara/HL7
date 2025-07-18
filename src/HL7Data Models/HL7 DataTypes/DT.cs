@@ -1,13 +1,5 @@
-﻿using HL7;
-using NodaTime;
-using System.Collections.Generic;
+﻿using NodaTime;
 
-public sealed record DT : Hl7DataType {
-    public Instant? Date { get; }
+namespace HL7;
 
-    public DT(IReadOnlyList<string> components) {
-        Date = components.GetInstant(1);
-    }
-
-    public override string Serialize(Hl7Encoding encoding) => SerializePropertyValue(Date, encoding);
-}
+public sealed record DT(Instant? Date) : Hl7Date(Date) { }

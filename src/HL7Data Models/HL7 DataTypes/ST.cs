@@ -1,13 +1,3 @@
-﻿using HL7;
-using System.Collections.Generic;
+﻿namespace HL7;
 
-public sealed record ST : Hl7DataType {
-    public string? StringData { get; }
-
-    public ST(IReadOnlyList<string> components) {
-        StringData = components.GetString(1);
-    }
-
-    public override string Serialize(Hl7Encoding encoding) => SerializePropertyValue(StringData, encoding);
-    
-}
+public sealed record ST(string? Value) : HL7String(Value);

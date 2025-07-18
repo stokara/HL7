@@ -1,4 +1,6 @@
-﻿namespace HL7;
+﻿using System.Collections.Generic;
+
+namespace HL7;
 
 public sealed record ABS : Hl7Segment {
     public XCN? DischargeCareProvider { get; }
@@ -47,7 +49,7 @@ public sealed record ACC : Hl7Segment {
     public ID? PoliceNotifiedIndicator { get; }
     public XAD? AccidentAddress { get; }
     public NM? Degreeofpatientliability { get; }
-    public RepField<EI> AccidentIdentifier { get; }
+    public ICollection<EI>? AccidentIdentifier { get; }
 
     public ACC(Segment segment) : base(typeof(ACC), segment) {
         this.AccidentDateTime = segment.GetField<DTM>(1);
@@ -114,7 +116,7 @@ public sealed record AFF : Hl7Segment {
     public SI SetIDAFF { get; }
     public XON ProfessionalOrganization { get; }
     public XAD? ProfessionalOrganizationAddress { get; }
-    public RepField<DR> ProfessionalOrganizationAffiliationDateRange { get; }
+    public ICollection<DR>? ProfessionalOrganizationAffiliationDateRange { get; }
     public ST? ProfessionalAffiliationAdditionalInformation { get; }
 
     public AFF(Segment segment) : base(typeof(AFF), segment) {
@@ -131,7 +133,7 @@ public sealed record AIG : Hl7Segment {
     public ID? SegmentActionCode { get; }
     public CWE? ResourceID { get; }
     public CWE ResourceType { get; }
-    public RepField<CWE> ResourceGroup { get; }
+    public ICollection<CWE>? ResourceGroup { get; }
     public NM? ResourceQuantity { get; }
     public CNE? ResourceQuantityUnits { get; }
     public DTM? StartDateTime { get; }
@@ -231,8 +233,8 @@ public sealed record AIS : Hl7Segment {
     public CNE? DurationUnits { get; }
     public CWE? AllowSubstitutionCode { get; }
     public CWE? FillerStatusCode { get; }
-    public RepField<CWE> PlacerSupplementalServiceInformation { get; }
-    public RepField<CWE> FillerSupplementalServiceInformation { get; }
+    public ICollection<CWE>? PlacerSupplementalServiceInformation { get; }
+    public ICollection<CWE>? FillerSupplementalServiceInformation { get; }
 
     public AIS(Segment segment) : base(typeof(AIS), segment) {
         this.SetIDAIS = segment.GetRequiredField<SI>(1);
@@ -255,7 +257,7 @@ public sealed record AL1 : Hl7Segment {
     public CWE? AllergenTypeCode { get; }
     public CWE? AllergenCodeMnemonicDescription { get; }
     public CWE? AllergySeverityCode { get; }
-    public RepField<ST> AllergyReactionCode { get; }
+    public ICollection<ST>? AllergyReactionCode { get; }
 
     public AL1(Segment segment) : base(typeof(AL1), segment) {
         this.SetIDAL1 = segment.GetRequiredField<SI>(1);
@@ -267,11 +269,11 @@ public sealed record AL1 : Hl7Segment {
 }
 
 public sealed record APR : Hl7Segment {
-    public RepField<SCV> TimeSelectionCriteria { get; }
-    public RepField<SCV> ResourceSelectionCriteria { get; }
-    public RepField<SCV> LocationSelectionCriteria { get; }
+    public ICollection<SCV>? TimeSelectionCriteria { get; }
+    public ICollection<SCV>? ResourceSelectionCriteria { get; }
+    public ICollection<SCV>? LocationSelectionCriteria { get; }
     public NM? SlotSpacingCriteria { get; }
-    public RepField<SCV> FillerOverrideCriteria { get; }
+    public ICollection<SCV>? FillerOverrideCriteria { get; }
 
     public APR(Segment segment) : base(typeof(APR), segment) {
         this.TimeSelectionCriteria = segment.GetRepField<SCV>(1);
@@ -293,16 +295,16 @@ public sealed record ARQ : Hl7Segment {
     public CWE? AppointmentType { get; }
     public NM? AppointmentDuration { get; }
     public CNE? AppointmentDurationUnits { get; }
-    public RepField<DR> RequestedStartDateTimeRange { get; }
+    public ICollection<DR>? RequestedStartDateTimeRange { get; }
     public ST? PriorityARQ { get; }
     public RI? RepeatingInterval { get; }
     public ST? RepeatingIntervalDuration { get; }
-    public RepField<XCN> PlacerContactPerson { get; }
-    public RepField<XTN> PlacerContactPhoneNumber { get; }
-    public RepField<XAD> PlacerContactAddress { get; }
+    public ICollection<XCN> PlacerContactPerson { get; }
+    public ICollection<XTN>? PlacerContactPhoneNumber { get; }
+    public ICollection<XAD>? PlacerContactAddress { get; }
     public PL? PlacerContactLocation { get; }
-    public RepField<XCN> EnteredByPerson { get; }
-    public RepField<XTN> EnteredByPhoneNumber { get; }
+    public ICollection<XCN> EnteredByPerson { get; }
+    public ICollection<XTN>? EnteredByPhoneNumber { get; }
     public PL? EnteredByLocation { get; }
     public EI? ParentPlacerAppointmentID { get; }
     public EI? ParentFillerAppointmentID { get; }
@@ -325,11 +327,11 @@ public sealed record ARQ : Hl7Segment {
         this.PriorityARQ = segment.GetField<ST>(12);
         this.RepeatingInterval = segment.GetField<RI>(13);
         this.RepeatingIntervalDuration = segment.GetField<ST>(14);
-        this.PlacerContactPerson = segment.GetRepField<XCN>(15);
+        this.PlacerContactPerson = segment.GetRequiredRepField<XCN>(15);
         this.PlacerContactPhoneNumber = segment.GetRepField<XTN>(16);
         this.PlacerContactAddress = segment.GetRepField<XAD>(17);
         this.PlacerContactLocation = segment.GetField<PL>(18);
-        this.EnteredByPerson = segment.GetRepField<XCN>(19);
+        this.EnteredByPerson = segment.GetRequiredRepField<XCN>(19);
         this.EnteredByPhoneNumber = segment.GetRepField<XTN>(20);
         this.EnteredByLocation = segment.GetField<PL>(21);
         this.ParentPlacerAppointmentID = segment.GetField<EI>(22);
@@ -344,12 +346,12 @@ public sealed record ARV : Hl7Segment {
     public SI? SetID { get; }
     public CNE AccessRestrictionActionCode { get; }
     public CWE AccessRestrictionValue { get; }
-    public RepField<CWE> AccessRestrictionReason { get; }
-    public RepField<ST> SpecialAccessRestrictionInstructions { get; }
+    public ICollection<CWE>? AccessRestrictionReason { get; }
+    public ICollection<ST>? SpecialAccessRestrictionInstructions { get; }
     public DR? AccessRestrictionDateRange { get; }
     public CWE SecurityClassificationTag { get; }
-    public RepField<CWE> SecurityHandlingInstructions { get; }
-    public RepField<ERL> AccessRestrictionMessageLocation { get; }
+    public ICollection<CWE>? SecurityHandlingInstructions { get; }
+    public ICollection<ERL>? AccessRestrictionMessageLocation { get; }
     public EI? AccessRestrictionInstanceIdentifier { get; }
 
     public ARV(Segment segment) : base(typeof(ARV), segment) {
@@ -377,8 +379,8 @@ public sealed record AUT : Hl7Segment {
     public CQ? RequestedNumberofTreatments { get; }
     public CQ? AuthorizedNumberofTreatments { get; }
     public DTM? ProcessDate { get; }
-    public RepField<CWE> RequestedDisciplines { get; }
-    public RepField<CWE> AuthorizedDisciplines { get; }
+    public ICollection<CWE>? RequestedDisciplines { get; }
+    public ICollection<CWE>? AuthorizedDisciplines { get; }
     public CWE AuthorizationReferralType { get; }
     public CWE? ApprovalStatus { get; }
     public DTM? PlannedTreatmentStopDate { get; }
@@ -497,7 +499,7 @@ public sealed record BLG : Hl7Segment {
 public sealed record BPO : Hl7Segment {
     public SI SetIDBPO { get; }
     public CWE BPUniversalServiceIdentifier { get; }
-    public RepField<CWE> BPProcessingRequirements { get; }
+    public ICollection<CWE>? BPProcessingRequirements { get; }
     public NM BPQuantity { get; }
     public NM? BPAmount { get; }
     public CWE? BPUnits { get; }
@@ -507,7 +509,7 @@ public sealed record BPO : Hl7Segment {
     public DTM? BPRequestedDispenseDateTime { get; }
     public PL? BPRequestedDispenseToLocation { get; }
     public XAD? BPRequestedDispenseToAddress { get; }
-    public RepField<CWE> BPIndicationforUse { get; }
+    public ICollection<CWE>? BPIndicationforUse { get; }
     public ID? BPInformedConsentIndicator { get; }
 
     public BPO(Segment segment) : base(typeof(BPO), segment) {
@@ -540,7 +542,7 @@ public sealed record BPX : Hl7Segment {
     public XON? CPManufacturer { get; }
     public EI? CPLotNumber { get; }
     public CNE? BPBloodGroup { get; }
-    public RepField<CNE> BCSpecialTesting { get; }
+    public ICollection<CNE>? BCSpecialTesting { get; }
     public DTM? BPExpirationDateTime { get; }
     public NM BPQuantity { get; }
     public NM? BPAmount { get; }
@@ -581,7 +583,7 @@ public sealed record BPX : Hl7Segment {
 public sealed record BTS : Hl7Segment {
     public ST? BatchMessageCount { get; }
     public ST? BatchComment { get; }
-    public RepField<NM> BatchTotals { get; }
+    public ICollection<NM>? BatchTotals { get; }
 
     public BTS(Segment segment) : base(typeof(BTS), segment) {
         this.BatchMessageCount = segment.GetField<ST>(1);
@@ -608,7 +610,7 @@ public sealed record BTX : Hl7Segment {
     public XCN? BPTransfusionVerifier { get; }
     public DTM? BPTransfusionStartDateTimeofStatus { get; }
     public DTM? BPTransfusionEndDateTimeofStatus { get; }
-    public RepField<CWE> BPAdverseReactionType { get; }
+    public ICollection<CWE>? BPAdverseReactionType { get; }
     public CWE? BPTransfusionInterruptedReason { get; }
     public EI? BPUniqueID { get; }
     public ID? ActionCode { get; }
@@ -650,7 +652,7 @@ public sealed record BUI : Hl7Segment {
     public ST ContainerLotNumber { get; }
     public XON ContainerManufacturer { get; }
     public NR TransportTemperature { get; }
-    public RepField<CNE> TransportTemperatureUnits { get; }
+    public ICollection<CNE> TransportTemperatureUnits { get; }
     public ID? ActionCode { get; }
 
     public BUI(Segment segment) : base(typeof(BUI), segment) {
@@ -665,24 +667,24 @@ public sealed record BUI : Hl7Segment {
         this.ContainerLotNumber = segment.GetRequiredField<ST>(9);
         this.ContainerManufacturer = segment.GetRequiredField<XON>(10);
         this.TransportTemperature = segment.GetRequiredField<NR>(11);
-        this.TransportTemperatureUnits = segment.GetRepField<CNE>(12);
+        this.TransportTemperatureUnits = segment.GetRequiredRepField<CNE>(12);
         this.ActionCode = segment.GetField<ID>(13);
     }
 }
 
 public sealed record CDM : Hl7Segment {
     public CWE PrimaryKeyValueCDM { get; }
-    public RepField<CWE> ChargeCodeAlias { get; }
+    public ICollection<CWE>? ChargeCodeAlias { get; }
     public ST ChargeDescriptionShort { get; }
     public ST? ChargeDescriptionLong { get; }
     public CWE? DescriptionOverrideIndicator { get; }
-    public RepField<CWE> ExplodingCharges { get; }
-    public RepField<CNE> ProcedureCode { get; }
+    public ICollection<CWE>? ExplodingCharges { get; }
+    public ICollection<CNE>? ProcedureCode { get; }
     public ID? ActiveInactiveFlag { get; }
-    public RepField<CWE> InventoryNumber { get; }
+    public ICollection<CWE>? InventoryNumber { get; }
     public NM? ResourceLoad { get; }
-    public RepField<CX> ContractNumber { get; }
-    public RepField<XON> ContractOrganization { get; }
+    public ICollection<CX>? ContractNumber { get; }
+    public ICollection<XON>? ContractOrganization { get; }
     public ID? RoomFeeIndicator { get; }
 
     public CDM(Segment segment) : base(typeof(CDM), segment) {
@@ -730,15 +732,15 @@ public sealed record CER : Hl7Segment {
     public CWE? CertificateDomain { get; }
     public EI? SubjectID { get; }
     public ST SubjectName { get; }
-    public RepField<CWE> SubjectDirectoryAttributeExtension { get; }
+    public ICollection<CWE>? SubjectDirectoryAttributeExtension { get; }
     public CWE? SubjectPublicKeyInfo { get; }
     public CWE? AuthorityKeyIdentifier { get; }
     public ID? BasicConstraint { get; }
-    public RepField<CWE> CRLDistributionPoint { get; }
+    public ICollection<CWE>? CRLDistributionPoint { get; }
     public ID? JurisdictionCountry { get; }
     public CWE? JurisdictionStateProvince { get; }
     public CWE? JurisdictionCountyParish { get; }
-    public RepField<CWE> JurisdictionBreadth { get; }
+    public ICollection<CWE>? JurisdictionBreadth { get; }
     public DTM? GrantingDate { get; }
     public DTM? IssuingDate { get; }
     public DTM? ActivationDate { get; }
@@ -789,13 +791,13 @@ public sealed record CM0 : Hl7Segment {
     public EI SponsorStudyID { get; }
     public EI? AlternateStudyID { get; }
     public ST TitleofStudy { get; }
-    public RepField<XCN> ChairmanofStudy { get; }
+    public ICollection<XCN>? ChairmanofStudy { get; }
     public DT? LastIRBApprovalDate { get; }
     public NM? TotalAccrualtoDate { get; }
     public DT? LastAccrualDate { get; }
-    public RepField<XCN> ContactforStudy { get; }
+    public ICollection<XCN>? ContactforStudy { get; }
     public XTN? ContactsTelephoneNumber { get; }
-    public RepField<XAD> ContactsAddress { get; }
+    public ICollection<XAD>? ContactsAddress { get; }
 
     public CM0(Segment segment) : base(typeof(CM0), segment) {
         this.SetIDCM0 = segment.GetField<SI>(1);
@@ -877,8 +879,8 @@ public sealed record CSR : Hl7Segment {
     public CX SponsorPatientID { get; }
     public CX? AlternatePatientIDCSR { get; }
     public DTM DateTimeofPatientStudyRegistration { get; }
-    public RepField<XCN> PersonPerformingStudyRegistration { get; }
-    public RepField<XCN> StudyAuthorizingProvider { get; }
+    public ICollection<XCN>? PersonPerformingStudyRegistration { get; }
+    public ICollection<XCN> StudyAuthorizingProvider { get; }
     public DTM? DateTimePatientStudyConsentSigned { get; }
     public CWE? PatientStudyEligibilityStatus { get; }
     public DTM? StudyRandomizationDatetime { get; }
@@ -897,7 +899,7 @@ public sealed record CSR : Hl7Segment {
         this.AlternatePatientIDCSR = segment.GetField<CX>(5);
         this.DateTimeofPatientStudyRegistration = segment.GetRequiredField<DTM>(6);
         this.PersonPerformingStudyRegistration = segment.GetRepField<XCN>(7);
-        this.StudyAuthorizingProvider = segment.GetRepField<XCN>(8);
+        this.StudyAuthorizingProvider = segment.GetRequiredRepField<XCN>(8);
         this.DateTimePatientStudyConsentSigned = segment.GetField<DTM>(9);
         this.PatientStudyEligibilityStatus = segment.GetField<CWE>(10);
         this.StudyRandomizationDatetime = segment.GetField<DTM>(11);
@@ -923,16 +925,16 @@ public sealed record CSS : Hl7Segment {
 }
 
 public sealed record CTD : Hl7Segment {
-    public RepField<CWE> ContactRole { get; }
-    public RepField<XPN> ContactName { get; }
-    public RepField<XAD> ContactAddress { get; }
+    public ICollection<CWE> ContactRole { get; }
+    public ICollection<XPN>? ContactName { get; }
+    public ICollection<XAD>? ContactAddress { get; }
     public PL? ContactLocation { get; }
-    public RepField<XTN> ContactCommunicationInformation { get; }
+    public ICollection<XTN>? ContactCommunicationInformation { get; }
     public CWE? PreferredMethodofContact { get; }
-    public RepField<PLN> ContactIdentifiers { get; }
+    public ICollection<PLN>? ContactIdentifiers { get; }
 
     public CTD(Segment segment) : base(typeof(CTD), segment) {
-        this.ContactRole = segment.GetRepField<CWE>(1);
+        this.ContactRole = segment.GetRequiredRepField<CWE>(1);
         this.ContactName = segment.GetRepField<XPN>(2);
         this.ContactAddress = segment.GetRepField<XAD>(3);
         this.ContactLocation = segment.GetField<PL>(4);
@@ -1007,7 +1009,7 @@ public sealed record CTR : Hl7Segment {
 public sealed record DB1 : Hl7Segment {
     public SI SetIDDB1 { get; }
     public CWE? DisabledPersonCode { get; }
-    public RepField<CX> DisabledPersonIdentifier { get; }
+    public ICollection<CX>? DisabledPersonIdentifier { get; }
     public ID? DisabilityIndicator { get; }
     public DT? DisabilityStartDate { get; }
     public DT? DisabilityEndDate { get; }
@@ -1030,7 +1032,7 @@ public sealed record DEV : Hl7Segment {
     public ID ActionCode { get; }
     public EI? UniqueDeviceIdentifier { get; }
     public CNE? DeviceType { get; }
-    public RepField<CNE> DeviceStatus { get; }
+    public ICollection<CNE>? DeviceStatus { get; }
     public XON? ManufacturerDistributor { get; }
     public ST? BrandName { get; }
     public ST? ModelIdentifier { get; }
@@ -1040,7 +1042,7 @@ public sealed record DEV : Hl7Segment {
     public ST? DeviceSerialNumber { get; }
     public DTM? DeviceManufactureDate { get; }
     public DTM? DeviceExpiryDate { get; }
-    public RepField<CWE> SafetyCharacteristics { get; }
+    public ICollection<CWE>? SafetyCharacteristics { get; }
     public EI? DeviceDonationIdentification { get; }
     public ST? SoftwareVersionNumber { get; }
     public CNE? ImplantationStatus { get; }
@@ -1079,7 +1081,7 @@ public sealed record DG1 : Hl7Segment {
     public NM? OutlierDays { get; }
     public CP? OutlierCost { get; }
     public NM? DiagnosisPriority { get; }
-    public RepField<XCN> DiagnosingClinician { get; }
+    public ICollection<XCN>? DiagnosingClinician { get; }
     public CWE? DiagnosisClassification { get; }
     public ID? ConfidentialIndicator { get; }
     public DTM? AttestationDateTime { get; }
@@ -1141,14 +1143,14 @@ public sealed record DON : Hl7Segment {
     public DTM PhlebotomyEndDateTime { get; }
     public NM DonationDuration { get; }
     public CNE DonationDurationUnits { get; }
-    public RepField<CNE> IntendedProcedureType { get; }
-    public RepField<CNE> ActualProcedureType { get; }
+    public ICollection<CNE> IntendedProcedureType { get; }
+    public ICollection<CNE> ActualProcedureType { get; }
     public ID DonorEligibilityFlag { get; }
-    public RepField<CNE> DonorEligibilityProcedureType { get; }
+    public ICollection<CNE> DonorEligibilityProcedureType { get; }
     public DTM DonorEligibilityDate { get; }
     public CNE ProcessInterruption { get; }
     public CNE ProcessInterruptionReason { get; }
-    public RepField<CNE> PhlebotomyIssue { get; }
+    public ICollection<CNE> PhlebotomyIssue { get; }
     public ID IntendedRecipientBloodRelative { get; }
     public XPN IntendedRecipientName { get; }
     public DTM IntendedRecipientDOB { get; }
@@ -1165,9 +1167,9 @@ public sealed record DON : Hl7Segment {
     public XPN FinalReviewStaffID { get; }
     public DTM FinalReviewDateTime { get; }
     public NM NumberofTubesCollected { get; }
-    public RepField<EI> DonationSampleIdentifier { get; }
+    public ICollection<EI> DonationSampleIdentifier { get; }
     public XCN DonationAcceptStaff { get; }
-    public RepField<XCN> DonationMaterialReviewStaff { get; }
+    public ICollection<XCN> DonationMaterialReviewStaff { get; }
     public ID? ActionCode { get; }
 
     public DON(Segment segment) : base(typeof(DON), segment) {
@@ -1177,14 +1179,14 @@ public sealed record DON : Hl7Segment {
         this.PhlebotomyEndDateTime = segment.GetRequiredField<DTM>(4);
         this.DonationDuration = segment.GetRequiredField<NM>(5);
         this.DonationDurationUnits = segment.GetRequiredField<CNE>(6);
-        this.IntendedProcedureType = segment.GetRepField<CNE>(7);
-        this.ActualProcedureType = segment.GetRepField<CNE>(8);
+        this.IntendedProcedureType = segment.GetRequiredRepField<CNE>(7);
+        this.ActualProcedureType = segment.GetRequiredRepField<CNE>(8);
         this.DonorEligibilityFlag = segment.GetRequiredField<ID>(9);
-        this.DonorEligibilityProcedureType = segment.GetRepField<CNE>(10);
+        this.DonorEligibilityProcedureType = segment.GetRequiredRepField<CNE>(10);
         this.DonorEligibilityDate = segment.GetRequiredField<DTM>(11);
         this.ProcessInterruption = segment.GetRequiredField<CNE>(12);
         this.ProcessInterruptionReason = segment.GetRequiredField<CNE>(13);
-        this.PhlebotomyIssue = segment.GetRepField<CNE>(14);
+        this.PhlebotomyIssue = segment.GetRequiredRepField<CNE>(14);
         this.IntendedRecipientBloodRelative = segment.GetRequiredField<ID>(15);
         this.IntendedRecipientName = segment.GetRequiredField<XPN>(16);
         this.IntendedRecipientDOB = segment.GetRequiredField<DTM>(17);
@@ -1201,23 +1203,23 @@ public sealed record DON : Hl7Segment {
         this.FinalReviewStaffID = segment.GetRequiredField<XPN>(28);
         this.FinalReviewDateTime = segment.GetRequiredField<DTM>(29);
         this.NumberofTubesCollected = segment.GetRequiredField<NM>(30);
-        this.DonationSampleIdentifier = segment.GetRepField<EI>(31);
+        this.DonationSampleIdentifier = segment.GetRequiredRepField<EI>(31);
         this.DonationAcceptStaff = segment.GetRequiredField<XCN>(32);
-        this.DonationMaterialReviewStaff = segment.GetRepField<XCN>(33);
+        this.DonationMaterialReviewStaff = segment.GetRequiredRepField<XCN>(33);
         this.ActionCode = segment.GetField<ID>(34);
     }
 }
 
 public sealed record DPS : Hl7Segment {
     public CWE DiagnosisCodeMCP { get; }
-    public RepField<CWE> ProcedureCode { get; }
+    public ICollection<CWE> ProcedureCode { get; }
     public DTM? EffectiveDateTime { get; }
     public DTM? ExpirationDateTime { get; }
     public CNE? TypeofLimitation { get; }
 
     public DPS(Segment segment) : base(typeof(DPS), segment) {
         this.DiagnosisCodeMCP = segment.GetRequiredField<CWE>(1);
-        this.ProcedureCode = segment.GetRepField<CWE>(2);
+        this.ProcedureCode = segment.GetRequiredRepField<CWE>(2);
         this.EffectiveDateTime = segment.GetField<DTM>(3);
         this.ExpirationDateTime = segment.GetField<DTM>(4);
         this.TypeofLimitation = segment.GetField<CNE>(5);
@@ -1324,7 +1326,7 @@ public sealed record DSP : Hl7Segment {
 
 public sealed record DST : Hl7Segment {
     public CWE Destination { get; }
-    public RepField<CWE> Route { get; }
+    public ICollection<CWE>? Route { get; }
 
     public DST(Segment segment) : base(typeof(DST), segment) {
         this.Destination = segment.GetRequiredField<CWE>(1);
@@ -1336,7 +1338,7 @@ public sealed record ECD : Hl7Segment {
     public NM ReferenceCommandNumber { get; }
     public CWE RemoteControlCommand { get; }
     public ID? ResponseRequired { get; }
-    public RepField<TX> Parameters { get; }
+    public ICollection<TX>? Parameters { get; }
 
     public ECD(Segment segment) : base(typeof(ECD), segment) {
         this.ReferenceCommandNumber = segment.GetRequiredField<NM>(1);
@@ -1349,7 +1351,7 @@ public sealed record ECD : Hl7Segment {
 public sealed record ECR : Hl7Segment {
     public CWE CommandResponse { get; }
     public DTM DateTimeCompleted { get; }
-    public RepField<TX> CommandResponseParameters { get; }
+    public ICollection<TX>? CommandResponseParameters { get; }
 
     public ECR(Segment segment) : base(typeof(ECR), segment) {
         this.CommandResponse = segment.GetRequiredField<CWE>(1);
@@ -1367,7 +1369,7 @@ public sealed record EDU : Hl7Segment {
     public XON? School { get; }
     public CWE? SchoolTypeCode { get; }
     public XAD? SchoolAddress { get; }
-    public RepField<CWE> MajorFieldofStudy { get; }
+    public ICollection<CWE>? MajorFieldofStudy { get; }
 
     public EDU(Segment segment) : base(typeof(EDU), segment) {
         this.SetIDEDU = segment.GetRequiredField<SI>(1);
@@ -1399,7 +1401,7 @@ public sealed record EQP : Hl7Segment {
 }
 
 public sealed record EQU : Hl7Segment {
-    public RepField<EI> EquipmentInstanceIdentifier { get; }
+    public ICollection<EI> EquipmentInstanceIdentifier { get; }
     public DTM EventDateTime { get; }
     public CWE? EquipmentState { get; }
     public CWE? LocalRemoteControlState { get; }
@@ -1407,7 +1409,7 @@ public sealed record EQU : Hl7Segment {
     public DTM? Expecteddatetimeofthenextstatuschange { get; }
 
     public EQU(Segment segment) : base(typeof(EQU), segment) {
-        this.EquipmentInstanceIdentifier = segment.GetRepField<EI>(1);
+        this.EquipmentInstanceIdentifier = segment.GetRequiredRepField<EI>(1);
         this.EventDateTime = segment.GetRequiredField<DTM>(2);
         this.EquipmentState = segment.GetField<CWE>(3);
         this.LocalRemoteControlState = segment.GetField<CWE>(4);
@@ -1417,17 +1419,17 @@ public sealed record EQU : Hl7Segment {
 }
 
 public sealed record ERR : Hl7Segment {
-    public RepField<ERL> ErrorLocation { get; }
+    public ICollection<ERL>? ErrorLocation { get; }
     public CWE HL7ErrorCode { get; }
     public ID Severity { get; }
     public CWE? ApplicationErrorCode { get; }
     public ST? ApplicationErrorParameter { get; }
     public TX? DiagnosticInformation { get; }
     public TX? UserMessage { get; }
-    public RepField<CWE> InformPersonIndicator { get; }
+    public ICollection<CWE>? InformPersonIndicator { get; }
     public CWE? OverrideType { get; }
-    public RepField<CWE> OverrideReasonCode { get; }
-    public RepField<XTN> HelpDeskContactPoint { get; }
+    public ICollection<CWE>? OverrideReasonCode { get; }
+    public ICollection<XTN>? HelpDeskContactPoint { get; }
 
     public ERR(Segment segment) : base(typeof(ERR), segment) {
         this.ErrorLocation = segment.GetRepField<ERL>(1);
@@ -1448,7 +1450,7 @@ public sealed record EVN : Hl7Segment {
     public DTM RecordedDateTime { get; }
     public DTM? DateTimePlannedEvent { get; }
     public CWE? EventReasonCode { get; }
-    public RepField<XCN> OperatorID { get; }
+    public ICollection<XCN>? OperatorID { get; }
     public DTM? EventOccurred { get; }
     public HD? EventFacility { get; }
 
@@ -1465,27 +1467,27 @@ public sealed record EVN : Hl7Segment {
 public sealed record FAC : Hl7Segment {
     public EI FacilityIDFAC { get; }
     public ID? FacilityType { get; }
-    public RepField<XAD> FacilityAddress { get; }
+    public ICollection<XAD> FacilityAddress { get; }
     public XTN FacilityTelecommunication { get; }
-    public RepField<XCN> ContactPerson { get; }
-    public RepField<ST> ContactTitle { get; }
-    public RepField<XAD> ContactAddress { get; }
-    public RepField<XTN> ContactTelecommunication { get; }
-    public RepField<XCN> SignatureAuthority { get; }
+    public ICollection<XCN>? ContactPerson { get; }
+    public ICollection<ST>? ContactTitle { get; }
+    public ICollection<XAD>? ContactAddress { get; }
+    public ICollection<XTN>? ContactTelecommunication { get; }
+    public ICollection<XCN> SignatureAuthority { get; }
     public ST? SignatureAuthorityTitle { get; }
-    public RepField<XAD> SignatureAuthorityAddress { get; }
+    public ICollection<XAD>? SignatureAuthorityAddress { get; }
     public XTN? SignatureAuthorityTelecommunication { get; }
 
     public FAC(Segment segment) : base(typeof(FAC), segment) {
         this.FacilityIDFAC = segment.GetRequiredField<EI>(1);
         this.FacilityType = segment.GetField<ID>(2);
-        this.FacilityAddress = segment.GetRepField<XAD>(3);
+        this.FacilityAddress = segment.GetRequiredRepField<XAD>(3);
         this.FacilityTelecommunication = segment.GetRequiredField<XTN>(4);
         this.ContactPerson = segment.GetRepField<XCN>(5);
         this.ContactTitle = segment.GetRepField<ST>(6);
         this.ContactAddress = segment.GetRepField<XAD>(7);
         this.ContactTelecommunication = segment.GetRepField<XTN>(8);
-        this.SignatureAuthority = segment.GetRepField<XCN>(9);
+        this.SignatureAuthority = segment.GetRequiredRepField<XCN>(9);
         this.SignatureAuthorityTitle = segment.GetField<ST>(10);
         this.SignatureAuthorityAddress = segment.GetRepField<XAD>(11);
         this.SignatureAuthorityTelecommunication = segment.GetField<XTN>(12);
@@ -1549,24 +1551,24 @@ public sealed record FT1 : Hl7Segment {
     public PL? AssignedPatientLocation { get; }
     public CWE? FeeSchedule { get; }
     public CWE? PatientType { get; }
-    public RepField<CWE> DiagnosisCodeFT1 { get; }
-    public RepField<XCN> PerformedByCode { get; }
-    public RepField<XCN> OrderedByCode { get; }
+    public ICollection<CWE>? DiagnosisCodeFT1 { get; }
+    public ICollection<XCN>? PerformedByCode { get; }
+    public ICollection<XCN>? OrderedByCode { get; }
     public CP? UnitCost { get; }
     public EI? FillerOrderNumber { get; }
-    public RepField<XCN> EnteredByCode { get; }
+    public ICollection<XCN>? EnteredByCode { get; }
     public CNE? ProcedureCode { get; }
-    public RepField<CNE> ProcedureCodeModifier { get; }
+    public ICollection<CNE>? ProcedureCodeModifier { get; }
     public CWE? AdvancedBeneficiaryNoticeCode { get; }
     public CWE? MedicallyNecessaryDuplicateProcedureReason { get; }
     public CWE? NDCCode { get; }
     public CX? PaymentReferenceID { get; }
-    public RepField<SI> TransactionReferenceKey { get; }
-    public RepField<XON> PerformingFacility { get; }
+    public ICollection<SI>? TransactionReferenceKey { get; }
+    public ICollection<XON>? PerformingFacility { get; }
     public XON? OrderingFacility { get; }
     public CWE? ItemNumber { get; }
     public ST? ModelNumber { get; }
-    public RepField<CWE> SpecialProcessingCode { get; }
+    public ICollection<CWE>? SpecialProcessingCode { get; }
     public CWE? ClinicCode { get; }
     public CX? ReferralNumber { get; }
     public CX? AuthorizationNumber { get; }
@@ -1672,11 +1674,11 @@ public sealed record GOL : Hl7Segment {
     public DTM? NextGoalReviewDateTime { get; }
     public DTM? PreviousGoalReviewDateTime { get; }
     public CWE? GoalEvaluation { get; }
-    public RepField<ST> GoalEvaluationComment { get; }
+    public ICollection<ST>? GoalEvaluationComment { get; }
     public CWE? GoalLifeCycleStatus { get; }
     public DTM? GoalLifeCycleStatusDateTime { get; }
-    public RepField<CWE> GoalTargetType { get; }
-    public RepField<XPN> GoalTargetName { get; }
+    public ICollection<CWE>? GoalTargetType { get; }
+    public ICollection<XPN>? GoalTargetName { get; }
     public CNE? MoodCode { get; }
 
     public GOL(Segment segment) : base(typeof(GOL), segment) {
@@ -1706,9 +1708,9 @@ public sealed record GOL : Hl7Segment {
 
 public sealed record GP1 : Hl7Segment {
     public CWE TypeofBillCode { get; }
-    public RepField<CWE> RevenueCode { get; }
+    public ICollection<CWE>? RevenueCode { get; }
     public CWE? OverallClaimDispositionCode { get; }
-    public RepField<CWE> OCEEditsperVisitCode { get; }
+    public ICollection<CWE>? OCEEditsperVisitCode { get; }
     public CP? OutlierCost { get; }
 
     public GP1(Segment segment) : base(typeof(GP1), segment) {
@@ -1726,9 +1728,9 @@ public sealed record GP2 : Hl7Segment {
     public CP? Charge { get; }
     public CWE? ReimbursementActionCode { get; }
     public CWE? DenialorRejectionCode { get; }
-    public RepField<CWE> OCEEditCode { get; }
+    public ICollection<CWE>? OCEEditCode { get; }
     public CWE? AmbulatoryPaymentClassificationCode { get; }
-    public RepField<CWE> ModifierEditCode { get; }
+    public ICollection<CWE>? ModifierEditCode { get; }
     public CWE? PaymentAdjustmentCode { get; }
     public CWE? PackagingStatusCode { get; }
     public CP? ExpectedCMSPaymentAmount { get; }
@@ -1756,12 +1758,12 @@ public sealed record GP2 : Hl7Segment {
 
 public sealed record GT1 : Hl7Segment {
     public SI SetIDGT1 { get; }
-    public RepField<CX> GuarantorNumber { get; }
-    public RepField<XPN> GuarantorName { get; }
-    public RepField<XPN> GuarantorSpouseName { get; }
-    public RepField<XAD> GuarantorAddress { get; }
-    public RepField<XTN> GuarantorPhNumHome { get; }
-    public RepField<XTN> GuarantorPhNumBusiness { get; }
+    public ICollection<CX>? GuarantorNumber { get; }
+    public ICollection<XPN> GuarantorName { get; }
+    public ICollection<XPN>? GuarantorSpouseName { get; }
+    public ICollection<XAD>? GuarantorAddress { get; }
+    public ICollection<XTN>? GuarantorPhNumHome { get; }
+    public ICollection<XTN>? GuarantorPhNumBusiness { get; }
     public DTM? GuarantorDateTimeOfBirth { get; }
     public CWE? GuarantorAdministrativeSex { get; }
     public CWE? GuarantorType { get; }
@@ -1770,12 +1772,12 @@ public sealed record GT1 : Hl7Segment {
     public DT? GuarantorDateBegin { get; }
     public DT? GuarantorDateEnd { get; }
     public NM? GuarantorPriority { get; }
-    public RepField<XPN> GuarantorEmployerName { get; }
-    public RepField<XAD> GuarantorEmployerAddress { get; }
-    public RepField<XTN> GuarantorEmployerPhoneNumber { get; }
-    public RepField<CX> GuarantorEmployeeIDNumber { get; }
+    public ICollection<XPN>? GuarantorEmployerName { get; }
+    public ICollection<XAD>? GuarantorEmployerAddress { get; }
+    public ICollection<XTN>? GuarantorEmployerPhoneNumber { get; }
+    public ICollection<CX>? GuarantorEmployeeIDNumber { get; }
     public CWE? GuarantorEmploymentStatus { get; }
-    public RepField<XON> GuarantorOrganizationName { get; }
+    public ICollection<XON>? GuarantorOrganizationName { get; }
     public ID? GuarantorBillingHoldFlag { get; }
     public CWE? GuarantorCreditRatingCode { get; }
     public DTM? GuarantorDeathDateAndTime { get; }
@@ -1783,40 +1785,40 @@ public sealed record GT1 : Hl7Segment {
     public CWE? GuarantorChargeAdjustmentCode { get; }
     public CP? GuarantorHouseholdAnnualIncome { get; }
     public NM? GuarantorHouseholdSize { get; }
-    public RepField<CX> GuarantorEmployerIDNumber { get; }
+    public ICollection<CX>? GuarantorEmployerIDNumber { get; }
     public CWE? GuarantorMaritalStatusCode { get; }
     public DT? GuarantorHireEffectiveDate { get; }
     public DT? EmploymentStopDate { get; }
     public CWE? LivingDependency { get; }
-    public RepField<CWE> AmbulatoryStatus { get; }
-    public RepField<CWE> Citizenship { get; }
+    public ICollection<CWE>? AmbulatoryStatus { get; }
+    public ICollection<CWE>? Citizenship { get; }
     public CWE? PrimaryLanguage { get; }
     public CWE? LivingArrangement { get; }
     public CWE? PublicityCode { get; }
     public ID? ProtectionIndicator { get; }
     public CWE? StudentIndicator { get; }
     public CWE? Religion { get; }
-    public RepField<XPN> MothersMaidenName { get; }
+    public ICollection<XPN>? MothersMaidenName { get; }
     public CWE? Nationality { get; }
-    public RepField<CWE> EthnicGroup { get; }
-    public RepField<XPN> ContactPersonsName { get; }
-    public RepField<XTN> ContactPersonsTelephoneNumber { get; }
+    public ICollection<CWE>? EthnicGroup { get; }
+    public ICollection<XPN>? ContactPersonsName { get; }
+    public ICollection<XTN>? ContactPersonsTelephoneNumber { get; }
     public CWE? ContactReason { get; }
     public CWE? ContactRelationship { get; }
     public ST? JobTitle { get; }
     public JCC? JobCodeClass { get; }
-    public RepField<XON> GuarantorEmployersOrganizationName { get; }
+    public ICollection<XON>? GuarantorEmployersOrganizationName { get; }
     public CWE? Handicap { get; }
     public CWE? JobStatus { get; }
     public FC? GuarantorFinancialClass { get; }
-    public RepField<CWE> GuarantorRace { get; }
+    public ICollection<CWE>? GuarantorRace { get; }
     public ST? GuarantorBirthPlace { get; }
     public CWE? VIPIndicator { get; }
 
     public GT1(Segment segment) : base(typeof(GT1), segment) {
         this.SetIDGT1 = segment.GetRequiredField<SI>(1);
         this.GuarantorNumber = segment.GetRepField<CX>(2);
-        this.GuarantorName = segment.GetRepField<XPN>(3);
+        this.GuarantorName = segment.GetRequiredRepField<XPN>(3);
         this.GuarantorSpouseName = segment.GetRepField<XPN>(4);
         this.GuarantorAddress = segment.GetRepField<XAD>(5);
         this.GuarantorPhNumHome = segment.GetRepField<XTN>(6);
@@ -1885,7 +1887,7 @@ public sealed record IAM : Hl7Segment {
     public CWE? AllergenTypeCode { get; }
     public CWE AllergenCodeMnemonicDescription { get; }
     public CWE? AllergySeverityCode { get; }
-    public RepField<ST> AllergyReactionCode { get; }
+    public ICollection<ST>? AllergyReactionCode { get; }
     public CNE AllergyActionCode { get; }
     public EI? AllergyUniqueIdentifier { get; }
     public ST? ActionReason { get; }
@@ -1975,7 +1977,7 @@ public sealed record IIM : Hl7Segment {
     public NM? InventoryOnHandQuantity { get; }
     public CWE? InventoryOnHandQuantityUnit { get; }
     public CNE? ProcedureCode { get; }
-    public RepField<CNE> ProcedureCodeModifier { get; }
+    public ICollection<CNE>? ProcedureCodeModifier { get; }
 
     public IIM(Segment segment) : base(typeof(IIM), segment) {
         this.PrimaryKeyValueIIM = segment.GetRequiredField<CWE>(1);
@@ -2025,23 +2027,23 @@ public sealed record ILT : Hl7Segment {
 public sealed record IN1 : Hl7Segment {
     public SI SetIDIN1 { get; }
     public CWE HealthPlanID { get; }
-    public RepField<CX> InsuranceCompanyID { get; }
-    public RepField<XON> InsuranceCompanyName { get; }
-    public RepField<XAD> InsuranceCompanyAddress { get; }
-    public RepField<XPN> InsuranceCoContactPerson { get; }
-    public RepField<XTN> InsuranceCoPhoneNumber { get; }
+    public ICollection<CX> InsuranceCompanyID { get; }
+    public ICollection<XON>? InsuranceCompanyName { get; }
+    public ICollection<XAD>? InsuranceCompanyAddress { get; }
+    public ICollection<XPN>? InsuranceCoContactPerson { get; }
+    public ICollection<XTN>? InsuranceCoPhoneNumber { get; }
     public ST? GroupNumber { get; }
-    public RepField<XON> GroupName { get; }
-    public RepField<CX> InsuredsGroupEmpID { get; }
-    public RepField<XON> InsuredsGroupEmpName { get; }
+    public ICollection<XON>? GroupName { get; }
+    public ICollection<CX>? InsuredsGroupEmpID { get; }
+    public ICollection<XON>? InsuredsGroupEmpName { get; }
     public DT? PlanEffectiveDate { get; }
     public DT? PlanExpirationDate { get; }
     public AUI? AuthorizationInformation { get; }
     public CWE? PlanType { get; }
-    public RepField<XPN> NameOfInsured { get; }
+    public ICollection<XPN>? NameOfInsured { get; }
     public CWE? InsuredsRelationshipToPatient { get; }
     public DTM? InsuredsDateOfBirth { get; }
-    public RepField<XAD> InsuredsAddress { get; }
+    public ICollection<XAD>? InsuredsAddress { get; }
     public CWE? AssignmentOfBenefits { get; }
     public CWE? CoordinationOfBenefits { get; }
     public ST? CoordOfBenPriority { get; }
@@ -2052,7 +2054,7 @@ public sealed record IN1 : Hl7Segment {
     public CWE? ReleaseInformationCode { get; }
     public ST? PreAdmitCert { get; }
     public DTM? VerificationDateTime { get; }
-    public RepField<XCN> VerificationBy { get; }
+    public ICollection<XCN>? VerificationBy { get; }
     public CWE? TypeOfAgreementCode { get; }
     public CWE? BillingStatus { get; }
     public NM? LifetimeReserveDays { get; }
@@ -2063,23 +2065,23 @@ public sealed record IN1 : Hl7Segment {
     public NM? PolicyLimitDays { get; }
     public CWE? InsuredsEmploymentStatus { get; }
     public CWE? InsuredsAdministrativeSex { get; }
-    public RepField<XAD> InsuredsEmployersAddress { get; }
+    public ICollection<XAD>? InsuredsEmployersAddress { get; }
     public ST? VerificationStatus { get; }
     public CWE? PriorInsurancePlanID { get; }
     public CWE? CoverageType { get; }
     public CWE? Handicap { get; }
-    public RepField<CX> InsuredsIDNumber { get; }
+    public ICollection<CX>? InsuredsIDNumber { get; }
     public CWE? SignatureCode { get; }
     public DT? SignatureCodeDate { get; }
     public ST? InsuredsBirthPlace { get; }
     public CWE? VIPIndicator { get; }
-    public RepField<CX> ExternalHealthPlanIdentifiers { get; }
+    public ICollection<CX>? ExternalHealthPlanIdentifiers { get; }
     public ID? InsuranceActionCode { get; }
 
     public IN1(Segment segment) : base(typeof(IN1), segment) {
         this.SetIDIN1 = segment.GetRequiredField<SI>(1);
         this.HealthPlanID = segment.GetRequiredField<CWE>(2);
-        this.InsuranceCompanyID = segment.GetRepField<CX>(3);
+        this.InsuranceCompanyID = segment.GetRequiredRepField<CX>(3);
         this.InsuranceCompanyName = segment.GetRepField<XON>(4);
         this.InsuranceCompanyAddress = segment.GetRepField<XAD>(5);
         this.InsuranceCoContactPerson = segment.GetRepField<XPN>(6);
@@ -2133,15 +2135,15 @@ public sealed record IN1 : Hl7Segment {
 }
 
 public sealed record IN2 : Hl7Segment {
-    public RepField<CX> InsuredsEmployeeID { get; }
+    public ICollection<CX>? InsuredsEmployeeID { get; }
     public ST? InsuredsSocialSecurityNumber { get; }
-    public RepField<XCN> InsuredsEmployersNameandID { get; }
+    public ICollection<XCN>? InsuredsEmployersNameandID { get; }
     public CWE? EmployerInformationData { get; }
-    public RepField<CWE> MailClaimParty { get; }
+    public ICollection<CWE>? MailClaimParty { get; }
     public ST? MedicareHealthInsCardNumber { get; }
-    public RepField<XPN> MedicaidCaseName { get; }
+    public ICollection<XPN>? MedicaidCaseName { get; }
     public ST? MedicaidCaseNumber { get; }
-    public RepField<XPN> MilitarySponsorName { get; }
+    public ICollection<XPN>? MilitarySponsorName { get; }
     public ST? MilitaryIDNumber { get; }
     public CWE? DependentOfMilitaryRecipient { get; }
     public ST? MilitaryOrganization { get; }
@@ -2154,56 +2156,56 @@ public sealed record IN2 : Hl7Segment {
     public ID? BabyCoverage { get; }
     public ID? CombineBabyBill { get; }
     public ST? BloodDeductible { get; }
-    public RepField<XPN> SpecialCoverageApprovalName { get; }
+    public ICollection<XPN>? SpecialCoverageApprovalName { get; }
     public ST? SpecialCoverageApprovalTitle { get; }
-    public RepField<CWE> NonCoveredInsuranceCode { get; }
-    public RepField<CX> PayorID { get; }
-    public RepField<CX> PayorSubscriberID { get; }
+    public ICollection<CWE>? NonCoveredInsuranceCode { get; }
+    public ICollection<CX>? PayorID { get; }
+    public ICollection<CX>? PayorSubscriberID { get; }
     public CWE? EligibilitySource { get; }
-    public RepField<RMC> RoomCoverageTypeAmount { get; }
-    public RepField<PTA> PolicyTypeAmount { get; }
+    public ICollection<RMC>? RoomCoverageTypeAmount { get; }
+    public ICollection<PTA>? PolicyTypeAmount { get; }
     public DDI? DailyDeductible { get; }
     public CWE? LivingDependency { get; }
-    public RepField<CWE> AmbulatoryStatus { get; }
-    public RepField<CWE> Citizenship { get; }
+    public ICollection<CWE>? AmbulatoryStatus { get; }
+    public ICollection<CWE>? Citizenship { get; }
     public CWE? PrimaryLanguage { get; }
     public CWE? LivingArrangement { get; }
     public CWE? PublicityCode { get; }
     public ID? ProtectionIndicator { get; }
     public CWE? StudentIndicator { get; }
     public CWE? Religion { get; }
-    public RepField<XPN> MothersMaidenName { get; }
+    public ICollection<XPN>? MothersMaidenName { get; }
     public CWE? Nationality { get; }
-    public RepField<CWE> EthnicGroup { get; }
-    public RepField<CWE> MaritalStatus { get; }
+    public ICollection<CWE>? EthnicGroup { get; }
+    public ICollection<CWE>? MaritalStatus { get; }
     public DT? InsuredsEmploymentStartDate { get; }
     public DT? EmploymentStopDate { get; }
     public ST? JobTitle { get; }
     public JCC? JobCodeClass { get; }
     public CWE? JobStatus { get; }
-    public RepField<XPN> EmployerContactPersonName { get; }
-    public RepField<XTN> EmployerContactPersonPhoneNumber { get; }
+    public ICollection<XPN>? EmployerContactPersonName { get; }
+    public ICollection<XTN>? EmployerContactPersonPhoneNumber { get; }
     public CWE? EmployerContactReason { get; }
-    public RepField<XPN> InsuredsContactPersonsName { get; }
-    public RepField<XTN> InsuredsContactPersonPhoneNumber { get; }
-    public RepField<CWE> InsuredsContactPersonReason { get; }
+    public ICollection<XPN>? InsuredsContactPersonsName { get; }
+    public ICollection<XTN>? InsuredsContactPersonPhoneNumber { get; }
+    public ICollection<CWE>? InsuredsContactPersonReason { get; }
     public DT? RelationshiptothePatientStartDate { get; }
-    public RepField<DT> RelationshiptothePatientStopDate { get; }
+    public ICollection<DT>? RelationshiptothePatientStopDate { get; }
     public CWE? InsuranceCoContactReason { get; }
-    public RepField<XTN> InsuranceCoContactPhoneNumber { get; }
+    public ICollection<XTN>? InsuranceCoContactPhoneNumber { get; }
     public CWE? PolicyScope { get; }
     public CWE? PolicySource { get; }
     public CX? PatientMemberNumber { get; }
     public CWE? GuarantorsRelationshiptoInsured { get; }
-    public RepField<XTN> InsuredsPhoneNumberHome { get; }
-    public RepField<XTN> InsuredsEmployerPhoneNumber { get; }
+    public ICollection<XTN>? InsuredsPhoneNumberHome { get; }
+    public ICollection<XTN>? InsuredsEmployerPhoneNumber { get; }
     public CWE? MilitaryHandicappedProgram { get; }
     public ID? SuspendFlag { get; }
     public ID? CopayLimitFlag { get; }
     public ID? StoplossLimitFlag { get; }
-    public RepField<XON> InsuredOrganizationNameandID { get; }
-    public RepField<XON> InsuredEmployerOrganizationNameandID { get; }
-    public RepField<CWE> Race { get; }
+    public ICollection<XON>? InsuredOrganizationNameandID { get; }
+    public ICollection<XON>? InsuredEmployerOrganizationNameandID { get; }
+    public ICollection<CWE>? Race { get; }
     public CWE? PatientsRelationshiptoInsured { get; }
     public CP? CoPayAmount { get; }
 
@@ -2287,29 +2289,29 @@ public sealed record IN2 : Hl7Segment {
 public sealed record IN3 : Hl7Segment {
     public SI SetIDIN3 { get; }
     public CX? CertificationNumber { get; }
-    public RepField<XCN> CertifiedBy { get; }
+    public ICollection<XCN>? CertifiedBy { get; }
     public ID? CertificationRequired { get; }
     public MOP? Penalty { get; }
     public DTM? CertificationDateTime { get; }
     public DTM? CertificationModifyDateTime { get; }
-    public RepField<XCN> Operator { get; }
+    public ICollection<XCN>? Operator { get; }
     public DT? CertificationBeginDate { get; }
     public DT? CertificationEndDate { get; }
     public DTN? Days { get; }
     public CWE? NonConcurCodeDescription { get; }
     public DTM? NonConcurEffectiveDateTime { get; }
-    public RepField<XCN> PhysicianReviewer { get; }
+    public ICollection<XCN>? PhysicianReviewer { get; }
     public ST? CertificationContact { get; }
-    public RepField<XTN> CertificationContactPhoneNumber { get; }
+    public ICollection<XTN>? CertificationContactPhoneNumber { get; }
     public CWE? AppealReason { get; }
     public CWE? CertificationAgency { get; }
-    public RepField<XTN> CertificationAgencyPhoneNumber { get; }
-    public RepField<ICD> PreCertificationRequirement { get; }
+    public ICollection<XTN>? CertificationAgencyPhoneNumber { get; }
+    public ICollection<ICD>? PreCertificationRequirement { get; }
     public ST? CaseManager { get; }
     public DT? SecondOpinionDate { get; }
     public CWE? SecondOpinionStatus { get; }
-    public RepField<CWE> SecondOpinionDocumentationReceived { get; }
-    public RepField<XCN> SecondOpinionPhysician { get; }
+    public ICollection<CWE>? SecondOpinionDocumentationReceived { get; }
+    public ICollection<XCN>? SecondOpinionPhysician { get; }
     public CWE? CertificationType { get; }
     public CWE? CertificationCategory { get; }
     public DTM? OnlineVerificationDateTime { get; }
@@ -2366,7 +2368,7 @@ public sealed record INV : Hl7Segment {
     public CWE? QuantityUnits { get; }
     public DTM? ExpirationDateTime { get; }
     public DTM? FirstUsedDateTime { get; }
-    public RepField<CWE> TestFluidIdentifiers { get; }
+    public ICollection<CWE>? TestFluidIdentifiers { get; }
     public ST? ManufacturerLotNumber { get; }
     public CWE? ManufacturerIdentifier { get; }
     public CWE? SupplierIdentifier { get; }
@@ -2406,9 +2408,9 @@ public sealed record IPC : Hl7Segment {
     public EI StudyInstanceUID { get; }
     public EI ScheduledProcedureStepID { get; }
     public CWE? Modality { get; }
-    public RepField<CWE> ProtocolCode { get; }
+    public ICollection<CWE>? ProtocolCode { get; }
     public EI? ScheduledStationName { get; }
-    public RepField<CWE> ScheduledProcedureStepLocation { get; }
+    public ICollection<CWE>? ScheduledProcedureStepLocation { get; }
     public ST? ScheduledStationAETitle { get; }
     public ID? ActionCode { get; }
 
@@ -2476,9 +2478,9 @@ public sealed record ITM : Hl7Segment {
     public CP? TransactionAmountUnit { get; }
     public CNE? StockedItemIndicator { get; }
     public CWE? SupplyRiskCodes { get; }
-    public RepField<XON> ApprovingRegulatoryAgency { get; }
+    public ICollection<XON>? ApprovingRegulatoryAgency { get; }
     public CNE? LatexIndicator { get; }
-    public RepField<CWE> RulingAct { get; }
+    public ICollection<CWE>? RulingAct { get; }
     public CWE? ItemNaturalAccountCode { get; }
     public NM? ApprovedToBuyQuantity { get; }
     public MO? ApprovedToBuyPrice { get; }
@@ -2488,7 +2490,7 @@ public sealed record ITM : Hl7Segment {
     public EI? ItemSetIdentifier { get; }
     public CNE? TrackDepartmentUsageIndicator { get; }
     public CNE? ProcedureCode { get; }
-    public RepField<CNE> ProcedureCodeModifier { get; }
+    public ICollection<CNE>? ProcedureCodeModifier { get; }
     public CWE? SpecialHandlingCode { get; }
     public CNE? HazardousIndicator { get; }
     public CNE? SterileIndicator { get; }
@@ -2566,7 +2568,7 @@ public sealed record IVC : Hl7Segment {
     public CP? InvoicePrepaidAmount { get; }
     public CP? TotalInvoiceAmountwithoutPrepaidAmount { get; }
     public CP? TotalAmountofVAT { get; }
-    public RepField<NM> VATRatesapplied { get; }
+    public ICollection<NM>? VATRatesapplied { get; }
     public CWE BenefitGroup { get; }
     public ST? ProviderTaxID { get; }
     public ST? PayerTaxID { get; }
@@ -2615,7 +2617,7 @@ public sealed record IVT : Hl7Segment {
     public EI? SourceLocationIdentifier { get; }
     public ST? SourceLocationName { get; }
     public CWE? ItemStatus { get; }
-    public RepField<EI> BinLocationIdentifier { get; }
+    public ICollection<EI>? BinLocationIdentifier { get; }
     public CWE? OrderPackaging { get; }
     public CWE? IssuePackaging { get; }
     public EI? DefaultInventoryAssetAccount { get; }
@@ -2627,7 +2629,7 @@ public sealed record IVT : Hl7Segment {
     public CNE? ConsignmentItemIndicator { get; }
     public CNE? ReusableItemIndicator { get; }
     public CP? ReusableCost { get; }
-    public RepField<EI> SubstituteItemIdentifier { get; }
+    public ICollection<EI>? SubstituteItemIdentifier { get; }
     public EI? LatexFreeSubstituteItemIdentifier { get; }
     public CWE? RecommendedReorderTheory { get; }
     public NM? RecommendedSafetyStockDays { get; }
@@ -2669,7 +2671,7 @@ public sealed record IVT : Hl7Segment {
 public sealed record LAN : Hl7Segment {
     public SI SetIDLAN { get; }
     public CWE LanguageCode { get; }
-    public RepField<CWE> LanguageAbilityCode { get; }
+    public ICollection<CWE>? LanguageAbilityCode { get; }
     public CWE? LanguageProficiencyCode { get; }
 
     public LAN(Segment segment) : base(typeof(LAN), segment) {
@@ -2683,14 +2685,14 @@ public sealed record LAN : Hl7Segment {
 public sealed record LCC : Hl7Segment {
     public PL PrimaryKeyValueLCC { get; }
     public CWE LocationDepartment { get; }
-    public RepField<CWE> AccommodationType { get; }
-    public RepField<CWE> ChargeCode { get; }
+    public ICollection<CWE>? AccommodationType { get; }
+    public ICollection<CWE> ChargeCode { get; }
 
     public LCC(Segment segment) : base(typeof(LCC), segment) {
         this.PrimaryKeyValueLCC = segment.GetRequiredField<PL>(1);
         this.LocationDepartment = segment.GetRequiredField<CWE>(2);
         this.AccommodationType = segment.GetRepField<CWE>(3);
-        this.ChargeCode = segment.GetRepField<CWE>(4);
+        this.ChargeCode = segment.GetRequiredRepField<CWE>(4);
     }
 }
 
@@ -2713,14 +2715,14 @@ public sealed record LCH : Hl7Segment {
 public sealed record LDP : Hl7Segment {
     public PL PrimaryKeyValueLDP { get; }
     public CWE LocationDepartment { get; }
-    public RepField<CWE> LocationService { get; }
-    public RepField<CWE> SpecialtyType { get; }
-    public RepField<CWE> ValidPatientClasses { get; }
+    public ICollection<CWE>? LocationService { get; }
+    public ICollection<CWE>? SpecialtyType { get; }
+    public ICollection<CWE>? ValidPatientClasses { get; }
     public ID? ActiveInactiveFlag { get; }
     public DTM? ActivationDateLDP { get; }
     public DTM? InactivationDateLDP { get; }
     public ST? InactivatedReason { get; }
-    public RepField<VH> VisitingHours { get; }
+    public ICollection<VH>? VisitingHours { get; }
     public XTN? ContactPhone { get; }
     public CWE? LocationCostCenter { get; }
 
@@ -2743,18 +2745,18 @@ public sealed record LDP : Hl7Segment {
 public sealed record LOC : Hl7Segment {
     public PL PrimaryKeyValueLOC { get; }
     public ST? LocationDescription { get; }
-    public RepField<CWE> LocationTypeLOC { get; }
-    public RepField<XON> OrganizationNameLOC { get; }
-    public RepField<XAD> LocationAddress { get; }
-    public RepField<XTN> LocationPhone { get; }
-    public RepField<CWE> LicenseNumber { get; }
-    public RepField<CWE> LocationEquipment { get; }
+    public ICollection<CWE> LocationTypeLOC { get; }
+    public ICollection<XON>? OrganizationNameLOC { get; }
+    public ICollection<XAD>? LocationAddress { get; }
+    public ICollection<XTN>? LocationPhone { get; }
+    public ICollection<CWE>? LicenseNumber { get; }
+    public ICollection<CWE>? LocationEquipment { get; }
     public CWE? LocationServiceCode { get; }
 
     public LOC(Segment segment) : base(typeof(LOC), segment) {
         this.PrimaryKeyValueLOC = segment.GetRequiredField<PL>(1);
         this.LocationDescription = segment.GetField<ST>(2);
-        this.LocationTypeLOC = segment.GetRepField<CWE>(3);
+        this.LocationTypeLOC = segment.GetRequiredRepField<CWE>(3);
         this.OrganizationNameLOC = segment.GetRepField<XON>(4);
         this.LocationAddress = segment.GetRepField<XAD>(5);
         this.LocationPhone = segment.GetRepField<XTN>(6);
@@ -2803,16 +2805,16 @@ public sealed record MFA : Hl7Segment {
     public ST? MFNControlID { get; }
     public DTM? EventCompletionDateTime { get; }
     public CWE MFNRecordLevelErrorReturn { get; }
-    public RepField<ST> PrimaryKeyValueMFA { get; }
-    public RepField<ID> PrimaryKeyValueTypeMFA { get; }
+    public ICollection<ST> PrimaryKeyValueMFA { get; }
+    public ICollection<ID> PrimaryKeyValueTypeMFA { get; }
 
     public MFA(Segment segment) : base(typeof(MFA), segment) {
         this.RecordLevelEventCode = segment.GetRequiredField<ID>(1);
         this.MFNControlID = segment.GetField<ST>(2);
         this.EventCompletionDateTime = segment.GetField<DTM>(3);
         this.MFNRecordLevelErrorReturn = segment.GetRequiredField<CWE>(4);
-        this.PrimaryKeyValueMFA = segment.GetRepField<ST>(5);
-        this.PrimaryKeyValueTypeMFA = segment.GetRepField<ID>(6);
+        this.PrimaryKeyValueMFA = segment.GetRequiredRepField<ST>(5);
+        this.PrimaryKeyValueTypeMFA = segment.GetRequiredRepField<ID>(6);
     }
 }
 
@@ -2820,8 +2822,8 @@ public sealed record MFE : Hl7Segment {
     public ID RecordLevelEventCode { get; }
     public ST? MFNControlID { get; }
     public DTM? EffectiveDateTime { get; }
-    public RepField<ST> PrimaryKeyValueMFE { get; }
-    public RepField<ID> PrimaryKeyValueType { get; }
+    public ICollection<ST> PrimaryKeyValueMFE { get; }
+    public ICollection<ID> PrimaryKeyValueType { get; }
     public DTM? EnteredDateTime { get; }
     public XCN? EnteredBy { get; }
 
@@ -2829,8 +2831,8 @@ public sealed record MFE : Hl7Segment {
         this.RecordLevelEventCode = segment.GetRequiredField<ID>(1);
         this.MFNControlID = segment.GetField<ST>(2);
         this.EffectiveDateTime = segment.GetField<DTM>(3);
-        this.PrimaryKeyValueMFE = segment.GetRepField<ST>(4);
-        this.PrimaryKeyValueType = segment.GetRepField<ID>(5);
+        this.PrimaryKeyValueMFE = segment.GetRequiredRepField<ST>(4);
+        this.PrimaryKeyValueType = segment.GetRequiredRepField<ID>(5);
         this.EnteredDateTime = segment.GetField<DTM>(6);
         this.EnteredBy = segment.GetField<XCN>(7);
     }
@@ -2838,7 +2840,7 @@ public sealed record MFE : Hl7Segment {
 
 public sealed record MFI : Hl7Segment {
     public CWE MasterFileIdentifier { get; }
-    public RepField<HD> MasterFileApplicationIdentifier { get; }
+    public ICollection<HD>? MasterFileApplicationIdentifier { get; }
     public ID FileLevelEventCode { get; }
     public DTM? EnteredDateTime { get; }
     public DTM? EffectiveDateTime { get; }
@@ -2855,14 +2857,14 @@ public sealed record MFI : Hl7Segment {
 }
 
 public sealed record MRG : Hl7Segment {
-    public RepField<CX> PriorPatientIdentifierList { get; }
+    public ICollection<CX> PriorPatientIdentifierList { get; }
     public CX? PriorPatientAccountNumber { get; }
     public CX? PriorVisitNumber { get; }
-    public RepField<CX> PriorAlternateVisitID { get; }
-    public RepField<XPN> PriorPatientName { get; }
+    public ICollection<CX>? PriorAlternateVisitID { get; }
+    public ICollection<XPN>? PriorPatientName { get; }
 
     public MRG(Segment segment) : base(typeof(MRG), segment) {
-        this.PriorPatientIdentifierList = segment.GetRepField<CX>(1);
+        this.PriorPatientIdentifierList = segment.GetRequiredRepField<CX>(1);
         this.PriorPatientAccountNumber = segment.GetField<CX>(2);
         this.PriorVisitNumber = segment.GetField<CX>(3);
         this.PriorAlternateVisitID = segment.GetRepField<CX>(4);
@@ -2883,68 +2885,6 @@ public sealed record MSA : Hl7Segment {
         this.ExpectedSequenceNumber = segment.GetField<NM>(3);
         this.MessageWaitingNumber = segment.GetField<NM>(4);
         this.MessageWaitingPriority = segment.GetField<ID>(5);
-    }
-}
-
-public sealed record MSH : Hl7Segment {
-    public ST FieldSeparator { get; }
-    public ST EncodingCharacters { get; }
-    public HD? SendingApplication { get; }
-    public HD? SendingFacility { get; }
-    public HD? ReceivingApplication { get; }
-    public RepField<HD> ReceivingFacility { get; }
-    public DTM DateTimeofMessage { get; }
-    public ST? Security { get; }
-    public MSG MessageType { get; }
-    public ST MessageControlID { get; }
-    public PT ProcessingID { get; }
-    public VID VersionID { get; }
-    public NM? SequenceNumber { get; }
-    public ST? ContinuationPointer { get; }
-    public ID? AcceptAcknowledgmentType { get; }
-    public ID? ApplicationAcknowledgmentType { get; }
-    public ID? CountryCode { get; }
-    public RepField<ID> CharacterSet { get; }
-    public CWE? PrincipalLanguageOfMessage { get; }
-    public ID? AlternateCharacterSetHandlingScheme { get; }
-    public RepField<EI> MessageProfileIdentifier { get; }
-    public XON? SendingResponsibleOrganization { get; }
-    public XON? ReceivingResponsibleOrganization { get; }
-    public HD? SendingNetworkAddress { get; }
-    public HD? ReceivingNetworkAddress { get; }
-    public CWE? SecurityClassificationTag { get; }
-    public RepField<CWE> SecurityHandlingInstructions { get; }
-    public RepField<ST> SpecialAccessRestrictionInstructions { get; }
-
-    public MSH(Segment segment) : base(typeof(MSH), segment) {
-        this.FieldSeparator = segment.GetRequiredField<ST>(1);
-        this.EncodingCharacters = segment.GetRequiredField<ST>(2);
-        this.SendingApplication = segment.GetField<HD>(3);
-        this.SendingFacility = segment.GetField<HD>(4);
-        this.ReceivingApplication = segment.GetField<HD>(5);
-        this.ReceivingFacility = segment.GetRepField<HD>(6);
-        this.DateTimeofMessage = segment.GetRequiredField<DTM>(7);
-        this.Security = segment.GetField<ST>(8);
-        this.MessageType = segment.GetRequiredField<MSG>(9);
-        this.MessageControlID = segment.GetRequiredField<ST>(10);
-        this.ProcessingID = segment.GetRequiredField<PT>(11);
-        this.VersionID = segment.GetRequiredField<VID>(12);
-        this.SequenceNumber = segment.GetField<NM>(13);
-        this.ContinuationPointer = segment.GetField<ST>(14);
-        this.AcceptAcknowledgmentType = segment.GetField<ID>(15);
-        this.ApplicationAcknowledgmentType = segment.GetField<ID>(16);
-        this.CountryCode = segment.GetField<ID>(17);
-        this.CharacterSet = segment.GetRepField<ID>(18);
-        this.PrincipalLanguageOfMessage = segment.GetField<CWE>(19);
-        this.AlternateCharacterSetHandlingScheme = segment.GetField<ID>(20);
-        this.MessageProfileIdentifier = segment.GetRepField<EI>(21);
-        this.SendingResponsibleOrganization = segment.GetField<XON>(22);
-        this.ReceivingResponsibleOrganization = segment.GetField<XON>(23);
-        this.SendingNetworkAddress = segment.GetField<HD>(24);
-        this.ReceivingNetworkAddress = segment.GetField<HD>(25);
-        this.SecurityClassificationTag = segment.GetField<CWE>(26);
-        this.SecurityHandlingInstructions = segment.GetRepField<CWE>(27);
-        this.SpecialAccessRestrictionInstructions = segment.GetRepField<ST>(28);
     }
 }
 
@@ -2972,9 +2912,9 @@ public sealed record NDS : Hl7Segment {
 
 public sealed record NK1 : Hl7Segment {
     public SI SetIDNK1 { get; }
-    public RepField<XPN> Name { get; }
+    public ICollection<XPN>? Name { get; }
     public CWE? Relationship { get; }
-    public RepField<XAD> Address { get; }
+    public ICollection<XAD>? Address { get; }
     public XTN? PhoneNumber { get; }
     public XTN? BusinessPhoneNumber { get; }
     public CWE? ContactRole { get; }
@@ -2983,29 +2923,29 @@ public sealed record NK1 : Hl7Segment {
     public ST? NextofKinAssociatedPartiesJobTitle { get; }
     public JCC? NextofKinAssociatedPartiesJobCodeClass { get; }
     public CX? NextofKinAssociatedPartiesEmployeeNumber { get; }
-    public RepField<XON> OrganizationNameNK1 { get; }
+    public ICollection<XON>? OrganizationNameNK1 { get; }
     public CWE? MaritalStatus { get; }
     public CWE? AdministrativeSex { get; }
     public DTM? DateTimeofBirth { get; }
-    public RepField<CWE> LivingDependency { get; }
-    public RepField<CWE> AmbulatoryStatus { get; }
-    public RepField<CWE> Citizenship { get; }
+    public ICollection<CWE>? LivingDependency { get; }
+    public ICollection<CWE>? AmbulatoryStatus { get; }
+    public ICollection<CWE>? Citizenship { get; }
     public CWE? PrimaryLanguage { get; }
     public CWE? LivingArrangement { get; }
     public CWE? PublicityCode { get; }
     public ID? ProtectionIndicator { get; }
     public CWE? StudentIndicator { get; }
     public CWE? Religion { get; }
-    public RepField<XPN> MothersMaidenName { get; }
+    public ICollection<XPN>? MothersMaidenName { get; }
     public CWE? Nationality { get; }
-    public RepField<CWE> EthnicGroup { get; }
-    public RepField<CWE> ContactReason { get; }
-    public RepField<XPN> ContactPersonsName { get; }
+    public ICollection<CWE>? EthnicGroup { get; }
+    public ICollection<CWE>? ContactReason { get; }
+    public ICollection<XPN>? ContactPersonsName { get; }
     public XTN? ContactPersonsTelephoneNumber { get; }
-    public RepField<XAD> ContactPersonsAddress { get; }
-    public RepField<CX> NextofKinAssociatedPartysIdentifiers { get; }
+    public ICollection<XAD>? ContactPersonsAddress { get; }
+    public ICollection<CX>? NextofKinAssociatedPartysIdentifiers { get; }
     public CWE? JobStatus { get; }
-    public RepField<CWE> Race { get; }
+    public ICollection<CWE>? Race { get; }
     public CWE? Handicap { get; }
     public ST? ContactPersonSocialSecurityNumber { get; }
     public ST? NextofKinBirthPlace { get; }
@@ -3137,7 +3077,7 @@ public sealed record NTE : Hl7Segment {
     public DTM? EnteredDateTime { get; }
     public DTM? EffectiveStartDate { get; }
     public DTM? ExpirationDate { get; }
-    public RepField<CWE> CodedComment { get; }
+    public ICollection<CWE>? CodedComment { get; }
 
     public NTE(Segment segment) : base(typeof(NTE), segment) {
         this.SetIDNTE = segment.GetField<SI>(1);
@@ -3160,10 +3100,10 @@ public sealed record OBR : Hl7Segment {
     public DTM? ObservationDateTime { get; }
     public DTM? ObservationEndDateTime { get; }
     public CQ? CollectionVolume { get; }
-    public RepField<XCN> CollectorIdentifier { get; }
+    public ICollection<XCN>? CollectorIdentifier { get; }
     public ID? SpecimenActionCode { get; }
     public CWE? DangerCode { get; }
-    public RepField<CWE> RelevantClinicalInformation { get; }
+    public ICollection<CWE>? RelevantClinicalInformation { get; }
     public DTM? SpecimenReceivedDateTime { get; }
     public XTN? OrderCallbackPhoneNumber { get; }
     public ST? PlacerField1 { get; }
@@ -3177,25 +3117,25 @@ public sealed record OBR : Hl7Segment {
     public PRL? ParentResult { get; }
     public EIP? ParentResultsObservationIdentifier { get; }
     public ID? TransportationMode { get; }
-    public RepField<CWE> ReasonforStudy { get; }
+    public ICollection<CWE>? ReasonforStudy { get; }
     public DTM? ScheduledDateTime { get; }
     public NM? NumberofSampleContainers { get; }
-    public RepField<CWE> TransportLogisticsofCollectedSample { get; }
-    public RepField<CWE> CollectorsComment { get; }
+    public ICollection<CWE>? TransportLogisticsofCollectedSample { get; }
+    public ICollection<CWE>? CollectorsComment { get; }
     public CWE? TransportArrangementResponsibility { get; }
     public ID? TransportArranged { get; }
     public ID? EscortRequired { get; }
-    public RepField<CWE> PlannedPatientTransportComment { get; }
+    public ICollection<CWE>? PlannedPatientTransportComment { get; }
     public CNE? ProcedureCode { get; }
-    public RepField<CNE> ProcedureCodeModifier { get; }
-    public RepField<CWE> PlacerSupplementalServiceInformation { get; }
-    public RepField<CWE> FillerSupplementalServiceInformation { get; }
+    public ICollection<CNE>? ProcedureCodeModifier { get; }
+    public ICollection<CWE>? PlacerSupplementalServiceInformation { get; }
+    public ICollection<CWE>? FillerSupplementalServiceInformation { get; }
     public CWE? MedicallyNecessaryDuplicateProcedureReason { get; }
     public CWE? ResultHandling { get; }
     public EI? ObservationGroupID { get; }
     public EI? ParentObservationGroupID { get; }
-    public RepField<CX> AlternatePlacerOrderNumber { get; }
-    public RepField<EIP> ParentOrder { get; }
+    public ICollection<CX>? AlternatePlacerOrderNumber { get; }
+    public ICollection<EIP>? ParentOrder { get; }
     public ID? ActionCode { get; }
 
     public OBR(Segment segment) : base(typeof(OBR), segment) {
@@ -3254,19 +3194,19 @@ public sealed record OBX : Hl7Segment {
     public ST? ObservationValue { get; }
     public CWE? Units { get; }
     public ST? ReferenceRange { get; }
-    public RepField<CWE> InterpretationCodes { get; }
+    public ICollection<CWE>? InterpretationCodes { get; }
     public NM? Probability { get; }
-    public RepField<ID> NatureofAbnormalTest { get; }
+    public ICollection<ID>? NatureofAbnormalTest { get; }
     public ID ObservationResultStatus { get; }
     public DTM? EffectiveDateofReferenceRange { get; }
     public ST? UserDefinedAccessChecks { get; }
     public DTM? DateTimeoftheObservation { get; }
     public CWE? ProducersID { get; }
-    public RepField<XCN> ResponsibleObserver { get; }
-    public RepField<CWE> ObservationMethod { get; }
-    public RepField<EI> EquipmentInstanceIdentifier { get; }
+    public ICollection<XCN>? ResponsibleObserver { get; }
+    public ICollection<CWE>? ObservationMethod { get; }
+    public ICollection<EI>? EquipmentInstanceIdentifier { get; }
     public DTM? DateTimeoftheAnalysis { get; }
-    public RepField<CWE> ObservationSite { get; }
+    public ICollection<CWE>? ObservationSite { get; }
     public EI? ObservationInstanceIdentifier { get; }
     public CNE? MoodCode { get; }
     public XON? PerformingOrganizationName { get; }
@@ -3274,12 +3214,12 @@ public sealed record OBX : Hl7Segment {
     public XCN? PerformingOrganizationMedicalDirector { get; }
     public ID? PatientResultsReleaseCategory { get; }
     public CWE? RootCause { get; }
-    public RepField<CWE> LocalProcessControl { get; }
+    public ICollection<CWE>? LocalProcessControl { get; }
     public ID? ObservationType { get; }
     public ID? ObservationSubType { get; }
     public ID? ActionCode { get; }
     public CWE? ObservationValueAbsentReason { get; }
-    public RepField<EIP> ObservationRelatedSpecimenIdentifier { get; }
+    public ICollection<EIP>? ObservationRelatedSpecimenIdentifier { get; }
 
     public OBX(Segment segment) : base(typeof(OBX), segment) {
         this.SetIDOBX = segment.GetField<SI>(1);
@@ -3377,10 +3317,10 @@ public sealed record OH2 : Hl7Segment {
     public NM? AverageHoursworkedperDay { get; }
     public NM? AverageDaysWorkedperWeek { get; }
     public XON? EmployerOrganization { get; }
-    public RepField<XAD> EmployerAddress { get; }
+    public ICollection<XAD>? EmployerAddress { get; }
     public CWE? SupervisoryLevel { get; }
-    public RepField<ST> JobDuties { get; }
-    public RepField<FT> OccupationalHazards { get; }
+    public ICollection<ST>? JobDuties { get; }
+    public ICollection<FT>? OccupationalHazards { get; }
     public EI? JobUniqueIdentifier { get; }
     public CWE? CurrentJobIndicator { get; }
 
@@ -3449,20 +3389,20 @@ public sealed record OH4 : Hl7Segment {
 public sealed record OM1 : Hl7Segment {
     public NM SequenceNumberTestObservationMasterFile { get; }
     public CWE ProducersServiceTestObservationID { get; }
-    public RepField<ID> PermittedDataTypes { get; }
+    public ICollection<ID>? PermittedDataTypes { get; }
     public ID SpecimenRequired { get; }
     public CWE ProducerID { get; }
     public TX? ObservationDescription { get; }
-    public RepField<CWE> OtherServiceTestObservationIDsfortheObservation { get; }
-    public RepField<ST> OtherNames { get; }
+    public ICollection<CWE>? OtherServiceTestObservationIDsfortheObservation { get; }
+    public ICollection<ST>? OtherNames { get; }
     public ST? PreferredReportNamefortheObservation { get; }
     public ST? PreferredShortNameorMnemonicfortheObservation { get; }
     public ST? PreferredLongNamefortheObservation { get; }
     public ID? Orderability { get; }
-    public RepField<CWE> IdentityofInstrumentUsedtoPerformthisStudy { get; }
-    public RepField<CWE> CodedRepresentationofMethod { get; }
+    public ICollection<CWE>? IdentityofInstrumentUsedtoPerformthisStudy { get; }
+    public ICollection<CWE>? CodedRepresentationofMethod { get; }
     public ID? PortableDeviceIndicator { get; }
-    public RepField<CWE> ObservationProducingDepartmentSection { get; }
+    public ICollection<CWE>? ObservationProducingDepartmentSection { get; }
     public XTN? TelephoneNumberofSection { get; }
     public CWE NatureofServiceTestObservation { get; }
     public CWE? ReportSubheader { get; }
@@ -3471,22 +3411,22 @@ public sealed record OM1 : Hl7Segment {
     public DTM? EffectiveDateTimeofChange { get; }
     public NM? TypicalTurnAroundTime { get; }
     public NM? ProcessingTime { get; }
-    public RepField<ID> ProcessingPriority { get; }
+    public ICollection<ID>? ProcessingPriority { get; }
     public ID? ReportingPriority { get; }
-    public RepField<CWE> OutsideSitesWhereObservationMayBePerformed { get; }
-    public RepField<XAD> AddressofOutsideSites { get; }
+    public ICollection<CWE>? OutsideSitesWhereObservationMayBePerformed { get; }
+    public ICollection<XAD>? AddressofOutsideSites { get; }
     public XTN? PhoneNumberofOutsideSite { get; }
     public CWE? ConfidentialityCode { get; }
-    public RepField<CWE> ObservationsRequiredtoInterpretthisObservation { get; }
+    public ICollection<CWE>? ObservationsRequiredtoInterpretthisObservation { get; }
     public TX? InterpretationofObservations { get; }
-    public RepField<CWE> ContraindicationstoObservations { get; }
-    public RepField<CWE> ReflexTestsObservations { get; }
-    public RepField<TX> RulesthatTriggerReflexTesting { get; }
-    public RepField<CWE> FixedCannedMessage { get; }
-    public RepField<TX> PatientPreparation { get; }
+    public ICollection<CWE>? ContraindicationstoObservations { get; }
+    public ICollection<CWE>? ReflexTestsObservations { get; }
+    public ICollection<TX>? RulesthatTriggerReflexTesting { get; }
+    public ICollection<CWE>? FixedCannedMessage { get; }
+    public ICollection<TX>? PatientPreparation { get; }
     public CWE? ProcedureMedication { get; }
     public TX? FactorsthatmayAffecttheObservation { get; }
-    public RepField<ST> ServiceTestObservationPerformanceSchedule { get; }
+    public ICollection<ST>? ServiceTestObservationPerformanceSchedule { get; }
     public TX? DescriptionofTestMethods { get; }
     public CWE? KindofQuantityObserved { get; }
     public CWE? PointVersusInterval { get; }
@@ -3497,15 +3437,15 @@ public sealed record OM1 : Hl7Segment {
     public ID? ExclusiveTest { get; }
     public ID? DiagnosticServSectID { get; }
     public CWE? TaxonomicClassificationCode { get; }
-    public RepField<ST> OtherNames2 { get; }
-    public RepField<CWE> ReplacementProducersServiceTestObservationID { get; }
-    public RepField<TX> PriorResutsInstructions { get; }
+    public ICollection<ST>? OtherNames2 { get; }
+    public ICollection<CWE>? ReplacementProducersServiceTestObservationID { get; }
+    public ICollection<TX>? PriorResutsInstructions { get; }
     public TX? SpecialInstructions { get; }
-    public RepField<CWE> TestCategory { get; }
+    public ICollection<CWE>? TestCategory { get; }
     public CWE? ObservationIdentifierassociatedwithProducersServiceTestObservationID { get; }
     public CQ? TypicalTurnAroundTime2 { get; }
-    public RepField<CWE> GenderRestriction { get; }
-    public RepField<NR> AgeRestriction { get; }
+    public ICollection<CWE>? GenderRestriction { get; }
+    public ICollection<NR>? AgeRestriction { get; }
 
     public OM1(Segment segment) : base(typeof(OM1), segment) {
         this.SequenceNumberTestObservationMasterFile = segment.GetRequiredField<NM>(1);
@@ -3573,13 +3513,13 @@ public sealed record OM1 : Hl7Segment {
 public sealed record OM2 : Hl7Segment {
     public NM? SequenceNumberTestObservationMasterFile { get; }
     public CWE? UnitsofMeasure { get; }
-    public RepField<NM> RangeofDecimalPrecision { get; }
+    public ICollection<NM>? RangeofDecimalPrecision { get; }
     public CWE? CorrespondingSIUnitsofMeasure { get; }
     public TX? SIConversionFactor { get; }
-    public RepField<RFR> Reference { get; }
-    public RepField<RFR> CriticalRangeforOrdinalandContinuousObservations { get; }
+    public ICollection<RFR>? Reference { get; }
+    public ICollection<RFR>? CriticalRangeforOrdinalandContinuousObservations { get; }
     public RFR? AbsoluteRangeforOrdinalandContinuousObservations { get; }
-    public RepField<DLT> DeltaCheckCriteria { get; }
+    public ICollection<DLT>? DeltaCheckCriteria { get; }
     public NM? MinimumMeaningfulIncrements { get; }
 
     public OM2(Segment segment) : base(typeof(OM2), segment) {
@@ -3599,10 +3539,10 @@ public sealed record OM2 : Hl7Segment {
 public sealed record OM3 : Hl7Segment {
     public NM? SequenceNumberTestObservationMasterFile { get; }
     public CWE? PreferredCodingSystem { get; }
-    public RepField<CWE> ValidCodedAnswers { get; }
-    public RepField<CWE> NormalTextCodesforCategoricalObservations { get; }
-    public RepField<CWE> AbnormalTextCodesforCategoricalObservations { get; }
-    public RepField<CWE> CriticalTextCodesforCategoricalObservations { get; }
+    public ICollection<CWE>? ValidCodedAnswers { get; }
+    public ICollection<CWE>? NormalTextCodesforCategoricalObservations { get; }
+    public ICollection<CWE>? AbnormalTextCodesforCategoricalObservations { get; }
+    public ICollection<CWE>? CriticalTextCodesforCategoricalObservations { get; }
     public ID? ValueType { get; }
 
     public OM3(Segment segment) : base(typeof(OM3), segment) {
@@ -3619,9 +3559,9 @@ public sealed record OM3 : Hl7Segment {
 public sealed record OM4 : Hl7Segment {
     public NM? SequenceNumberTestObservationMasterFile { get; }
     public ID? DerivedSpecimen { get; }
-    public RepField<TX> ContainerDescription { get; }
-    public RepField<NM> ContainerVolume { get; }
-    public RepField<CWE> ContainerUnits { get; }
+    public ICollection<TX>? ContainerDescription { get; }
+    public ICollection<NM>? ContainerVolume { get; }
+    public ICollection<CWE>? ContainerUnits { get; }
     public CWE? Specimen { get; }
     public CWE? Additive { get; }
     public TX? Preparation { get; }
@@ -3629,12 +3569,12 @@ public sealed record OM4 : Hl7Segment {
     public CQ? NormalCollectionVolume { get; }
     public CQ? MinimumCollectionVolume { get; }
     public TX? SpecimenRequirements { get; }
-    public RepField<ID> SpecimenPriorities { get; }
+    public ICollection<ID>? SpecimenPriorities { get; }
     public CQ? SpecimenRetentionTime { get; }
-    public RepField<CWE> SpecimenHandlingCode { get; }
+    public ICollection<CWE>? SpecimenHandlingCode { get; }
     public ID? SpecimenPreference { get; }
     public NM? PreferredSpecimenAttribtureSequenceID { get; }
-    public RepField<CWE> TaxonomicClassificationCode { get; }
+    public ICollection<CWE>? TaxonomicClassificationCode { get; }
 
     public OM4(Segment segment) : base(typeof(OM4), segment) {
         this.SequenceNumberTestObservationMasterFile = segment.GetField<NM>(1);
@@ -3660,7 +3600,7 @@ public sealed record OM4 : Hl7Segment {
 
 public sealed record OM5 : Hl7Segment {
     public NM? SequenceNumberTestObservationMasterFile { get; }
-    public RepField<CWE> TestObservationsIncludedWithinanOrderedTestBattery { get; }
+    public ICollection<CWE>? TestObservationsIncludedWithinanOrderedTestBattery { get; }
     public ST? ObservationIDSuffixes { get; }
 
     public OM5(Segment segment) : base(typeof(OM5), segment) {
@@ -3683,9 +3623,9 @@ public sealed record OM6 : Hl7Segment {
 public sealed record OM7 : Hl7Segment {
     public NM SequenceNumberTestObservationMasterFile { get; }
     public CWE UniversalServiceIdentifier { get; }
-    public RepField<CWE> CategoryIdentifier { get; }
+    public ICollection<CWE>? CategoryIdentifier { get; }
     public TX? CategoryDescription { get; }
-    public RepField<ST> CategorySynonym { get; }
+    public ICollection<ST>? CategorySynonym { get; }
     public DTM? EffectiveTestServiceStartDateTime { get; }
     public DTM? EffectiveTestServiceEndDateTime { get; }
     public NM? TestServiceDefaultDurationQuantity { get; }
@@ -3701,10 +3641,10 @@ public sealed record OM7 : Hl7Segment {
     public CWE? ConsentWaitingPeriodUnits { get; }
     public DTM? EffectiveDateTimeofChange { get; }
     public XCN? EnteredBy { get; }
-    public RepField<PL> OrderableatLocation { get; }
+    public ICollection<PL>? OrderableatLocation { get; }
     public CWE? FormularyStatus { get; }
     public ID? SpecialOrderIndicator { get; }
-    public RepField<CWE> PrimaryKeyValueCDM { get; }
+    public ICollection<CWE>? PrimaryKeyValueCDM { get; }
 
     public OM7(Segment segment) : base(typeof(OM7), segment) {
         this.SequenceNumberTestObservationMasterFile = segment.GetRequiredField<NM>(1);
@@ -3739,13 +3679,13 @@ public sealed record OMC : Hl7Segment {
     public ID? SegmentActionCode { get; }
     public EI? SegmentUniqueKey { get; }
     public CWE ClinicalInformationRequest { get; }
-    public RepField<CWE> CollectionEventProcessStep { get; }
+    public ICollection<CWE> CollectionEventProcessStep { get; }
     public CWE CommunicationLocation { get; }
     public ID? AnswerRequired { get; }
     public ST? HintHelpText { get; }
     public ID? TypeofAnswer { get; }
     public ID? MultipleAnswersAllowed { get; }
-    public RepField<CWE> AnswerChoices { get; }
+    public ICollection<CWE>? AnswerChoices { get; }
     public NM? CharacterLimit { get; }
     public NM? NumberofDecimals { get; }
 
@@ -3754,7 +3694,7 @@ public sealed record OMC : Hl7Segment {
         this.SegmentActionCode = segment.GetField<ID>(2);
         this.SegmentUniqueKey = segment.GetField<EI>(3);
         this.ClinicalInformationRequest = segment.GetRequiredField<CWE>(4);
-        this.CollectionEventProcessStep = segment.GetRepField<CWE>(5);
+        this.CollectionEventProcessStep = segment.GetRequiredRepField<CWE>(5);
         this.CommunicationLocation = segment.GetRequiredField<CWE>(6);
         this.AnswerRequired = segment.GetField<ID>(7);
         this.HintHelpText = segment.GetField<ST>(8);
@@ -3773,7 +3713,7 @@ public sealed record ORC : Hl7Segment {
     public EI? PlacerOrderGroupNumber { get; }
     public ID? OrderStatus { get; }
     public ID? ResponseFlag { get; }
-    public RepField<EIP> ParentOrder { get; }
+    public ICollection<EIP>? ParentOrder { get; }
     public DTM? DateTimeofOrderEvent { get; }
     public XCN? EnteredBy { get; }
     public PL? EnterersLocation { get; }
@@ -3788,8 +3728,8 @@ public sealed record ORC : Hl7Segment {
     public CWE? OrderType { get; }
     public CNE? EntererAuthorizationMode { get; }
     public DT? AdvancedBeneficiaryNoticeDate { get; }
-    public RepField<CX> AlternatePlacerOrderNumber { get; }
-    public RepField<CWE> OrderWorkflowProfile { get; }
+    public ICollection<CX>? AlternatePlacerOrderNumber { get; }
+    public ICollection<CWE>? OrderWorkflowProfile { get; }
     public ID? ActionCode { get; }
     public DR? OrderStatusDateRange { get; }
     public DTM? OrderCreationDateTime { get; }
@@ -3839,7 +3779,7 @@ public sealed record ORG : Hl7Segment {
     public CWE? EmploymentStatusCode { get; }
     public ID? BoardApprovalIndicator { get; }
     public ID? PrimaryCarePhysicianIndicator { get; }
-    public RepField<CWE> CostCenterCode { get; }
+    public ICollection<CWE>? CostCenterCode { get; }
 
     public ORG(Segment segment) : base(typeof(ORG), segment) {
         this.SetIDORG = segment.GetRequiredField<SI>(1);
@@ -3880,9 +3820,9 @@ public sealed record PAC : Hl7Segment {
     public EI? ParentPackageID { get; }
     public NA? PositioninParentPackage { get; }
     public CWE PackageType { get; }
-    public RepField<CWE> PackageCondition { get; }
-    public RepField<CWE> PackageHandlingCode { get; }
-    public RepField<CWE> PackageRiskCode { get; }
+    public ICollection<CWE>? PackageCondition { get; }
+    public ICollection<CWE>? PackageHandlingCode { get; }
+    public ICollection<CWE>? PackageRiskCode { get; }
     public ID? ActionCode { get; }
 
     public PAC(Segment segment) : base(typeof(PAC), segment) {
@@ -3965,19 +3905,19 @@ public sealed record PCR : Hl7Segment {
 }
 
 public sealed record PD1 : Hl7Segment {
-    public RepField<CWE> LivingDependency { get; }
+    public ICollection<CWE>? LivingDependency { get; }
     public CWE? LivingArrangement { get; }
-    public RepField<XON> PatientPrimaryFacility { get; }
+    public ICollection<XON>? PatientPrimaryFacility { get; }
     public CWE? StudentIndicator { get; }
     public CWE? Handicap { get; }
     public CWE? LivingWillCode { get; }
     public CWE? OrganDonorCode { get; }
     public ID? SeparateBill { get; }
-    public RepField<CX> DuplicatePatient { get; }
+    public ICollection<CX>? DuplicatePatient { get; }
     public CWE? PublicityCode { get; }
     public ID? ProtectionIndicator { get; }
     public DT? ProtectionIndicatorEffectiveDate { get; }
-    public RepField<XON> PlaceofWorship { get; }
+    public ICollection<XON>? PlaceofWorship { get; }
     public CWE? AdvanceDirectiveCode { get; }
     public CWE? ImmunizationRegistryStatus { get; }
     public DT? ImmunizationRegistryStatusEffectiveDate { get; }
@@ -4015,7 +3955,7 @@ public sealed record PD1 : Hl7Segment {
 }
 
 public sealed record PDA : Hl7Segment {
-    public RepField<CWE> DeathCauseCode { get; }
+    public ICollection<CWE>? DeathCauseCode { get; }
     public PL? DeathLocation { get; }
     public ID? DeathCertifiedIndicator { get; }
     public DTM? DeathCertificateSignedDateTime { get; }
@@ -4039,14 +3979,14 @@ public sealed record PDA : Hl7Segment {
 }
 
 public sealed record PDC : Hl7Segment {
-    public RepField<XON> ManufacturerDistributor { get; }
+    public ICollection<XON> ManufacturerDistributor { get; }
     public CWE Country { get; }
     public ST BrandName { get; }
     public ST? DeviceFamilyName { get; }
     public CWE? GenericName { get; }
-    public RepField<ST> ModelIdentifier { get; }
+    public ICollection<ST>? ModelIdentifier { get; }
     public ST? CatalogueIdentifier { get; }
-    public RepField<ST> OtherIdentifier { get; }
+    public ICollection<ST>? OtherIdentifier { get; }
     public CWE? ProductCode { get; }
     public ID? MarketingBasis { get; }
     public ST? MarketingApprovalID { get; }
@@ -4056,7 +3996,7 @@ public sealed record PDC : Hl7Segment {
     public DTM? DateLastMarketed { get; }
 
     public PDC(Segment segment) : base(typeof(PDC), segment) {
-        this.ManufacturerDistributor = segment.GetRepField<XON>(1);
+        this.ManufacturerDistributor = segment.GetRequiredRepField<XON>(1);
         this.Country = segment.GetRequiredField<CWE>(2);
         this.BrandName = segment.GetRequiredField<ST>(3);
         this.DeviceFamilyName = segment.GetField<ST>(4);
@@ -4075,27 +4015,27 @@ public sealed record PDC : Hl7Segment {
 }
 
 public sealed record PEO : Hl7Segment {
-    public RepField<CWE> EventIdentifiersUsed { get; }
-    public RepField<CWE> EventSymptomDiagnosisCode { get; }
+    public ICollection<CWE>? EventIdentifiersUsed { get; }
+    public ICollection<CWE>? EventSymptomDiagnosisCode { get; }
     public DTM EventOnsetDateTime { get; }
     public DTM? EventExacerbationDateTime { get; }
     public DTM? EventImprovedDateTime { get; }
     public DTM? EventEndedDataTime { get; }
-    public RepField<XAD> EventLocationOccurredAddress { get; }
-    public RepField<ID> EventQualification { get; }
+    public ICollection<XAD>? EventLocationOccurredAddress { get; }
+    public ICollection<ID>? EventQualification { get; }
     public ID? EventSerious { get; }
     public ID? EventExpected { get; }
-    public RepField<ID> EventOutcome { get; }
+    public ICollection<ID>? EventOutcome { get; }
     public ID? PatientOutcome { get; }
-    public RepField<FT> EventDescriptionfromOthers { get; }
-    public RepField<FT> EventDescriptionfromOriginalReporter { get; }
-    public RepField<FT> EventDescriptionfromPatient { get; }
-    public RepField<FT> EventDescriptionfromPractitioner { get; }
-    public RepField<FT> EventDescriptionfromAutopsy { get; }
-    public RepField<CWE> CauseOfDeath { get; }
-    public RepField<XPN> PrimaryObserverName { get; }
-    public RepField<XAD> PrimaryObserverAddress { get; }
-    public RepField<XTN> PrimaryObserverTelephone { get; }
+    public ICollection<FT>? EventDescriptionfromOthers { get; }
+    public ICollection<FT>? EventDescriptionfromOriginalReporter { get; }
+    public ICollection<FT>? EventDescriptionfromPatient { get; }
+    public ICollection<FT>? EventDescriptionfromPractitioner { get; }
+    public ICollection<FT>? EventDescriptionfromAutopsy { get; }
+    public ICollection<CWE>? CauseOfDeath { get; }
+    public ICollection<XPN>? PrimaryObserverName { get; }
+    public ICollection<XAD>? PrimaryObserverAddress { get; }
+    public ICollection<XTN>? PrimaryObserverTelephone { get; }
     public ID? PrimaryObserversQualification { get; }
     public ID? ConfirmationProvidedBy { get; }
     public DTM? PrimaryObserverAwareDateTime { get; }
@@ -4131,19 +4071,19 @@ public sealed record PEO : Hl7Segment {
 }
 
 public sealed record PES : Hl7Segment {
-    public RepField<XON> SenderOrganizationName { get; }
-    public RepField<XCN> SenderIndividualName { get; }
-    public RepField<XAD> SenderAddress { get; }
-    public RepField<XTN> SenderTelephone { get; }
+    public ICollection<XON>? SenderOrganizationName { get; }
+    public ICollection<XCN>? SenderIndividualName { get; }
+    public ICollection<XAD>? SenderAddress { get; }
+    public ICollection<XTN>? SenderTelephone { get; }
     public EI? SenderEventIdentifier { get; }
     public NM? SenderSequenceNumber { get; }
-    public RepField<FT> SenderEventDescription { get; }
+    public ICollection<FT>? SenderEventDescription { get; }
     public FT? SenderComment { get; }
     public DTM? SenderAwareDateTime { get; }
     public DTM EventReportDate { get; }
     public ID? EventReportTimingType { get; }
     public ID? EventReportSource { get; }
-    public RepField<ID> EventReportedTo { get; }
+    public ICollection<ID>? EventReportedTo { get; }
 
     public PES(Segment segment) : base(typeof(PES), segment) {
         this.SenderOrganizationName = segment.GetRepField<XON>(1);
@@ -4164,44 +4104,44 @@ public sealed record PES : Hl7Segment {
 
 public sealed record PID : Hl7Segment {
     public SI? SetIDPID { get; }
-    public RepField<CX> PatientIdentifierList { get; }
-    public RepField<XPN> PatientName { get; }
-    public RepField<XPN> MothersMaidenName { get; }
+    public ICollection<CX> PatientIdentifierList { get; }
+    public ICollection<XPN> PatientName { get; }
+    public ICollection<XPN>? MothersMaidenName { get; }
     public DTM? DateTimeofBirth { get; }
     public CWE? AdministrativeSex { get; }
-    public RepField<CWE> Race { get; }
-    public RepField<XAD> PatientAddress { get; }
+    public ICollection<CWE>? Race { get; }
+    public ICollection<XAD>? PatientAddress { get; }
     public XTN? PhoneNumberHome { get; }
     public XTN? PhoneNumberBusiness { get; }
     public CWE? PrimaryLanguage { get; }
     public CWE? MaritalStatus { get; }
     public CWE? Religion { get; }
     public CX? PatientAccountNumber { get; }
-    public RepField<CX> MothersIdentifier { get; }
-    public RepField<CWE> EthnicGroup { get; }
+    public ICollection<CX>? MothersIdentifier { get; }
+    public ICollection<CWE>? EthnicGroup { get; }
     public ST? BirthPlace { get; }
     public ID? MultipleBirthIndicator { get; }
     public NM? BirthOrder { get; }
-    public RepField<CWE> Citizenship { get; }
+    public ICollection<CWE>? Citizenship { get; }
     public CWE? VeteransMilitaryStatus { get; }
     public CWE? Nationality { get; }
     public DTM? PatientDeathDateandTime { get; }
     public ID? PatientDeathIndicator { get; }
     public ID? IdentityUnknownIndicator { get; }
-    public RepField<CWE> IdentityReliabilityCode { get; }
+    public ICollection<CWE>? IdentityReliabilityCode { get; }
     public DTM? LastUpdateDateTime { get; }
     public HD? LastUpdateFacility { get; }
     public CWE? TaxonomicClassificationCode { get; }
     public CWE? BreedCode { get; }
     public ST? Strain { get; }
     public CWE? ProductionClassCode { get; }
-    public RepField<CWE> TribalCitizenship { get; }
-    public RepField<XTN> PatientTelecommunicationInformation { get; }
+    public ICollection<CWE>? TribalCitizenship { get; }
+    public ICollection<XTN>? PatientTelecommunicationInformation { get; }
 
     public PID(Segment segment) : base(typeof(PID), segment) {
         this.SetIDPID = segment.GetField<SI>(1);
-        this.PatientIdentifierList = segment.GetRepField<CX>(2);
-        this.PatientName = segment.GetRepField<XPN>(3);
+        this.PatientIdentifierList = segment.GetRequiredRepField<CX>(2);
+        this.PatientName = segment.GetRequiredRepField<XPN>(3);
         this.MothersMaidenName = segment.GetRepField<XPN>(4);
         this.DateTimeofBirth = segment.GetField<DTM>(5);
         this.AdministrativeSex = segment.GetField<CWE>(6);
@@ -4266,13 +4206,13 @@ public sealed record PKG : Hl7Segment {
 
 public sealed record PM1 : Hl7Segment {
     public CWE HealthPlanID { get; }
-    public RepField<CX> InsuranceCompanyID { get; }
-    public RepField<XON> InsuranceCompanyName { get; }
-    public RepField<XAD> InsuranceCompanyAddress { get; }
-    public RepField<XPN> InsuranceCoContactPerson { get; }
-    public RepField<XTN> InsuranceCoPhoneNumber { get; }
+    public ICollection<CX> InsuranceCompanyID { get; }
+    public ICollection<XON>? InsuranceCompanyName { get; }
+    public ICollection<XAD>? InsuranceCompanyAddress { get; }
+    public ICollection<XPN>? InsuranceCoContactPerson { get; }
+    public ICollection<XTN>? InsuranceCoPhoneNumber { get; }
     public ST? GroupNumber { get; }
-    public RepField<XON> GroupName { get; }
+    public ICollection<XON>? GroupName { get; }
     public DT? PlanEffectiveDate { get; }
     public DT? PlanExpirationDate { get; }
     public ID? PatientDOBRequired { get; }
@@ -4292,7 +4232,7 @@ public sealed record PM1 : Hl7Segment {
 
     public PM1(Segment segment) : base(typeof(PM1), segment) {
         this.HealthPlanID = segment.GetRequiredField<CWE>(1);
-        this.InsuranceCompanyID = segment.GetRepField<CX>(2);
+        this.InsuranceCompanyID = segment.GetRequiredRepField<CX>(2);
         this.InsuranceCompanyName = segment.GetRepField<XON>(3);
         this.InsuranceCompanyAddress = segment.GetRepField<XAD>(4);
         this.InsuranceCoContactPerson = segment.GetRepField<XPN>(5);
@@ -4359,14 +4299,14 @@ public sealed record PR1 : Hl7Segment {
     public CWE? ConsentCode { get; }
     public NM? ProcedurePriority { get; }
     public CWE? AssociatedDiagnosisCode { get; }
-    public RepField<CNE> ProcedureCodeModifier { get; }
+    public ICollection<CNE>? ProcedureCodeModifier { get; }
     public CWE? ProcedureDRGType { get; }
-    public RepField<CWE> TissueTypeCode { get; }
+    public ICollection<CWE>? TissueTypeCode { get; }
     public EI? ProcedureIdentifier { get; }
     public ID? ProcedureActionCode { get; }
     public CWE? DRGProcedureDeterminationStatus { get; }
     public CWE? DRGProcedureRelevance { get; }
-    public RepField<PL> TreatingOrganizationalUnit { get; }
+    public ICollection<PL>? TreatingOrganizationalUnit { get; }
     public ID? RespiratoryWithinSurgery { get; }
     public EI? ParentProcedureID { get; }
 
@@ -4396,16 +4336,16 @@ public sealed record PR1 : Hl7Segment {
 
 public sealed record PRA : Hl7Segment {
     public CWE? PrimaryKeyValuePRA { get; }
-    public RepField<CWE> PractitionerGroup { get; }
-    public RepField<CWE> PractitionerCategory { get; }
+    public ICollection<CWE>? PractitionerGroup { get; }
+    public ICollection<CWE>? PractitionerCategory { get; }
     public ID? ProviderBilling { get; }
-    public RepField<SPD> Specialty { get; }
-    public RepField<PLN> PractitionerIDNumbers { get; }
-    public RepField<PIP> Privileges { get; }
+    public ICollection<SPD>? Specialty { get; }
+    public ICollection<PLN>? PractitionerIDNumbers { get; }
+    public ICollection<PIP>? Privileges { get; }
     public DT? DateEnteredPractice { get; }
     public CWE? Institution { get; }
     public DT? DateLeftPractice { get; }
-    public RepField<CWE> GovernmentReimbursementBillingEligibility { get; }
+    public ICollection<CWE>? GovernmentReimbursementBillingEligibility { get; }
     public SI? SetIDPRA { get; }
 
     public PRA(Segment segment) : base(typeof(PRA), segment) {
@@ -4435,7 +4375,7 @@ public sealed record PRB : Hl7Segment {
     public DTM? AnticipatedProblemResolutionDateTime { get; }
     public DTM? ActualProblemResolutionDateTime { get; }
     public CWE? ProblemClassification { get; }
-    public RepField<CWE> ProblemManagementDiscipline { get; }
+    public ICollection<CWE>? ProblemManagementDiscipline { get; }
     public CWE? ProblemPersistence { get; }
     public CWE? ProblemConfirmationStatus { get; }
     public CWE? ProblemLifeCycleStatus { get; }
@@ -4488,11 +4428,11 @@ public sealed record PRB : Hl7Segment {
 
 public sealed record PRC : Hl7Segment {
     public CWE PrimaryKeyValuePRC { get; }
-    public RepField<CWE> FacilityIDPRC { get; }
-    public RepField<CWE> Department { get; }
-    public RepField<CWE> ValidPatientClasses { get; }
+    public ICollection<CWE>? FacilityIDPRC { get; }
+    public ICollection<CWE>? Department { get; }
+    public ICollection<CWE>? ValidPatientClasses { get; }
     public CP? Price { get; }
-    public RepField<ST> Formula { get; }
+    public ICollection<ST>? Formula { get; }
     public NM? MinimumQuantity { get; }
     public NM? MaximumQuantity { get; }
     public MO? MinimumPrice { get; }
@@ -4500,7 +4440,7 @@ public sealed record PRC : Hl7Segment {
     public DTM? EffectiveStartDate { get; }
     public DTM? EffectiveEndDate { get; }
     public CWE? PriceOverrideFlag { get; }
-    public RepField<CWE> BillingCategory { get; }
+    public ICollection<CWE>? BillingCategory { get; }
     public ID? ChargeableFlag { get; }
     public ID? ActiveInactiveFlag { get; }
     public MO? Cost { get; }
@@ -4529,23 +4469,23 @@ public sealed record PRC : Hl7Segment {
 }
 
 public sealed record PRD : Hl7Segment {
-    public RepField<CWE> ProviderRole { get; }
-    public RepField<XPN> ProviderName { get; }
-    public RepField<XAD> ProviderAddress { get; }
+    public ICollection<CWE> ProviderRole { get; }
+    public ICollection<XPN>? ProviderName { get; }
+    public ICollection<XAD>? ProviderAddress { get; }
     public PL? ProviderLocation { get; }
-    public RepField<XTN> ProviderCommunicationInformation { get; }
+    public ICollection<XTN>? ProviderCommunicationInformation { get; }
     public CWE? PreferredMethodofContact { get; }
-    public RepField<PLN> ProviderIdentifiers { get; }
+    public ICollection<PLN>? ProviderIdentifiers { get; }
     public DTM? EffectiveStartDateofProviderRole { get; }
-    public RepField<DTM> EffectiveEndDateofProviderRole { get; }
+    public ICollection<DTM>? EffectiveEndDateofProviderRole { get; }
     public XON? ProviderOrganizationNameandIdentifier { get; }
-    public RepField<XAD> ProviderOrganizationAddress { get; }
-    public RepField<PL> ProviderOrganizationLocationInformation { get; }
-    public RepField<XTN> ProviderOrganizationCommunicationInformation { get; }
+    public ICollection<XAD>? ProviderOrganizationAddress { get; }
+    public ICollection<PL>? ProviderOrganizationLocationInformation { get; }
+    public ICollection<XTN>? ProviderOrganizationCommunicationInformation { get; }
     public CWE? ProviderOrganizationMethodofContact { get; }
 
     public PRD(Segment segment) : base(typeof(PRD), segment) {
-        this.ProviderRole = segment.GetRepField<CWE>(1);
+        this.ProviderRole = segment.GetRequiredRepField<CWE>(1);
         this.ProviderName = segment.GetRepField<XPN>(2);
         this.ProviderAddress = segment.GetRepField<XAD>(3);
         this.ProviderLocation = segment.GetField<PL>(4);
@@ -4577,7 +4517,7 @@ public sealed record PRT : Hl7Segment {
     public DTM? EndDateTime { get; }
     public CWE? QualitativeDuration { get; }
     public XAD? Address { get; }
-    public RepField<XTN> TelecommunicationAddress { get; }
+    public ICollection<XTN>? TelecommunicationAddress { get; }
     public EI? UDIDeviceIdentifier { get; }
     public DTM? DeviceManufactureDate { get; }
     public DTM? DeviceExpiryDate { get; }
@@ -4586,7 +4526,7 @@ public sealed record PRT : Hl7Segment {
     public EI? DeviceDonationIdentification { get; }
     public CNE? DeviceType { get; }
     public CWE? PreferredMethodofContact { get; }
-    public RepField<PLN> ContactIdentifiers { get; }
+    public ICollection<PLN>? ContactIdentifiers { get; }
 
     public PRT(Segment segment) : base(typeof(PRT), segment) {
         this.ParticipationInstanceID = segment.GetField<EI>(1);
@@ -4813,27 +4753,27 @@ public sealed record PV1 : Hl7Segment {
     public CWE? AdmissionType { get; }
     public CX? PreadmitNumber { get; }
     public PL? PriorPatientLocation { get; }
-    public RepField<XCN> AttendingDoctor { get; }
-    public RepField<XCN> ReferringDoctor { get; }
-    public RepField<XCN> ConsultingDoctor { get; }
+    public ICollection<XCN>? AttendingDoctor { get; }
+    public ICollection<XCN>? ReferringDoctor { get; }
+    public ICollection<XCN>? ConsultingDoctor { get; }
     public CWE? HospitalService { get; }
     public PL? TemporaryLocation { get; }
     public CWE? PreadmitTestIndicator { get; }
     public CWE? ReadmissionIndicator { get; }
     public CWE? AdmitSource { get; }
-    public RepField<CWE> AmbulatoryStatus { get; }
+    public ICollection<CWE>? AmbulatoryStatus { get; }
     public CWE? VIPIndicator { get; }
-    public RepField<XCN> AdmittingDoctor { get; }
+    public ICollection<XCN>? AdmittingDoctor { get; }
     public CWE? PatientType { get; }
     public CX? VisitNumber { get; }
-    public RepField<FC> FinancialClass { get; }
+    public ICollection<FC>? FinancialClass { get; }
     public CWE? ChargePriceIndicator { get; }
     public CWE? CourtesyCode { get; }
     public CWE? CreditRating { get; }
-    public RepField<CWE> ContractCode { get; }
-    public RepField<DT> ContractEffectiveDate { get; }
-    public RepField<NM> ContractAmount { get; }
-    public RepField<NM> ContractPeriod { get; }
+    public ICollection<CWE>? ContractCode { get; }
+    public ICollection<DT>? ContractEffectiveDate { get; }
+    public ICollection<NM>? ContractAmount { get; }
+    public ICollection<NM>? ContractPeriod { get; }
     public CWE? InterestCode { get; }
     public CWE? TransfertoBadDebtCode { get; }
     public DT? TransfertoBadDebtDate { get; }
@@ -4856,7 +4796,7 @@ public sealed record PV1 : Hl7Segment {
     public NM? TotalCharges { get; }
     public NM? TotalAdjustments { get; }
     public NM? TotalPayments { get; }
-    public RepField<CX> AlternateVisitID { get; }
+    public ICollection<CX>? AlternateVisitID { get; }
     public CWE? VisitIndicator { get; }
     public ST? ServiceEpisodeDescription { get; }
     public CX? ServiceEpisodeIdentifier { get; }
@@ -4923,15 +4863,15 @@ public sealed record PV2 : Hl7Segment {
     public CWE? AccommodationCode { get; }
     public CWE? AdmitReason { get; }
     public CWE? TransferReason { get; }
-    public RepField<ST> PatientValuables { get; }
+    public ICollection<ST>? PatientValuables { get; }
     public ST? PatientValuablesLocation { get; }
-    public RepField<CWE> VisitUserCode { get; }
+    public ICollection<CWE>? VisitUserCode { get; }
     public DTM? ExpectedAdmitDateTime { get; }
     public DTM? ExpectedDischargeDateTime { get; }
     public NM? EstimatedLengthofInpatientStay { get; }
     public NM? ActualLengthofInpatientStay { get; }
     public ST? VisitDescription { get; }
-    public RepField<XCN> ReferralSourceCode { get; }
+    public ICollection<XCN>? ReferralSourceCode { get; }
     public DT? PreviousServiceDate { get; }
     public ID? EmploymentIllnessRelatedIndicator { get; }
     public CWE? PurgeStatusCode { get; }
@@ -4941,7 +4881,7 @@ public sealed record PV2 : Hl7Segment {
     public NM? ExpectedNumberofInsurancePlans { get; }
     public CWE? VisitPublicityCode { get; }
     public ID? VisitProtectionIndicator { get; }
-    public RepField<XON> ClinicOrganizationName { get; }
+    public ICollection<XON>? ClinicOrganizationName { get; }
     public CWE? PatientStatusCode { get; }
     public CWE? VisitPriorityCode { get; }
     public DT? PreviousTreatmentDate { get; }
@@ -4957,9 +4897,9 @@ public sealed record PV2 : Hl7Segment {
     public ID? NewbornBabyIndicator { get; }
     public ID? BabyDetainedIndicator { get; }
     public CWE? ModeofArrivalCode { get; }
-    public RepField<CWE> RecreationalDrugUseCode { get; }
+    public ICollection<CWE>? RecreationalDrugUseCode { get; }
     public CWE? AdmissionLevelofCareCode { get; }
-    public RepField<CWE> PrecautionCode { get; }
+    public ICollection<CWE>? PrecautionCode { get; }
     public CWE? PatientConditionCode { get; }
     public CWE? LivingWillCode { get; }
     public CWE? OrganDonorCode { get; }
@@ -4967,7 +4907,7 @@ public sealed record PV2 : Hl7Segment {
     public DT? PatientStatusEffectiveDate { get; }
     public DTM? ExpectedLOAReturnDateTime { get; }
     public DTM? ExpectedPreadmissionTestingDateTime { get; }
-    public RepField<CWE> NotifyClergyCode { get; }
+    public ICollection<CWE>? NotifyClergyCode { get; }
     public DT? AdvanceDirectiveLastVerifiedDate { get; }
 
     public PV2(Segment segment) : base(typeof(PV2), segment) {
@@ -5086,7 +5026,7 @@ public sealed record QPD : Hl7Segment {
 
 public sealed record QRI : Hl7Segment {
     public NM? CandidateConfidence { get; }
-    public RepField<CWE> MatchReasonCode { get; }
+    public ICollection<CWE>? MatchReasonCode { get; }
     public CWE? AlgorithmDescriptor { get; }
 
     public QRI(Segment segment) : base(typeof(QRI), segment) {
@@ -5102,8 +5042,8 @@ public sealed record RCP : Hl7Segment {
     public CNE? ResponseModality { get; }
     public DTM? ExecutionandDeliveryTime { get; }
     public ID? ModifyIndicator { get; }
-    public RepField<SRT> SortbyField { get; }
-    public RepField<ID> Segmentgroupinclusion { get; }
+    public ICollection<SRT>? SortbyField { get; }
+    public ICollection<ID>? Segmentgroupinclusion { get; }
 
     public RCP(Segment segment) : base(typeof(RCP), segment) {
         this.QueryPriority = segment.GetField<ID>(1);
@@ -5118,11 +5058,11 @@ public sealed record RCP : Hl7Segment {
 
 public sealed record RDF : Hl7Segment {
     public NM NumberofColumnsperRow { get; }
-    public RepField<RCD> ColumnDescription { get; }
+    public ICollection<RCD> ColumnDescription { get; }
 
     public RDF(Segment segment) : base(typeof(RDF), segment) {
         this.NumberofColumnsperRow = segment.GetRequiredField<NM>(1);
-        this.ColumnDescription = segment.GetRepField<RCD>(2);
+        this.ColumnDescription = segment.GetRequiredRepField<RCD>(2);
     }
 }
 
@@ -5180,14 +5120,14 @@ public sealed record RF1 : Hl7Segment {
     public CWE? ReferralStatus { get; }
     public CWE? ReferralPriority { get; }
     public CWE? ReferralType { get; }
-    public RepField<CWE> ReferralDisposition { get; }
+    public ICollection<CWE>? ReferralDisposition { get; }
     public CWE? ReferralCategory { get; }
     public EI OriginatingReferralIdentifier { get; }
     public DTM? EffectiveDate { get; }
     public DTM? ExpirationDate { get; }
     public DTM? ProcessDate { get; }
-    public RepField<CWE> ReferralReason { get; }
-    public RepField<EI> ExternalReferralIdentifier { get; }
+    public ICollection<CWE>? ReferralReason { get; }
+    public ICollection<EI>? ExternalReferralIdentifier { get; }
     public CWE? ReferralDocumentationCompletionStatus { get; }
     public DTM? PlannedTreatmentStopDate { get; }
     public ST? ReferralReasonText { get; }
@@ -5331,15 +5271,15 @@ public sealed record RXA : Hl7Segment {
     public NM AdministeredAmount { get; }
     public CWE? AdministeredUnits { get; }
     public CWE? AdministeredDosageForm { get; }
-    public RepField<CWE> AdministrationNotes { get; }
+    public ICollection<CWE>? AdministrationNotes { get; }
     public ST? AdministeredPer { get; }
     public NM? AdministeredStrength { get; }
     public CWE? AdministeredStrengthUnits { get; }
-    public RepField<ST> SubstanceLotNumber { get; }
-    public RepField<DTM> SubstanceExpirationDate { get; }
-    public RepField<CWE> SubstanceManufacturerName { get; }
-    public RepField<CWE> SubstanceTreatmentRefusalReason { get; }
-    public RepField<CWE> Indication { get; }
+    public ICollection<ST>? SubstanceLotNumber { get; }
+    public ICollection<DTM>? SubstanceExpirationDate { get; }
+    public ICollection<CWE>? SubstanceManufacturerName { get; }
+    public ICollection<CWE>? SubstanceTreatmentRefusalReason { get; }
+    public ICollection<CWE>? Indication { get; }
     public ID? CompletionStatus { get; }
     public ID? ActionCodeRXA { get; }
     public DTM? SystemEntryDateTime { get; }
@@ -5349,7 +5289,7 @@ public sealed record RXA : Hl7Segment {
     public ID? PharmacyOrderType { get; }
     public PL? Administerat { get; }
     public XAD? AdministeredatAddress { get; }
-    public RepField<EI> AdministeredTagIdentifier { get; }
+    public ICollection<EI>? AdministeredTagIdentifier { get; }
 
     public RXA(Segment segment) : base(typeof(RXA), segment) {
         this.GiveSubIDCounter = segment.GetRequiredField<NM>(1);
@@ -5389,7 +5329,7 @@ public sealed record RXC : Hl7Segment {
     public CWE ComponentUnits { get; }
     public NM? ComponentStrength { get; }
     public CWE? ComponentStrengthUnits { get; }
-    public RepField<CWE> SupplementaryCode { get; }
+    public ICollection<CWE>? SupplementaryCode { get; }
     public NM? ComponentDrugStrengthVolume { get; }
     public CWE? ComponentDrugStrengthVolumeUnits { get; }
     public NM? DispenseAmount { get; }
@@ -5419,22 +5359,22 @@ public sealed record RXD : Hl7Segment {
     public CWE? ActualDosageForm { get; }
     public ST PrescriptionNumber { get; }
     public NM? NumberofRefillsRemaining { get; }
-    public RepField<ST> DispenseNotes { get; }
-    public RepField<XCN> DispensingProvider { get; }
+    public ICollection<ST>? DispenseNotes { get; }
+    public ICollection<XCN>? DispensingProvider { get; }
     public ID? SubstitutionStatus { get; }
     public CQ? TotalDailyDose { get; }
     public ID? NeedsHumanReview { get; }
-    public RepField<CWE> SpecialDispensingInstructions { get; }
+    public ICollection<CWE>? SpecialDispensingInstructions { get; }
     public NM? ActualStrength { get; }
     public CWE? ActualStrengthUnit { get; }
-    public RepField<ST> SubstanceLotNumber { get; }
-    public RepField<DTM> SubstanceExpirationDate { get; }
-    public RepField<CWE> SubstanceManufacturerName { get; }
-    public RepField<CWE> Indication { get; }
+    public ICollection<ST>? SubstanceLotNumber { get; }
+    public ICollection<DTM>? SubstanceExpirationDate { get; }
+    public ICollection<CWE>? SubstanceManufacturerName { get; }
+    public ICollection<CWE>? Indication { get; }
     public NM? DispensePackageSize { get; }
     public CWE? DispensePackageSizeUnit { get; }
     public ID? DispensePackageMethod { get; }
-    public RepField<CWE> SupplementaryCode { get; }
+    public ICollection<CWE>? SupplementaryCode { get; }
     public CWE? InitiatingLocation { get; }
     public CWE? PackagingAssemblyLocation { get; }
     public NM? ActualDrugStrengthVolume { get; }
@@ -5443,8 +5383,8 @@ public sealed record RXD : Hl7Segment {
     public XAD? DispensetoPharmacyAddress { get; }
     public ID? PharmacyOrderType { get; }
     public CWE? DispenseType { get; }
-    public RepField<XTN> PharmacyPhoneNumber { get; }
-    public RepField<EI> DispenseTagIdentifier { get; }
+    public ICollection<XTN>? PharmacyPhoneNumber { get; }
+    public ICollection<EI>? DispenseTagIdentifier { get; }
 
     public RXD(Segment segment) : base(typeof(RXD), segment) {
         this.DispenseSubIDCounter = segment.GetRequiredField<NM>(1);
@@ -5490,36 +5430,36 @@ public sealed record RXE : Hl7Segment {
     public NM? GiveAmountMaximum { get; }
     public CWE GiveUnits { get; }
     public CWE? GiveDosageForm { get; }
-    public RepField<CWE> ProvidersAdministrationInstructions { get; }
+    public ICollection<CWE>? ProvidersAdministrationInstructions { get; }
     public ID? SubstitutionStatus { get; }
     public NM? DispenseAmount { get; }
     public CWE? DispenseUnits { get; }
     public NM? NumberOfRefills { get; }
-    public RepField<XCN> OrderingProvidersDEANumber { get; }
-    public RepField<XCN> PharmacistTreatmentSuppliersVerifierID { get; }
+    public ICollection<XCN>? OrderingProvidersDEANumber { get; }
+    public ICollection<XCN>? PharmacistTreatmentSuppliersVerifierID { get; }
     public ST? PrescriptionNumber { get; }
     public NM? NumberofRefillsRemaining { get; }
     public NM? NumberofRefillsDosesDispensed { get; }
     public DTM? DTofMostRecentRefillorDoseDispensed { get; }
     public CQ? TotalDailyDose { get; }
     public ID? NeedsHumanReview { get; }
-    public RepField<CWE> SpecialDispensingInstructions { get; }
+    public ICollection<CWE>? SpecialDispensingInstructions { get; }
     public ST? GivePer { get; }
     public ST? GiveRateAmount { get; }
     public CWE? GiveRateUnits { get; }
     public NM? GiveStrength { get; }
     public CWE? GiveStrengthUnits { get; }
-    public RepField<CWE> GiveIndication { get; }
+    public ICollection<CWE>? GiveIndication { get; }
     public NM? DispensePackageSize { get; }
     public CWE? DispensePackageSizeUnit { get; }
     public ID? DispensePackageMethod { get; }
-    public RepField<CWE> SupplementaryCode { get; }
+    public ICollection<CWE>? SupplementaryCode { get; }
     public DTM? OriginalOrderDateTime { get; }
     public NM? GiveDrugStrengthVolume { get; }
     public CWE? GiveDrugStrengthVolumeUnits { get; }
     public CWE? ControlledSubstanceSchedule { get; }
     public ID? FormularyStatus { get; }
-    public RepField<CWE> PharmaceuticalSubstanceAlternative { get; }
+    public ICollection<CWE>? PharmaceuticalSubstanceAlternative { get; }
     public CWE? PharmacyofMostRecentFill { get; }
     public NM? InitialDispenseAmount { get; }
     public CWE? DispensingPharmacy { get; }
@@ -5527,7 +5467,7 @@ public sealed record RXE : Hl7Segment {
     public PL? DelivertoPatientLocation { get; }
     public XAD? DelivertoAddress { get; }
     public ID? PharmacyOrderType { get; }
-    public RepField<XTN> PharmacyPhoneNumber { get; }
+    public ICollection<XTN>? PharmacyPhoneNumber { get; }
 
     public RXE(Segment segment) : base(typeof(RXE), segment) {
         this.GiveCode = segment.GetRequiredField<CWE>(1);
@@ -5584,19 +5524,19 @@ public sealed record RXG : Hl7Segment {
     public NM? GiveAmountMaximum { get; }
     public CWE GiveUnits { get; }
     public CWE? GiveDosageForm { get; }
-    public RepField<CWE> AdministrationNotes { get; }
+    public ICollection<CWE>? AdministrationNotes { get; }
     public ID? SubstitutionStatus { get; }
     public ID? NeedsHumanReview { get; }
-    public RepField<CWE> SpecialAdministrationInstructions { get; }
+    public ICollection<CWE>? SpecialAdministrationInstructions { get; }
     public ST? GivePer { get; }
     public ST? GiveRateAmount { get; }
     public CWE? GiveRateUnits { get; }
     public NM? GiveStrength { get; }
     public CWE? GiveStrengthUnits { get; }
-    public RepField<ST> SubstanceLotNumber { get; }
-    public RepField<DTM> SubstanceExpirationDate { get; }
-    public RepField<CWE> SubstanceManufacturerName { get; }
-    public RepField<CWE> Indication { get; }
+    public ICollection<ST>? SubstanceLotNumber { get; }
+    public ICollection<DTM>? SubstanceExpirationDate { get; }
+    public ICollection<CWE>? SubstanceManufacturerName { get; }
+    public ICollection<CWE>? Indication { get; }
     public NM? GiveDrugStrengthVolume { get; }
     public CWE? GiveDrugStrengthVolumeUnits { get; }
     public CWE? GiveBarcodeIdentifier { get; }
@@ -5605,7 +5545,7 @@ public sealed record RXG : Hl7Segment {
     public XAD? DispensetoPharmacyAddress { get; }
     public PL? DelivertoPatientLocation { get; }
     public XAD? DelivertoAddress { get; }
-    public RepField<EI> GiveTagIdentifier { get; }
+    public ICollection<EI>? GiveTagIdentifier { get; }
     public NM? DispenseAmount { get; }
     public CWE? DispenseUnits { get; }
 
@@ -5650,8 +5590,8 @@ public sealed record RXO : Hl7Segment {
     public NM? RequestedGiveAmountMaximum { get; }
     public CWE? RequestedGiveUnits { get; }
     public CWE? RequestedDosageForm { get; }
-    public RepField<CWE> ProvidersPharmacyTreatmentInstructions { get; }
-    public RepField<CWE> ProvidersAdministrationInstructions { get; }
+    public ICollection<CWE>? ProvidersPharmacyTreatmentInstructions { get; }
+    public ICollection<CWE>? ProvidersAdministrationInstructions { get; }
     public ID? AllowSubstitutions { get; }
     public CWE? RequestedDispenseCode { get; }
     public NM? RequestedDispenseAmount { get; }
@@ -5663,11 +5603,11 @@ public sealed record RXO : Hl7Segment {
     public ST? RequestedGivePer { get; }
     public NM? RequestedGiveStrength { get; }
     public CWE? RequestedGiveStrengthUnits { get; }
-    public RepField<CWE> Indication { get; }
+    public ICollection<CWE>? Indication { get; }
     public ST? RequestedGiveRateAmount { get; }
     public CWE? RequestedGiveRateUnits { get; }
     public CQ? TotalDailyDose { get; }
-    public RepField<CWE> SupplementaryCode { get; }
+    public ICollection<CWE>? SupplementaryCode { get; }
     public NM? RequestedDrugStrengthVolume { get; }
     public CWE? RequestedDrugStrengthVolumeUnits { get; }
     public ID? PharmacyOrderType { get; }
@@ -5679,7 +5619,7 @@ public sealed record RXO : Hl7Segment {
     public XAD? DispensingPharmacyAddress { get; }
     public PL? DelivertoPatientLocation { get; }
     public XAD? DelivertoAddress { get; }
-    public RepField<XTN> PharmacyPhoneNumber { get; }
+    public ICollection<XTN>? PharmacyPhoneNumber { get; }
 
     public RXO(Segment segment) : base(typeof(RXO), segment) {
         this.RequestedGiveCode = segment.GetField<CWE>(1);
@@ -5802,7 +5742,7 @@ public sealed record SAC : Hl7Segment {
     public CWE? TrayTypeSAC { get; }
     public EI? TrayIdentifier { get; }
     public NA? PositioninTray { get; }
-    public RepField<CWE> Location { get; }
+    public ICollection<CWE>? Location { get; }
     public NM? ContainerHeight { get; }
     public NM? ContainerDiameter { get; }
     public NM? BarrierDelta { get; }
@@ -5814,7 +5754,7 @@ public sealed record SAC : Hl7Segment {
     public CWE? VolumeUnits { get; }
     public CWE? SeparatorType { get; }
     public CWE? CapType { get; }
-    public RepField<CWE> Additive { get; }
+    public ICollection<CWE>? Additive { get; }
     public CWE? SpecimenComponent { get; }
     public SN? DilutionFactor { get; }
     public CWE? Treatment { get; }
@@ -5827,11 +5767,11 @@ public sealed record SAC : Hl7Segment {
     public CWE? IcterusIndexUnits { get; }
     public NM? FibrinIndex { get; }
     public CWE? FibrinIndexUnits { get; }
-    public RepField<CWE> SystemInducedContaminants { get; }
-    public RepField<CWE> DrugInterference { get; }
+    public ICollection<CWE>? SystemInducedContaminants { get; }
+    public ICollection<CWE>? DrugInterference { get; }
     public CWE? ArtificialBlood { get; }
-    public RepField<CWE> SpecialHandlingCode { get; }
-    public RepField<CWE> OtherEnvironmentalFactors { get; }
+    public ICollection<CWE>? SpecialHandlingCode { get; }
+    public ICollection<CWE>? OtherEnvironmentalFactors { get; }
     public CQ? ContainerLength { get; }
     public CQ? ContainerWidth { get; }
     public CWE? ContainerForm { get; }
@@ -5923,7 +5863,7 @@ public sealed record SCD : Hl7Segment {
     public CQ? WashTime { get; }
     public CQ? InjectionRate { get; }
     public CNE? ProcedureCode { get; }
-    public RepField<CX> PatientIdentifierList { get; }
+    public ICollection<CX>? PatientIdentifierList { get; }
     public XCN? AttendingDoctor { get; }
     public SN? DilutionFactor { get; }
     public CQ? FillTime { get; }
@@ -5981,16 +5921,16 @@ public sealed record SCH : Hl7Segment {
     public CWE? AppointmentType { get; }
     public NM? AppointmentDuration { get; }
     public CNE? AppointmentDurationUnits { get; }
-    public RepField<XCN> PlacerContactPerson { get; }
+    public ICollection<XCN>? PlacerContactPerson { get; }
     public XTN? PlacerContactPhoneNumber { get; }
-    public RepField<XAD> PlacerContactAddress { get; }
+    public ICollection<XAD>? PlacerContactAddress { get; }
     public PL? PlacerContactLocation { get; }
-    public RepField<XCN> FillerContactPerson { get; }
+    public ICollection<XCN> FillerContactPerson { get; }
     public XTN? FillerContactPhoneNumber { get; }
-    public RepField<XAD> FillerContactAddress { get; }
+    public ICollection<XAD>? FillerContactAddress { get; }
     public PL? FillerContactLocation { get; }
-    public RepField<XCN> EnteredByPerson { get; }
-    public RepField<XTN> EnteredByPhoneNumber { get; }
+    public ICollection<XCN> EnteredByPerson { get; }
+    public ICollection<XTN>? EnteredByPhoneNumber { get; }
     public PL? EnteredByLocation { get; }
     public EI? ParentPlacerAppointmentID { get; }
     public EI? ParentFillerAppointmentID { get; }
@@ -6014,11 +5954,11 @@ public sealed record SCH : Hl7Segment {
         this.PlacerContactPhoneNumber = segment.GetField<XTN>(12);
         this.PlacerContactAddress = segment.GetRepField<XAD>(13);
         this.PlacerContactLocation = segment.GetField<PL>(14);
-        this.FillerContactPerson = segment.GetRepField<XCN>(15);
+        this.FillerContactPerson = segment.GetRequiredRepField<XCN>(15);
         this.FillerContactPhoneNumber = segment.GetField<XTN>(16);
         this.FillerContactAddress = segment.GetRepField<XAD>(17);
         this.FillerContactLocation = segment.GetField<PL>(18);
-        this.EnteredByPerson = segment.GetRepField<XCN>(19);
+        this.EnteredByPerson = segment.GetRequiredRepField<XCN>(19);
         this.EnteredByPhoneNumber = segment.GetRepField<XTN>(20);
         this.EnteredByLocation = segment.GetField<PL>(21);
         this.ParentPlacerAppointmentID = segment.GetField<EI>(22);
@@ -6112,16 +6052,16 @@ public sealed record SGT : Hl7Segment {
 
 public sealed record SHP : Hl7Segment {
     public EI ShipmentID { get; }
-    public RepField<EI> InternalShipmentID { get; }
+    public ICollection<EI>? InternalShipmentID { get; }
     public CWE? ShipmentStatus { get; }
     public DTM ShipmentStatusDateTime { get; }
     public TX? ShipmentStatusReason { get; }
     public CWE? ShipmentPriority { get; }
-    public RepField<CWE> ShipmentConfidentiality { get; }
+    public ICollection<CWE>? ShipmentConfidentiality { get; }
     public NM? NumberofPackagesinShipment { get; }
-    public RepField<CWE> ShipmentCondition { get; }
-    public RepField<CWE> ShipmentHandlingCode { get; }
-    public RepField<CWE> ShipmentRiskCode { get; }
+    public ICollection<CWE>? ShipmentCondition { get; }
+    public ICollection<CWE>? ShipmentHandlingCode { get; }
+    public ICollection<CWE>? ShipmentRiskCode { get; }
     public ID? ActionCode { get; }
 
     public SHP(Segment segment) : base(typeof(SHP), segment) {
@@ -6173,35 +6113,35 @@ public sealed record SLT : Hl7Segment {
 public sealed record SPM : Hl7Segment {
     public SI? SetIDSPM { get; }
     public EIP? SpecimenIdentifier { get; }
-    public RepField<EIP> SpecimenParentIDs { get; }
+    public ICollection<EIP>? SpecimenParentIDs { get; }
     public CWE SpecimenType { get; }
-    public RepField<CWE> SpecimenTypeModifier { get; }
-    public RepField<CWE> SpecimenAdditives { get; }
+    public ICollection<CWE>? SpecimenTypeModifier { get; }
+    public ICollection<CWE>? SpecimenAdditives { get; }
     public CWE? SpecimenCollectionMethod { get; }
     public CWE? SpecimenSourceSite { get; }
-    public RepField<CWE> SpecimenSourceSiteModifier { get; }
+    public ICollection<CWE>? SpecimenSourceSiteModifier { get; }
     public CWE? SpecimenCollectionSite { get; }
-    public RepField<CWE> SpecimenRole { get; }
+    public ICollection<CWE>? SpecimenRole { get; }
     public CQ? SpecimenCollectionAmount { get; }
     public NM? GroupedSpecimenCount { get; }
-    public RepField<ST> SpecimenDescription { get; }
-    public RepField<CWE> SpecimenHandlingCode { get; }
-    public RepField<CWE> SpecimenRiskCode { get; }
+    public ICollection<ST>? SpecimenDescription { get; }
+    public ICollection<CWE>? SpecimenHandlingCode { get; }
+    public ICollection<CWE>? SpecimenRiskCode { get; }
     public DR? SpecimenCollectionDateTime { get; }
     public DTM? SpecimenReceivedDateTime { get; }
     public DTM? SpecimenExpirationDateTime { get; }
     public ID? SpecimenAvailability { get; }
-    public RepField<CWE> SpecimenRejectReason { get; }
+    public ICollection<CWE>? SpecimenRejectReason { get; }
     public CWE? SpecimenQuality { get; }
     public CWE? SpecimenAppropriateness { get; }
-    public RepField<CWE> SpecimenCondition { get; }
+    public ICollection<CWE>? SpecimenCondition { get; }
     public CQ? SpecimenCurrentQuantity { get; }
     public NM? NumberofSpecimenContainers { get; }
     public CWE? ContainerType { get; }
     public CWE? ContainerCondition { get; }
     public CWE? SpecimenChildRole { get; }
-    public RepField<CX> AccessionID { get; }
-    public RepField<CX> OtherSpecimenID { get; }
+    public ICollection<CX>? AccessionID { get; }
+    public ICollection<CX>? OtherSpecimenID { get; }
     public EI? ShipmentID { get; }
     public DTM? CultureStartDateTime { get; }
     public DTM? CultureFinalDateTime { get; }
@@ -6248,20 +6188,20 @@ public sealed record SPM : Hl7Segment {
 
 public sealed record STF : Hl7Segment {
     public CWE? PrimaryKeyValueSTF { get; }
-    public RepField<CX> StaffIdentifierList { get; }
-    public RepField<XPN> StaffName { get; }
-    public RepField<CWE> StaffType { get; }
+    public ICollection<CX>? StaffIdentifierList { get; }
+    public ICollection<XPN>? StaffName { get; }
+    public ICollection<CWE>? StaffType { get; }
     public CWE? AdministrativeSex { get; }
     public DTM? DateTimeofBirth { get; }
     public ID? ActiveInactiveFlag { get; }
-    public RepField<CWE> Department { get; }
-    public RepField<CWE> HospitalServiceSTF { get; }
-    public RepField<XTN> Phone { get; }
-    public RepField<XAD> OfficeHomeAddressBirthplace { get; }
-    public RepField<DIN> InstitutionActivationDate { get; }
-    public RepField<DIN> InstitutionInactivationDate { get; }
-    public RepField<CWE> BackupPersonID { get; }
-    public RepField<ST> EMailAddress { get; }
+    public ICollection<CWE>? Department { get; }
+    public ICollection<CWE>? HospitalServiceSTF { get; }
+    public ICollection<XTN>? Phone { get; }
+    public ICollection<XAD>? OfficeHomeAddressBirthplace { get; }
+    public ICollection<DIN>? InstitutionActivationDate { get; }
+    public ICollection<DIN>? InstitutionInactivationDate { get; }
+    public ICollection<CWE>? BackupPersonID { get; }
+    public ICollection<ST>? EMailAddress { get; }
     public CWE? PreferredMethodofContact { get; }
     public CWE? MaritalStatus { get; }
     public ST? JobTitle { get; }
@@ -6276,16 +6216,16 @@ public sealed record STF : Hl7Segment {
     public CWE? Race { get; }
     public CWE? EthnicGroup { get; }
     public ID? ReactivationApprovalIndicator { get; }
-    public RepField<CWE> Citizenship { get; }
+    public ICollection<CWE>? Citizenship { get; }
     public DTM? DateTimeofDeath { get; }
     public ID? DeathIndicator { get; }
     public CWE? InstitutionRelationshipTypeCode { get; }
     public DR? InstitutionRelationshipPeriod { get; }
     public DT? ExpectedReturnDate { get; }
-    public RepField<CWE> CostCenterCode { get; }
+    public ICollection<CWE>? CostCenterCode { get; }
     public ID? GenericClassificationIndicator { get; }
     public CWE? InactiveReasonCode { get; }
-    public RepField<CWE> Genericresourcetypeorcategory { get; }
+    public ICollection<CWE>? Genericresourcetypeorcategory { get; }
     public CWE? Religion { get; }
     public ED? Signature { get; }
 
@@ -6413,13 +6353,13 @@ public sealed record TCD : Hl7Segment {
 public sealed record TQ1 : Hl7Segment {
     public SI? SetIDTQ1 { get; }
     public CQ? Quantity { get; }
-    public RepField<RPT> RepeatPattern { get; }
-    public RepField<TM> ExplicitTime { get; }
-    public RepField<CQ> RelativeTimeandUnits { get; }
+    public ICollection<RPT>? RepeatPattern { get; }
+    public ICollection<TM>? ExplicitTime { get; }
+    public ICollection<CQ>? RelativeTimeandUnits { get; }
     public CQ? ServiceDuration { get; }
     public DTM? Startdatetime { get; }
     public DTM? Enddatetime { get; }
-    public RepField<CWE> Priority { get; }
+    public ICollection<CWE>? Priority { get; }
     public TX? Conditiontext { get; }
     public TX? Textinstruction { get; }
     public ID? Conjunction { get; }
@@ -6478,13 +6418,13 @@ public sealed record TXA : Hl7Segment {
     public XCN? PrimaryActivityProviderCodeName { get; }
     public DTM? OriginationDateTime { get; }
     public DTM? TranscriptionDateTime { get; }
-    public RepField<DTM> EditDateTime { get; }
-    public RepField<XCN> OriginatorCodeName { get; }
-    public RepField<XCN> AssignedDocumentAuthenticator { get; }
+    public ICollection<DTM>? EditDateTime { get; }
+    public ICollection<XCN>? OriginatorCodeName { get; }
+    public ICollection<XCN>? AssignedDocumentAuthenticator { get; }
     public XCN? TranscriptionistCodeName { get; }
     public EI UniqueDocumentNumber { get; }
     public EI? ParentDocumentNumber { get; }
-    public RepField<EI> PlacerOrderNumber { get; }
+    public ICollection<EI>? PlacerOrderNumber { get; }
     public EI? FillerOrderNumber { get; }
     public ST? UniqueDocumentFileName { get; }
     public ID DocumentCompletionStatus { get; }
@@ -6493,9 +6433,9 @@ public sealed record TXA : Hl7Segment {
     public ID? DocumentStorageStatus { get; }
     public ST? DocumentChangeReason { get; }
     public PPN? AuthenticationPersonTimeStamp { get; }
-    public RepField<XCN> DistributedCopies { get; }
-    public RepField<CWE> FolderAssignment { get; }
-    public RepField<ST> DocumentTitle { get; }
+    public ICollection<XCN>? DistributedCopies { get; }
+    public ICollection<CWE>? FolderAssignment { get; }
+    public ICollection<ST>? DocumentTitle { get; }
     public DTM? AgreedDueDateTime { get; }
     public HD? CreatingFacility { get; }
     public CWE? CreatingSpecialty { get; }
@@ -6594,9 +6534,9 @@ public sealed record VAR : Hl7Segment {
     public EI VarianceInstanceID { get; }
     public DTM DocumentedDateTime { get; }
     public DTM? StatedVarianceDateTime { get; }
-    public RepField<XCN> VarianceOriginator { get; }
+    public ICollection<XCN>? VarianceOriginator { get; }
     public CWE? VarianceClassification { get; }
-    public RepField<ST> VarianceDescription { get; }
+    public ICollection<ST>? VarianceDescription { get; }
 
     public VAR(Segment segment) : base(typeof(VAR), segment) {
         this.VarianceInstanceID = segment.GetRequiredField<EI>(1);
@@ -6614,11 +6554,11 @@ public sealed record VND : Hl7Segment {
     public ST? VendorName { get; }
     public EI? VendorCatalogNumber { get; }
     public CNE? PrimaryVendorIndicator { get; }
-    public RepField<EI> Corporation { get; }
+    public ICollection<EI>? Corporation { get; }
     public XCN? PrimaryContact { get; }
     public MOP? ContractAdjustment { get; }
-    public RepField<EI> AssociatedContractID { get; }
-    public RepField<ST> ClassofTrade { get; }
+    public ICollection<EI>? AssociatedContractID { get; }
+    public ICollection<ST>? ClassofTrade { get; }
     public CWE? PricingTierLevel { get; }
 
     public VND(Segment segment) : base(typeof(VND), segment) {

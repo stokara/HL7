@@ -86,7 +86,7 @@ public class HL7DataTypeScraper {
 
             int.TryParse(cells[0].InnerText.Trim(), out var order);
             var baseName = cells[1].InnerText.Trim().Replace(" ", "");
-            var name = baseName;
+            var name = sanitizePropertyName(baseName);
             if (propNameCounts.TryGetValue(baseName, out var count)) {
                 count++;
                 propNameCounts[baseName] = count;
@@ -98,9 +98,7 @@ public class HL7DataTypeScraper {
             var cardinality = cells[4].InnerText.Trim().Replace("[", "").Replace("]", "");
             var datatype = cells[8].InnerText.Trim();
 
-            // Skip property if datatype or cardinality is missing
-            if (string.IsNullOrWhiteSpace(datatype) || string.IsNullOrWhiteSpace(cardinality))
-                continue;
+            if (string.IsNullOrWhiteSpace(datatype) || string.IsNullOrWhiteSpace(cardinality)) continue;
 
             var isRequired = false;
             var parts = cardinality.Split([".."], StringSplitOptions.None);
@@ -112,61 +110,69 @@ public class HL7DataTypeScraper {
         return components;
     }
 
-    public static void OutputDataTypeClasses(List<DataTypeDefinition> dataTypes, Stream stream) {
-        // List of types to exclude
-        var excludedTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "DT", "DTM", "FT", "GTS", "ID", "IS", "NM", "SI", "SNM", "ST", "TM", "TX"
-        };
-
-        using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
-        foreach (var dd in dataTypes) {
-            if (excludedTypes.Contains(dd.Name))
-                continue;
-
-            writer.WriteLine($"public sealed record {dd.Name} : Hl7DataType {{");
-            foreach (var comp in dd.Components) {
-                var propName = sanitizePropertyName(comp.Name);
-                var propType = comp.DataTypeName + (comp.IsRequired ? "" : "?");
-                writer.WriteLine($"    public {propType} {propName} {{ get; }}");
-            }
-
-            // Constructor
-            writer.WriteLine();
-            writer.WriteLine($"    public {dd.Name}(IReadOnlyList<string> components, char subComponentDelimiter = '^') {{");
-            for (var i = 0; i < dd.Components.Count; i++) {
-                var comp = dd.Components[i];
-                var propName = sanitizePropertyName(comp.Name);
-                var propType = comp.DataTypeName;
-
-                writer.WriteLine(propType == "string"
-                    ? $"        {propName} = components.GetString({i + 1});"
-                    : $"        {propName} = components.Get<{propType}>({i + 1}, subComponentDelimiter);");
-            }
-
-            writer.WriteLine("    }");
-
-            // Serialize override
-            writer.WriteLine();
-            writer.WriteLine("    public override string Serialize(Hl7Encoding encoding) =>");
-            writer.WriteLine("        string.Join(encoding.ComponentDelimiter, new[] {");
-            for (int i = 0; i < dd.Components.Count; i++) {
-                var comp = dd.Components[i];
-                var propName = sanitizePropertyName(comp.Name);
-                var comma = (i < dd.Components.Count - 1) ? "," : "";
-                writer.WriteLine($"            SerializePropertyValue({propName},encoding){comma}");
-            }
-            writer.WriteLine("        });");
-            writer.WriteLine("    }");
-            writer.WriteLine();
-        }
-
-        writer.Flush();
-    }
-
     private static string sanitizePropertyName(string name) {
         var valid = new string(name.Where(char.IsLetterOrDigit).ToArray());
         if (string.IsNullOrEmpty(valid)) valid = "field";
         return char.ToUpper(valid[0]) + valid[1..];
     }
+
+    public static void OutputDataTypeClasses(List<DataTypeDefinition> dataTypes, Stream stream) {
+        // List of types to exclude
+        var excludedSimpleTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "DT", "DTM", "FT", "GTS", "ID", "IS", "NM", "SI", "SNM", "ST", "TM", "TX"
+        };
+
+        using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
+        writer.WriteLine("namespace HL7;");
+        writer.WriteLine();
+        
+        foreach (var dd in dataTypes) {
+            if (excludedSimpleTypes.Contains(dd.Name)) continue;
+
+            writer.WriteLine($"public sealed record {dd.Name} : Hl7ComplexType {{");
+            generateProperties(dd);
+
+            writer.WriteLine();
+            generateConstructor(dd);
+
+            writer.WriteLine("}");
+            writer.WriteLine();
+        }
+
+        writer.Flush();
+        return;
+
+        void generateConstructor(DataTypeDefinition dd) {
+            writer.WriteLine($"    public {dd.Name}(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {{");
+            writer.WriteLine("        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);");
+            const string simpleBlock = """
+                                               if (rawComponent.SubComponents.Length == 0) {
+                                                   this.StringValue = rawComponent.ComponentValue;
+                                                   this.Complexity = HL7.Complexity.Simple;
+                                                   return;
+                                               }
+                                       """;
+            writer.WriteLine(simpleBlock);
+            for (var i = 0; i < dd.Components.Count; i++) {
+                var comp = dd.Components[i];
+                var propName = comp.Name;
+                var propType = comp.DataTypeName;
+
+                writer.WriteLine(propType == "string"
+                    ? $"            {propName} = rawComponent.GetString({i + 1});"
+                    : $"            {propName} = rawComponent.Get<{propType}>({i + 1});");
+            }
+            writer.WriteLine("    }");
+        }
+
+        void generateProperties(DataTypeDefinition dd) {
+            foreach (var comp in dd.Components) {
+                var propName = comp.Name;
+                var propType = comp.DataTypeName + (comp.IsRequired ? "" : "?");
+                writer.WriteLine($"    public {propType} {propName} {{ get; }}");
+            }
+        }
+    }
+
 }

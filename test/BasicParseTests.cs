@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using HL7;
 using Xunit;
 
@@ -35,14 +36,14 @@ public class HL7Test {
     [Fact]
     public void ReadSegmentTest() {
         var message = Message.Parse(this.HL7_ORM);
-        Assert.NotNull(message.Segments[0]);
+        Assert.NotNull(message.Segments[1]);
     }
 
     [Fact]
     public void ReadFieldTest() {
         var message = Message.Parse(this.HL7_ADT);
-        var mshSegment = message.Segments[0];
-        var msh9 = mshSegment.Fields[8].StringValue;
-        Assert.Equal("ADT^O01", msh9);
+        var segment = message.Segments.First(s=>s.Name == "PID");
+        var field = segment.GetRawField(4).RawComponent.ComponentValue;
+        Assert.Equal("454721", field);
     }
 }

@@ -29,7 +29,7 @@ public static class Hl7DataLoader {
         registry[segmentType] = factory;
     }
 
-    public static Hl7Segment Create(Segment segment) {
+    public static Hl7Segment CreateHl7Segment(Segment segment) {
         if (segment is null) throw new ArgumentNullException(nameof(segment), new Hl7Exception("segment null"));
         if (registry.TryGetValue(segment.Name, out var factory)) return factory(segment);
         throw new InvalidDataException($"Unknown segment type: {segment.Name}");

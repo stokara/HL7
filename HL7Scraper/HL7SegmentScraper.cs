@@ -20,9 +20,8 @@ public class HL7SegmentScraper {
 
         foreach (var segmentUrl in segmentLinks) {
             var segment = await parseSegmentAsync(segmentUrl);
-            if (segment != null) segments.Add(segment);
+            if (segment != null && segment.SegmentName != "MSH") segments.Add(segment);
         }
-
         return segments;
     }
 
@@ -81,8 +80,7 @@ public class HL7SegmentScraper {
 
         foreach (var row in rows) {
             var cells = row.SelectNodes(".//td");
-            if (cells == null || cells.Count < 4)
-                continue;
+            if (cells == null || cells.Count < 4) continue;
 
             int num;
             var numText = cells[0].InnerText.Trim();
@@ -108,26 +106,17 @@ public class HL7SegmentScraper {
             var datatype = cells[9].InnerText.Trim();
 
             // Exclude if datatype or cardinality is missing
-            if (string.IsNullOrWhiteSpace(datatype) || string.IsNullOrWhiteSpace(cardinality))
-                continue;
+            if (string.IsNullOrWhiteSpace(datatype) || string.IsNullOrWhiteSpace(cardinality)) continue;
+            if (datatype.Equals("Varies", StringComparison.OrdinalIgnoreCase)) datatype = "ST";
 
-            // Treat "Varies" as "ST"
-            if (datatype.Equals("Varies", StringComparison.OrdinalIgnoreCase))
-                datatype = "ST";
-
-            // Parse cardinality (e.g., "0..1", "1..*", "0..n")
             bool isRequired = false, canRepeat = false;
-            var parts = cardinality.Split(new[] { ".." }, StringSplitOptions.None);
+            var parts = cardinality.Split([".."], StringSplitOptions.None);
             if (parts.Length == 2) {
                 isRequired = parts[0] == "1";
                 canRepeat = parts[1] == "*" || parts[1].Equals("n", StringComparison.OrdinalIgnoreCase);
             }
 
-            // Calculate property type
-            var propType = canRepeat
-                ? $"RepField<{datatype}>"
-                : $"{datatype}{(isRequired ? "" : "?")}";
-
+            var propType = (canRepeat ? $"ICollection<{datatype}>" : $"{datatype}") + (isRequired ? "" : "?");
             dataElements.Add(new DataElement(num, propName, isRequired, canRepeat, datatype, propType));
         }
 
@@ -139,27 +128,32 @@ public class HL7SegmentScraper {
         writer.WriteLine("namespace HL7;");
         writer.WriteLine();
 
-        foreach (var segment in segments) {
+        foreach (var segment in segments.Where(s => !string.IsNullOrWhiteSpace( s.SegmentName))) {
             writer.WriteLine($"public sealed record {segment.SegmentName} : Hl7Segment {{");
-            foreach (var de in segment.DataElements) {
-                writer.WriteLine($"    public {de.PropType} {de.Name} {{ get; }}");
-            }
+            generateProperties(segment);
             writer.WriteLine();
-            writer.WriteLine($"    public {segment.SegmentName}(Segment segment) : base(typeof({segment.SegmentName}), segment) {{");
-            for (int i = 0; i < segment.DataElements.Count; i++) {
-                var de = segment.DataElements[i];
-                var getMethod = de.CanRepeat
-                    ? "GetRepField"
-                    : de.IsRequired
-                        ? "GetRequiredField" : "GetField";
-                writer.WriteLine($"        this.{de.Name} = segment.{getMethod}<{de.DataType}>({i+1});");
-            }
-            writer.WriteLine("    }");
+            generateConstructor(segment);
             writer.WriteLine("}");
             writer.WriteLine();
         }
-
         writer.Flush();
+        return;
+
+        void generateProperties(SegmentDefinition segment) {
+            foreach (var de in segment.DataElements) {
+                writer.WriteLine($"    public {de.PropType} {de.Name} {{ get; }}");
+            }
+        }
+
+        void generateConstructor(SegmentDefinition segment) {
+            writer.WriteLine($"    public {segment.SegmentName}(Segment segment) : base(typeof({segment.SegmentName}), segment) {{");
+            for (var i = 0; i < segment.DataElements.Count; i++) {
+                var de = segment.DataElements[i];
+                var getMethod = $"Get{(de.IsRequired ? "Required" : "")}{(de.CanRepeat ? "Rep" : "")}Field";
+                writer.WriteLine($"        this.{de.Name} = segment.{getMethod}<{de.DataType}>({i+1});");
+            }
+            writer.WriteLine("    }");
+        }
     }
 
 // Helper to sanitize property names (PascalCase, remove invalid chars)
