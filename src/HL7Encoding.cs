@@ -25,7 +25,19 @@ public record Hl7Encoding {
         SegmentDelimiter = segmentDelimiter;
         PresentButNull = presentButNull;
     }
-
+    
+    public string GetDelimiter(Hl7Structure structure) {
+        return structure switch {
+            Hl7Structure.Hl7Segment => SegmentDelimiter,
+            Hl7Structure.Hl7Field => FieldDelimiter.ToString(),
+            Hl7Structure.Hl7RepField => RepeatDelimiter.ToString(),
+            Hl7Structure.Hl7Component => ComponentDelimiter.ToString(),
+            Hl7Structure.Hl7SubComponent => SubComponentDelimiter.ToString(),
+            Hl7Structure.Hl7None => "",
+            _ => throw new ArgumentOutOfRangeException(nameof(structure), structure, null)
+        };
+    }
+    
     public static Hl7Encoding FromString(string delimiters) {
         var fieldDelimiter = delimiters[0];
         var componentDelimiter = delimiters[1];
@@ -187,4 +199,8 @@ public record Hl7Encoding {
 
     //  |^~\&
     public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}";
+}
+
+public static class HL7EncodingExtensions {
+    public static string GetDelimiter(this Hl7Encoding encoding, Hl7Structure structure) => encoding.GetDelimiter(structure);
 }
