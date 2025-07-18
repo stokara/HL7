@@ -56,6 +56,7 @@ public static class Hl7DateParser {
             return new OffsetDateTime(localDateTime, offset);
         } catch {
             if (throwException) throw;
+
             return null;
         }
     }
@@ -63,5 +64,19 @@ public static class Hl7DateParser {
     public static Instant? ParseInstant(string dateTimeString, bool throwException = false) {
         var odt = ParseOffsetDateTime(dateTimeString, throwException);
         return odt?.ToInstant();
+    }
+
+    public static string GetFormat(string dateTimeString) {
+        var len= dateTimeString.Length;
+        var format = "yyyy";
+        if (len >= 6) format += "MM";
+        if (len >= 8) format += "dd";
+        if (len >= 10) format += "HH";
+        if (len >= 12) format += "mm";
+        if (len >= 14) format += "ss";
+        var fracMatch = Regex.Match(dateTimeString, @"\.(\d{1,4})");
+        if (fracMatch.Success) format += ".fff";
+        if (dateTimeString.Contains('+') || dateTimeString.Contains('-')) format += "zzz";
+        return  format;
     }
 }
