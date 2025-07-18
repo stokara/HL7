@@ -14,7 +14,7 @@ public abstract record Hl7Segment : Hl7ComplexType {
         }
     }
 
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure? structure) {
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure structure) {
         var props = this.GetProperties().ToArray();
         var type = this.GetType();
         var initialString = $"{type.Name}{(type == typeof(MSH) ? encoding : "")}";

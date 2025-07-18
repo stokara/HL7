@@ -61,7 +61,8 @@ public static class Hl7DateParser {
         }
     }
 
-    public static Instant? ParseInstant(string dateTimeString, bool throwException = false) {
+    public static Instant? ParseInstant(string? dateTimeString, bool throwException = false) {
+        if (dateTimeString is null) return null;
         var odt = ParseOffsetDateTime(dateTimeString, throwException);
         return odt?.ToInstant();
     }

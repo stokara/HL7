@@ -11,7 +11,7 @@ public abstract record Hl7Value<T> : Hl7ComplexType, IHl7Value where T : class, 
     protected Hl7Value(Hl7Structure structure) : base(structure) { }
     protected Hl7Value(T value, Hl7Structure structure) : this(structure) => Value = value;
 
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure? sourceStructure = null) {
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure sourceStructure) {
         var props = this.GetProperties()
             .Select(p => (Hl7DataType)p.GetValue(this)!)
             .ToArray();
@@ -43,7 +43,7 @@ public sealed record Hl7RepField<T> : Hl7Value<T> where T : class, IHl7DataType 
         Repetitions = repetitions ?? throw new ArgumentNullException(nameof(repetitions));
     }
     
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure? _) {
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure _) {
         if (Repetitions.Count == 0) return string.Empty;
         return string.Join(encoding.RepeatDelimiter.ToString(), Repetitions.Select(r => r.Serialize(encoding, Hl7Structure.Hl7Field)));
     }

@@ -46,7 +46,7 @@ public record Hl7Message : Hl7DataType{
 
     public string Serialize() => Serialize(MSH.Encoding, Hl7Structure.Hl7Message);
 
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure? sourceStructure = null) {
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure sourceStructure) {
         try {
             return string.Join(encoding.SegmentDelimiter, AllSegments.Select(seg => seg.Serialize(encoding, Hl7Structure.Hl7Segment)));
 
