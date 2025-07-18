@@ -10,8 +10,7 @@ public sealed record AD : Hl7ComplexType {
     public ID? AddressType { get; }
     public ST? OtherGeographicDesignation { get; }
 
-    public AD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public AD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -33,8 +32,7 @@ public sealed record AUI : Hl7ComplexType {
     public DT? Date { get; }
     public ST? Source { get; }
 
-    public AUI(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public AUI(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -50,8 +48,7 @@ public sealed record CCD : Hl7ComplexType {
     public ID? InvocationEvent { get; }
     public DTM? Datetime { get; }
 
-    public CCD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CCD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -67,8 +64,7 @@ public sealed record CCP : Hl7ComplexType {
     public NM? ChannelCalibrationBaseline { get; }
     public NM? ChannelCalibrationTimeSkew { get; }
 
-    public CCP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CCP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -88,8 +84,7 @@ public sealed record CD : Hl7ComplexType {
     public NM? ChannelSamplingFrequency { get; }
     public NR? MinimumandMaximumDataValues { get; }
 
-    public CD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -128,8 +123,7 @@ public sealed record CF : Hl7ComplexType {
     public ST? SecondAlternateValueSetOID { get; }
     public DTM? SecondAlternateValueSetVersionID { get; }
 
-    public CF(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CF(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -184,8 +178,7 @@ public sealed record CNE : Hl7ComplexType {
     public ST? SecondAlternateValueSetOID { get; }
     public DTM? SecondAlternateValueSetVersionID { get; }
 
-    public CNE(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CNE(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -229,8 +222,7 @@ public sealed record CNN : Hl7ComplexType {
     public ST? AssigningAuthorityUniversalID { get; }
     public ID? AssigningAuthorityUniversalIDType { get; }
 
-    public CNN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CNN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -258,8 +250,7 @@ public sealed record CP : Hl7ComplexType {
     public CWE? RangeUnits { get; }
     public ID? RangeType { get; }
 
-    public CP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -278,8 +269,7 @@ public sealed record CQ : Hl7ComplexType {
     public NM? Quantity { get; }
     public CWE? Units { get; }
 
-    public CQ(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CQ(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -315,8 +305,7 @@ public sealed record CSU : Hl7ComplexType {
     public ST? AlternateUnitofMeasureValueSetOID2 { get; }
     public ST? AlternateUnitofMeasureValueSetVersionID2 { get; }
 
-    public CSU(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CSU(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -372,8 +361,7 @@ public sealed record CWE : Hl7ComplexType {
     public ST? SecondAlternateValueSetOID { get; }
     public DTM? SecondAlternateValueSetVersionID { get; }
 
-    public CWE(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CWE(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -418,8 +406,7 @@ public sealed record CX : Hl7ComplexType {
     public ST? SecurityCheck { get; }
     public ID? SecurityCheckScheme { get; }
 
-    public CX(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public CX(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -445,8 +432,7 @@ public sealed record DDI : Hl7ComplexType {
     public MO? MonetaryAmount { get; }
     public NM? NumberofDays { get; }
 
-    public DDI(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DDI(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -462,8 +448,7 @@ public sealed record DIN : Hl7ComplexType {
     public DTM? Date { get; }
     public CWE? InstitutionName { get; }
 
-    public DIN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DIN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -478,8 +463,7 @@ public sealed record DLD : Hl7ComplexType {
     public CWE? DischargetoLocation { get; }
     public DTM? EffectiveDate { get; }
 
-    public DLD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DLD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -495,8 +479,7 @@ public sealed record DLN : Hl7ComplexType {
     public CWE? IssuingStateProvinceCountry { get; }
     public DT? ExpirationDate { get; }
 
-    public DLN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DLN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -514,8 +497,7 @@ public sealed record DLT : Hl7ComplexType {
     public ID? ChangeComputation { get; }
     public NM? DaysRetained { get; }
 
-    public DLT(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DLT(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -532,8 +514,7 @@ public sealed record DR : Hl7ComplexType {
     public DTM? RangeStartDateTime { get; }
     public DTM? RangeEndDateTime { get; }
 
-    public DR(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DR(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -548,8 +529,7 @@ public sealed record DTN : Hl7ComplexType {
     public CWE? DayType { get; }
     public NM? NumberofDays { get; }
 
-    public DTN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public DTN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -567,8 +547,7 @@ public sealed record ED : Hl7ComplexType {
     public ID? Encoding { get; }
     public TX? Data { get; }
 
-    public ED(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public ED(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -588,8 +567,7 @@ public sealed record EI : Hl7ComplexType {
     public ST? UniversalID { get; }
     public ID? UniversalIDType { get; }
 
-    public EI(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public EI(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -606,8 +584,7 @@ public sealed record EIP : Hl7ComplexType {
     public EI? PlacerAssignedIdentifier { get; }
     public EI? FillerAssignedIdentifier { get; }
 
-    public EIP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public EIP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -626,8 +603,7 @@ public sealed record ERL : Hl7ComplexType {
     public SI? ComponentNumber { get; }
     public SI? SubComponentNumber { get; }
 
-    public ERL(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public ERL(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -646,8 +622,7 @@ public sealed record FC : Hl7ComplexType {
     public CWE? FinancialClassCode { get; }
     public DTM? EffectiveDate { get; }
 
-    public FC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public FC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -665,8 +640,7 @@ public sealed record FN : Hl7ComplexType {
     public ST? SurnamePrefixfromPartnerSpouse { get; }
     public ST? SurnamefromPartnerSpouse { get; }
 
-    public FN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public FN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -685,8 +659,7 @@ public sealed record HD : Hl7ComplexType {
     public ST? UniversalID { get; }
     public ID? UniversalIDType { get; }
 
-    public HD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public HD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -703,8 +676,7 @@ public sealed record ICD : Hl7ComplexType {
     public ID? CertificationRequired { get; }
     public DTM? DateTimeCertificationRequired { get; }
 
-    public ICD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public ICD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -721,8 +693,7 @@ public sealed record JCC : Hl7ComplexType {
     public CWE? JobClass { get; }
     public TX? JobDescriptionText { get; }
 
-    public JCC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public JCC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -740,8 +711,7 @@ public sealed record MA : Hl7ComplexType {
     public NM? SampleYFromChannel3 { get; }
     public NM? SampleYFromChannel4 { get; }
 
-    public MA(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public MA(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -758,8 +728,7 @@ public sealed record MO : Hl7ComplexType {
     public NM? Quantity { get; }
     public ID? Denomination { get; }
 
-    public MO(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public MO(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -774,8 +743,7 @@ public sealed record MOC : Hl7ComplexType {
     public MO? MonetaryAmount { get; }
     public CWE? ChargeCode { get; }
 
-    public MOC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public MOC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -791,8 +759,7 @@ public sealed record MOP : Hl7ComplexType {
     public NM? MoneyorPercentageQuantity { get; }
     public ID? MonetaryDenomination { get; }
 
-    public MOP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public MOP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -809,8 +776,7 @@ public sealed record MSG : Hl7ComplexType {
     public ID? TriggerEvent { get; }
     public ID? MessageStructure { get; }
 
-    public MSG(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public MSG(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -828,8 +794,7 @@ public sealed record NA : Hl7ComplexType {
     public NM? Value3 { get; }
     public NM? Value4 { get; }
 
-    public NA(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public NA(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -855,8 +820,7 @@ public sealed record NDL : Hl7ComplexType {
     public IS? Building { get; }
     public IS? Floor { get; }
 
-    public NDL(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public NDL(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -880,8 +844,7 @@ public sealed record NR : Hl7ComplexType {
     public NM? LowValue { get; }
     public NM? HighValue { get; }
 
-    public NR(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public NR(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -896,8 +859,7 @@ public sealed record OCD : Hl7ComplexType {
     public CNE? OccurrenceCode { get; }
     public DT? OccurrenceDate { get; }
 
-    public OCD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public OCD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -914,8 +876,7 @@ public sealed record OG : Hl7ComplexType {
     public NM? Sequence { get; }
     public ST? Identifier { get; }
 
-    public OG(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public OG(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -933,8 +894,7 @@ public sealed record OSP : Hl7ComplexType {
     public DT? OccurrenceSpanStartDate { get; }
     public DT? OccurrenceSpanStopDate { get; }
 
-    public OSP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public OSP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -953,8 +913,7 @@ public sealed record PIP : Hl7ComplexType {
     public DT? ActivationDate { get; }
     public EI? Facility { get; }
 
-    public PIP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PIP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -981,8 +940,7 @@ public sealed record PL : Hl7ComplexType {
     public EI? ComprehensiveLocationIdentifier { get; }
     public HD? AssigningAuthorityforLocation { get; }
 
-    public PL(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PL(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1008,8 +966,7 @@ public sealed record PLN : Hl7ComplexType {
     public ST? StateotherQualifyingInformation { get; }
     public DT? ExpirationDate { get; }
 
-    public PLN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PLN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1048,8 +1005,7 @@ public sealed record PPN : Hl7ComplexType {
     public ST? SecurityCheck { get; }
     public ID? SecurityCheckScheme { get; }
 
-    public PPN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PPN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1087,8 +1043,7 @@ public sealed record PRL : Hl7ComplexType {
     public ST? ParentObservationSubidentifier { get; }
     public TX? ParentObservationValueDescriptor { get; }
 
-    public PRL(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PRL(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1104,8 +1059,7 @@ public sealed record PT : Hl7ComplexType {
     public ID? ProcessingID { get; }
     public ID? ProcessingMode { get; }
 
-    public PT(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PT(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1121,8 +1075,7 @@ public sealed record PTA : Hl7ComplexType {
     public CWE? AmountClass { get; }
     public MOP? MoneyorPercentage { get; }
 
-    public PTA(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public PTA(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1138,8 +1091,7 @@ public sealed record QIP : Hl7ComplexType {
     public ST? SegmentFieldName { get; }
     public ST? Values { get; }
 
-    public QIP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public QIP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1156,8 +1108,7 @@ public sealed record QSC : Hl7ComplexType {
     public ST? Value { get; }
     public ID? RelationalConjunction { get; }
 
-    public QSC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public QSC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1175,8 +1126,7 @@ public sealed record RCD : Hl7ComplexType {
     public ID? HL7DataType { get; }
     public NM? MaximumColumnWidth { get; }
 
-    public RCD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RCD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1197,8 +1147,7 @@ public sealed record RFR : Hl7ComplexType {
     public ST? Racesubspecies { get; }
     public TX? Conditions { get; }
 
-    public RFR(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RFR(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1218,8 +1167,7 @@ public sealed record RI : Hl7ComplexType {
     public CWE? RepeatPattern { get; }
     public ST? ExplicitTimeInterval { get; }
 
-    public RI(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RI(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1235,8 +1183,7 @@ public sealed record RMC : Hl7ComplexType {
     public CWE? AmountType { get; }
     public MOP? MoneyorPercentage { get; }
 
-    public RMC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RMC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1254,8 +1201,7 @@ public sealed record RP : Hl7ComplexType {
     public ID? TypeofData { get; }
     public ID? Subtype { get; }
 
-    public RP(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RP(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1281,8 +1227,7 @@ public sealed record RPT : Hl7ComplexType {
     public CWE? EventOffsetUnits { get; }
     public GTS? GeneralTimingSpecification { get; }
 
-    public RPT(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public RPT(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1307,8 +1252,7 @@ public sealed record SAD : Hl7ComplexType {
     public ST? StreetName { get; }
     public ST? DwellingNumber { get; }
 
-    public SAD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public SAD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1324,8 +1268,7 @@ public sealed record SCV : Hl7ComplexType {
     public CWE? ParameterClass { get; }
     public ST? ParameterValue { get; }
 
-    public SCV(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public SCV(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1342,8 +1285,7 @@ public sealed record SN : Hl7ComplexType {
     public ST? SeparatorSuffix { get; }
     public NM? Num2 { get; }
 
-    public SN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public SN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1362,8 +1304,7 @@ public sealed record SPD : Hl7ComplexType {
     public ID? EligibleorCertified { get; }
     public DT? DateofCertification { get; }
 
-    public SPD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public SPD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1380,8 +1321,7 @@ public sealed record SRT : Hl7ComplexType {
     public ST? SortbyField { get; }
     public ID? Sequencing { get; }
 
-    public SRT(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public SRT(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1398,8 +1338,7 @@ public sealed record UVC : Hl7ComplexType {
     public NM? NonMonetaryValueAmountQuantity { get; }
     public CWE? NonMonetaryValueAmountUnits { get; }
 
-    public UVC(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public UVC(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1418,8 +1357,7 @@ public sealed record VH : Hl7ComplexType {
     public TM? StartHourRange { get; }
     public TM? EndHourRange { get; }
 
-    public VH(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public VH(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1437,8 +1375,7 @@ public sealed record VID : Hl7ComplexType {
     public CWE? InternationalizationCode { get; }
     public CWE? InternationalVersionID { get; }
 
-    public VID(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public VID(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1454,8 +1391,7 @@ public sealed record VR : Hl7ComplexType {
     public ST? FirstDataCodeValue { get; }
     public ST? LastDataCodeValue { get; }
 
-    public VR(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public VR(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1470,8 +1406,7 @@ public sealed record WVI : Hl7ComplexType {
     public NM? ChannelNumber { get; }
     public ST? ChannelName { get; }
 
-    public WVI(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public WVI(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1486,8 +1421,7 @@ public sealed record WVS : Hl7ComplexType {
     public ST? SourceOneName { get; }
     public ST? SourceTwoName { get; }
 
-    public WVS(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public WVS(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1522,8 +1456,7 @@ public sealed record XAD : Hl7ComplexType {
     public CWE? ProtectionCode { get; }
     public EI? AddressIdentifier { get; }
 
-    public XAD(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public XAD(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1579,8 +1512,7 @@ public sealed record XCN : Hl7ComplexType {
     public ST? SecurityCheck { get; }
     public ID? SecurityCheckScheme { get; }
 
-    public XCN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public XCN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1621,8 +1553,7 @@ public sealed record XON : Hl7ComplexType {
     public ID? NameRepresentationCode { get; }
     public ST? OrganizationIdentifier { get; }
 
-    public XON(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public XON(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1653,8 +1584,7 @@ public sealed record XPN : Hl7ComplexType {
     public ST? ProfessionalSuffix { get; }
     public ST? CalledBy { get; }
 
-    public XPN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public XPN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;
@@ -1695,8 +1625,7 @@ public sealed record XTN : Hl7ComplexType {
     public EI? SharedTelecommunicationIdentifier { get; }
     public NM? PreferenceOrder { get; }
 
-    public XTN(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);
+    public XTN(RawComponent rawComponent) {
         if (rawComponent.SubComponents.Length == 0) {
             this.StringValue = rawComponent.ComponentValue;
             this.Complexity = HL7.Complexity.Simple;

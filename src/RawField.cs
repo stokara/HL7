@@ -7,11 +7,11 @@ using System.Linq;
 namespace HL7;
 
 public record RawField {
-    public IReadOnlyList<RawComponent> RepeatedFields { get; }
-    public RawComponent? RawComponent => RepeatedFields.Count == 1 ? RepeatedFields[0] : null;
+    public IReadOnlyList<RawComponent> Components { get; }
+    public RawComponent? Component => Components.Count == 1 ? Components[0] : null;
 
     public RawField(string rawFieldString, Hl7Encoding encoding) {
-        RepeatedFields = string.IsNullOrWhiteSpace(rawFieldString)
+        Components = string.IsNullOrWhiteSpace(rawFieldString)
             ? []
             : splitRepeatedFields();
         return;

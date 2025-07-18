@@ -22,10 +22,16 @@ public record RawComponent {
         }
 
         if (structure == Hl7Structure.Hl7Component) {
+            if (stringValue.Contains(encoding.ComponentDelimiter)) {
+                SubComponents = stringValue.Split(encoding.ComponentDelimiter);
+                return;
+            } 
+        }
+        if (structure == Hl7Structure.Hl7SubComponent) {
             if (stringValue.Contains(encoding.SubComponentDelimiter)) {
                 SubComponents = stringValue.Split(encoding.SubComponentDelimiter);
                 return;
-            } 
+            }
         }
         SubComponents = [];
         ComponentValue = stringValue;
@@ -65,10 +71,10 @@ public record RawComponent {
 
         if (constructorCache.TryGetValue(type, out var ctor) && ctor != null) {
             var parameters = ctor.GetParameters();
-            if (parameters is [var valueParam, _, { ParameterType.IsEnum: true }]
-                && parameters[1].ParameterType == typeof(Hl7Encoding)) {
+            if (parameters is [var valueParam]) {
                 var paramType = valueParam.ParameterType;
                 object? value = paramType switch {
+                    Type t when t == typeof(RawComponent) => rawComponent,
                     Type t when t == typeof(string) => rawComponent.ComponentValue,
                     Type t when t == typeof(IReadOnlyList<string>) => rawComponent.SubComponents,
                     Type t when t == typeof(Instant?) => Hl7DateParser.ParseInstant(rawComponent.ComponentValue),
@@ -76,7 +82,7 @@ public record RawComponent {
                     Type t when t == typeof(int?) => int.TryParse(rawComponent.ComponentValue, out var i) ? i : null,
                     _ => throw new NotSupportedException($"Unsupported parameter type {paramType.Name} for {type.Name}.")
                 };
-                return ctor.Invoke([value, rawComponent.Encoding, structure]) as T ?? throw new InvalidCastException($"Failed to cast {type.Name} from constructor result.");
+                return ctor.Invoke([value]) as T ?? throw new InvalidCastException($"Failed to cast {type.Name} from constructor result.");
             }
 
             if (parameters is [var singleParam]) {

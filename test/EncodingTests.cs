@@ -77,7 +77,7 @@ public class EncodingTests {
     public void SegmentParse_StandardDelimiters() {
         var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = "PID|1|12345|DOE^JOHN";
-        var segment = Segment.Parse(encoding, segmentStr);
+        var segment = new Segment(segmentStr, encoding);
 
         Assert.Equal("PID", segment.Name);
         Assert.Equal(4, segment.FieldCount);
@@ -87,7 +87,7 @@ public class EncodingTests {
     public void SegmentParse_NonStandardDelimiters() {
         var encoding = new Hl7Encoding('!', '@', '#', '$', '%');
         var segmentStr = "ZZZ!A!B@C$D%E";
-        var segment = Segment.Parse(encoding, segmentStr);
+        var segment = new Segment(segmentStr, encoding);
 
         Assert.Equal("ZZZ", segment.Name);
         Assert.Equal(3, segment.FieldCount);
@@ -97,7 +97,7 @@ public class EncodingTests {
     public void SegmentParse_EscapedDelimiter() {
         var encoding = new Hl7Encoding('|', '^', '~', '\\', '&');
         var segmentStr = @"OBX|1|TX|Some\F\StringValue|End";
-        var segment = Segment.Parse(encoding, segmentStr);
+        var segment = new Segment(segmentStr, encoding);
 
         Assert.Equal("OBX", segment.Name);
         Assert.Equal(5, segment.FieldCount);
@@ -108,9 +108,9 @@ public class EncodingTests {
         var segmentStr = @"MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202407021200||ADT^A01|123456|P|2.5|\r\n";
         var segment = new MshSegment(segmentStr);
 
-        Assert.Equal("SendingApp", segment.GetRawField(3).RawComponent.ComponentValue);
-        Assert.Equal("ReceivingApp", segment.GetRawField(5).RawComponent.ComponentValue);
-        Assert.Equal("2.5", segment.GetRawField(12).RawComponent.ComponentValue);
+        Assert.Equal("SendingApp", segment.GetRawFieldString(3));
+        Assert.Equal("ReceivingApp", segment.GetRawFieldString(5));
+        Assert.Equal("2.5", segment.GetRawFieldString(12));
     }
 
     [Fact]
@@ -119,16 +119,16 @@ public class EncodingTests {
         var msh = new MshSegment(segmentStr);
 
         Assert.Equal("MSH", msh.Name);
-        Assert.Equal("App1", msh.GetRawField(3).RawComponent.ComponentValue);
-        Assert.Equal("App2", msh.GetRawField(5).RawComponent.ComponentValue);
-        Assert.Equal("2.8", msh.GetRawField(12).RawComponent.ComponentValue);
+        Assert.Equal("App1", msh.GetRawFieldString(3));
+        Assert.Equal("App2", msh.GetRawFieldString(5));
+        Assert.Equal("2.8", msh.GetRawFieldString(12));
     }
 
     [Fact]
     public void FieldParse_SimpleValue() {
         var value = "SIMPLE";
         var field = new RawField(value, defaultEncoder);
-        Assert.Equal("SIMPLE", field.RawComponent.ComponentValue);
+        Assert.Equal("SIMPLE", field.Component.ComponentValue);
     }
 
     [Fact]
@@ -145,21 +145,21 @@ public class EncodingTests {
     public void FieldParse_WithRepetitions() {
         var value = "A~B~C";
         var field = new RawField( value, defaultEncoder);
-        Assert.Equal(3, field.RepeatedFields.Count);
+        Assert.Equal(3, field.Components.Count);
     }
 
     [Fact]
     public void FieldParse_WithComponentsAndRepetitions() {
         const string value = "A^B~C^D";
         var field = new RawField(value, defaultEncoder);
-        Assert.Equal(2, field.RepeatedFields.Count);
+        Assert.Equal(2, field.Components.Count);
     }
 
     [Fact]
     public void FieldParse_WithEscapedDelimiter() {
         var value = @"A\F\B";
         var field = new RawField(value, defaultEncoder);
-        Assert.Single(field.RepeatedFields);
+        Assert.Single(field.Components);
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public class EncodingTests {
         var message = Message.Parse(sampleMessage);
         var msa = message.Segments.FirstOrDefault(s => s.Name == "MSA");
         Assert.NotNull(msa);
-        Assert.Equal(@"\E\T\E\", msa.GetRawField(4).RawComponent.ComponentValue);
+        Assert.Equal(@"\E\T\E\", msa.GetRawFieldString(4));
     }
 
 

@@ -144,8 +144,7 @@ public class HL7DataTypeScraper {
         return;
 
         void generateConstructor(DataTypeDefinition dd) {
-            writer.WriteLine($"    public {dd.Name}(string? rawComponentString, Hl7Encoding encoding, Hl7Structure sourceStructure) {{");
-            writer.WriteLine("        var rawComponent = new RawComponent(rawComponentString, encoding, sourceStructure);");
+            writer.WriteLine($"    public {dd.Name}(RawComponent rawComponent) {{");
             const string simpleBlock = """
                                                if (rawComponent.SubComponents.Length == 0) {
                                                    this.StringValue = rawComponent.ComponentValue;

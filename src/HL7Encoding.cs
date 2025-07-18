@@ -119,7 +119,7 @@ public record Hl7Encoding {
         }
     }
 
-    public string Decode(string encodedValue) {
+    public string? Decode(string? encodedValue) {
         if (string.IsNullOrWhiteSpace(encodedValue) || !encodedValue.Contains(EscapeCharacter)) return encodedValue;
 
         var result = new StringBuilder(encodedValue.Length);

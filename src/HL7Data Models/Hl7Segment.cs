@@ -12,6 +12,7 @@ public abstract record Hl7Segment : Hl7ComplexType {
         if (segment.Name != segmentType.Name) {
             throw new InvalidDataException($"Invalid Segment when loading {segmentType.Name} using is {segment.Name}");
         }
+        
     }
 
     public override string Serialize(Hl7Encoding encoding, Hl7Structure structure) {
@@ -24,13 +25,13 @@ public abstract record Hl7Segment : Hl7ComplexType {
             if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)) {
                 var collection = propertyInfo.GetValue(this) as System.Collections.IEnumerable;
                 if (collection == null) return string.Empty;
-                var serializedItems = collection.OfType<Hl7DataType>().Select(hl7Item => hl7Item.Serialize(encoding, structure));
+                var serializedItems = collection.OfType<Hl7DataType>().Select(hl7Item => hl7Item.Serialize(encoding, Hl7Structure.Hl7Field));
                 return string.Join(encoding.FieldDelimiter.ToString(), serializedItems);
             }
 
             var h = (propertyInfo.GetValue(this) as Hl7DataType);
             if (h == null) return string.Empty;  //log a warning here 
-            return h.Serialize(encoding, Hl7Structure.Hl7Segment);
+            return h.Serialize(encoding, Hl7Structure.Hl7Field);
         }
     }
 }

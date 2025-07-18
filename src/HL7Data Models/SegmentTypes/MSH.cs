@@ -32,7 +32,7 @@ public sealed record MSH : Hl7Segment {
     public ICollection<ST>? SpecialAccessRestrictionInstructions { get; }
 
     public MSH(MshSegment segment) : base(typeof(MSH), segment) {
-        this.Encoding = segment.Encoding;
+        Encoding = segment.Encoding;
         this.SendingApplication = segment.GetField<HD>(1);
         this.SendingFacility = segment.GetField<HD>(2);
         this.ReceivingApplication = segment.GetField<HD>(3);

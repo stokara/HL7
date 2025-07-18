@@ -5,28 +5,6 @@ using Xunit;
 namespace HL7test;
 
 public class AckNackTests {
-    private readonly string HL7_ORM;
-    private readonly string HL7_ADT;
-
-    public AckNackTests() {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "Sample Files") + "\\";
-        this.HL7_ORM = File.ReadAllText(path + "Sample-ORM.txt");
-        this.HL7_ADT = File.ReadAllText(path + "Sample-ADT.txt");
-    }
-
-    [Fact]
-    public void GetAckTest() {
-        var message = Message.Parse(this.HL7_ADT);
-        Assert.NotNull(message);
-        // TODO: Update GetValue, GetACK, etc. to use new API
-    }
-
-    [Fact]
-    public void GetNackTest() {
-        var message = Message.Parse(this.HL7_ADT);
-        Assert.NotNull(message);
-        // TODO: Update GetNACK, GetValue, etc. to use new API
-    }
 
     [Fact]
     public void GenerateAckNoEscapeDelimiterTest() {
