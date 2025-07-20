@@ -3,8 +3,8 @@
 class Program
 {
     static async Task Main() {
-       //await GetSegmentTypesAsync();
-       await getDataTypesAsync();
+       await GetSegmentTypesAsync();
+       //await getDataTypesAsync();
 
 
     }

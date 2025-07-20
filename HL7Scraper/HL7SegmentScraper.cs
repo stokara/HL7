@@ -106,8 +106,8 @@ public class HL7SegmentScraper {
             var datatype = cells[9].InnerText.Trim();
 
             // Exclude if datatype or cardinality is missing
-            if (string.IsNullOrWhiteSpace(datatype) || string.IsNullOrWhiteSpace(cardinality)) continue;
-            if (datatype.Equals("Varies", StringComparison.OrdinalIgnoreCase)) datatype = "ST";
+            if (string.IsNullOrWhiteSpace(cardinality)) continue;
+            if (datatype.Equals("Varies", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(datatype)) datatype = "ST";
 
             bool isRequired = false, canRepeat = false;
             var parts = cardinality.Split([".."], StringSplitOptions.None);
@@ -125,6 +125,8 @@ public class HL7SegmentScraper {
 
     public static void GenerateClasses(List<SegmentDefinition> segments, Stream stream) {
         using var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
+        writer.WriteLine("using System.Collections.Generic;");
+        writer.WriteLine();
         writer.WriteLine("namespace HL7;");
         writer.WriteLine();
 
