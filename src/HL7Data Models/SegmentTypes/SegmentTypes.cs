@@ -258,6 +258,7 @@ public sealed record AL1 : Hl7Segment {
     public CWE? AllergenCodeMnemonicDescription { get; }
     public CWE? AllergySeverityCode { get; }
     public ICollection<ST>? AllergyReactionCode { get; }
+    public ST? IdentificationDate { get; }
 
     public AL1(Segment segment) : base(typeof(AL1), segment) {
         this.SetIDAL1 = segment.GetRequiredField<SI>(1);
@@ -265,6 +266,7 @@ public sealed record AL1 : Hl7Segment {
         this.AllergenCodeMnemonicDescription = segment.GetField<CWE>(3);
         this.AllergySeverityCode = segment.GetField<CWE>(4);
         this.AllergyReactionCode = segment.GetRepField<ST>(5);
+        this.IdentificationDate = segment.GetField<ST>(6);
     }
 }
 
@@ -1070,7 +1072,9 @@ public sealed record DEV : Hl7Segment {
 
 public sealed record DG1 : Hl7Segment {
     public SI SetIDDG1 { get; }
+    public ST? DiagnosisCodingMethod { get; }
     public CWE DiagnosisCodeDG1 { get; }
+    public ST? DiagnosisDescription { get; }
     public DTM? DiagnosisDateTime { get; }
     public CWE DiagnosisType { get; }
     public CNE? MajorDiagnosticCategory { get; }
@@ -1080,6 +1084,7 @@ public sealed record DG1 : Hl7Segment {
     public CWE? OutlierType { get; }
     public NM? OutlierDays { get; }
     public CP? OutlierCost { get; }
+    public ST? GrouperVersionAndType { get; }
     public NM? DiagnosisPriority { get; }
     public ICollection<XCN>? DiagnosingClinician { get; }
     public CWE? DiagnosisClassification { get; }
@@ -1095,28 +1100,31 @@ public sealed record DG1 : Hl7Segment {
 
     public DG1(Segment segment) : base(typeof(DG1), segment) {
         this.SetIDDG1 = segment.GetRequiredField<SI>(1);
-        this.DiagnosisCodeDG1 = segment.GetRequiredField<CWE>(2);
-        this.DiagnosisDateTime = segment.GetField<DTM>(3);
-        this.DiagnosisType = segment.GetRequiredField<CWE>(4);
-        this.MajorDiagnosticCategory = segment.GetField<CNE>(5);
-        this.DiagnosticRelatedGroup = segment.GetField<CNE>(6);
-        this.DRGApprovalIndicator = segment.GetField<ID>(7);
-        this.DRGGrouperReviewCode = segment.GetField<CWE>(8);
-        this.OutlierType = segment.GetField<CWE>(9);
-        this.OutlierDays = segment.GetField<NM>(10);
-        this.OutlierCost = segment.GetField<CP>(11);
-        this.DiagnosisPriority = segment.GetField<NM>(12);
-        this.DiagnosingClinician = segment.GetRepField<XCN>(13);
-        this.DiagnosisClassification = segment.GetField<CWE>(14);
-        this.ConfidentialIndicator = segment.GetField<ID>(15);
-        this.AttestationDateTime = segment.GetField<DTM>(16);
-        this.DiagnosisIdentifier = segment.GetField<EI>(17);
-        this.DiagnosisActionCode = segment.GetField<ID>(18);
-        this.ParentDiagnosis = segment.GetField<EI>(19);
-        this.DRGCCLValueCode = segment.GetField<CWE>(20);
-        this.DRGGroupingUsage = segment.GetField<ID>(21);
-        this.DRGDiagnosisDeterminationStatus = segment.GetField<CWE>(22);
-        this.PresentOnAdmission = segment.GetField<CWE>(23);
+        this.DiagnosisCodingMethod = segment.GetField<ST>(2);
+        this.DiagnosisCodeDG1 = segment.GetRequiredField<CWE>(3);
+        this.DiagnosisDescription = segment.GetField<ST>(4);
+        this.DiagnosisDateTime = segment.GetField<DTM>(5);
+        this.DiagnosisType = segment.GetRequiredField<CWE>(6);
+        this.MajorDiagnosticCategory = segment.GetField<CNE>(7);
+        this.DiagnosticRelatedGroup = segment.GetField<CNE>(8);
+        this.DRGApprovalIndicator = segment.GetField<ID>(9);
+        this.DRGGrouperReviewCode = segment.GetField<CWE>(10);
+        this.OutlierType = segment.GetField<CWE>(11);
+        this.OutlierDays = segment.GetField<NM>(12);
+        this.OutlierCost = segment.GetField<CP>(13);
+        this.GrouperVersionAndType = segment.GetField<ST>(14);
+        this.DiagnosisPriority = segment.GetField<NM>(15);
+        this.DiagnosingClinician = segment.GetRepField<XCN>(16);
+        this.DiagnosisClassification = segment.GetField<CWE>(17);
+        this.ConfidentialIndicator = segment.GetField<ID>(18);
+        this.AttestationDateTime = segment.GetField<DTM>(19);
+        this.DiagnosisIdentifier = segment.GetField<EI>(20);
+        this.DiagnosisActionCode = segment.GetField<ID>(21);
+        this.ParentDiagnosis = segment.GetField<EI>(22);
+        this.DRGCCLValueCode = segment.GetField<CWE>(23);
+        this.DRGGroupingUsage = segment.GetField<ID>(24);
+        this.DRGDiagnosisDeterminationStatus = segment.GetField<CWE>(25);
+        this.PresentOnAdmission = segment.GetField<CWE>(26);
     }
 }
 
@@ -1338,13 +1346,15 @@ public sealed record ECD : Hl7Segment {
     public NM ReferenceCommandNumber { get; }
     public CWE RemoteControlCommand { get; }
     public ID? ResponseRequired { get; }
+    public ST? RequestedCompletionTime { get; }
     public ICollection<TX>? Parameters { get; }
 
     public ECD(Segment segment) : base(typeof(ECD), segment) {
         this.ReferenceCommandNumber = segment.GetRequiredField<NM>(1);
         this.RemoteControlCommand = segment.GetRequiredField<CWE>(2);
         this.ResponseRequired = segment.GetField<ID>(3);
-        this.Parameters = segment.GetRepField<TX>(4);
+        this.RequestedCompletionTime = segment.GetField<ST>(4);
+        this.Parameters = segment.GetRepField<TX>(5);
     }
 }
 
@@ -1419,6 +1429,7 @@ public sealed record EQU : Hl7Segment {
 }
 
 public sealed record ERR : Hl7Segment {
+    public ST? ErrorCodeandLocation { get; }
     public ICollection<ERL>? ErrorLocation { get; }
     public CWE HL7ErrorCode { get; }
     public ID Severity { get; }
@@ -1432,21 +1443,23 @@ public sealed record ERR : Hl7Segment {
     public ICollection<XTN>? HelpDeskContactPoint { get; }
 
     public ERR(Segment segment) : base(typeof(ERR), segment) {
-        this.ErrorLocation = segment.GetRepField<ERL>(1);
-        this.HL7ErrorCode = segment.GetRequiredField<CWE>(2);
-        this.Severity = segment.GetRequiredField<ID>(3);
-        this.ApplicationErrorCode = segment.GetField<CWE>(4);
-        this.ApplicationErrorParameter = segment.GetField<ST>(5);
-        this.DiagnosticInformation = segment.GetField<TX>(6);
-        this.UserMessage = segment.GetField<TX>(7);
-        this.InformPersonIndicator = segment.GetRepField<CWE>(8);
-        this.OverrideType = segment.GetField<CWE>(9);
-        this.OverrideReasonCode = segment.GetRepField<CWE>(10);
-        this.HelpDeskContactPoint = segment.GetRepField<XTN>(11);
+        this.ErrorCodeandLocation = segment.GetField<ST>(1);
+        this.ErrorLocation = segment.GetRepField<ERL>(2);
+        this.HL7ErrorCode = segment.GetRequiredField<CWE>(3);
+        this.Severity = segment.GetRequiredField<ID>(4);
+        this.ApplicationErrorCode = segment.GetField<CWE>(5);
+        this.ApplicationErrorParameter = segment.GetField<ST>(6);
+        this.DiagnosticInformation = segment.GetField<TX>(7);
+        this.UserMessage = segment.GetField<TX>(8);
+        this.InformPersonIndicator = segment.GetRepField<CWE>(9);
+        this.OverrideType = segment.GetField<CWE>(10);
+        this.OverrideReasonCode = segment.GetRepField<CWE>(11);
+        this.HelpDeskContactPoint = segment.GetRepField<XTN>(12);
     }
 }
 
 public sealed record EVN : Hl7Segment {
+    public ST? EventTypeCode { get; }
     public DTM RecordedDateTime { get; }
     public DTM? DateTimePlannedEvent { get; }
     public CWE? EventReasonCode { get; }
@@ -1455,12 +1468,13 @@ public sealed record EVN : Hl7Segment {
     public HD? EventFacility { get; }
 
     public EVN(Segment segment) : base(typeof(EVN), segment) {
-        this.RecordedDateTime = segment.GetRequiredField<DTM>(1);
-        this.DateTimePlannedEvent = segment.GetField<DTM>(2);
-        this.EventReasonCode = segment.GetField<CWE>(3);
-        this.OperatorID = segment.GetRepField<XCN>(4);
-        this.EventOccurred = segment.GetField<DTM>(5);
-        this.EventFacility = segment.GetField<HD>(6);
+        this.EventTypeCode = segment.GetField<ST>(1);
+        this.RecordedDateTime = segment.GetRequiredField<DTM>(2);
+        this.DateTimePlannedEvent = segment.GetField<DTM>(3);
+        this.EventReasonCode = segment.GetField<CWE>(4);
+        this.OperatorID = segment.GetRepField<XCN>(5);
+        this.EventOccurred = segment.GetField<DTM>(6);
+        this.EventFacility = segment.GetField<HD>(7);
     }
 }
 
@@ -1542,6 +1556,8 @@ public sealed record FT1 : Hl7Segment {
     public DTM? TransactionPostingDate { get; }
     public CWE TransactionType { get; }
     public CWE TransactionCode { get; }
+    public ST? TransactionDescription { get; }
+    public ST? TransactionDescriptionAlt { get; }
     public NM? TransactionQuantity { get; }
     public CP? TransactionAmountExtended { get; }
     public CP? TransactionAmountUnit { get; }
@@ -1598,53 +1614,55 @@ public sealed record FT1 : Hl7Segment {
         this.TransactionPostingDate = segment.GetField<DTM>(5);
         this.TransactionType = segment.GetRequiredField<CWE>(6);
         this.TransactionCode = segment.GetRequiredField<CWE>(7);
-        this.TransactionQuantity = segment.GetField<NM>(8);
-        this.TransactionAmountExtended = segment.GetField<CP>(9);
-        this.TransactionAmountUnit = segment.GetField<CP>(10);
-        this.DepartmentCode = segment.GetField<CWE>(11);
-        this.HealthPlanID = segment.GetField<CWE>(12);
-        this.InsuranceAmount = segment.GetField<CP>(13);
-        this.AssignedPatientLocation = segment.GetField<PL>(14);
-        this.FeeSchedule = segment.GetField<CWE>(15);
-        this.PatientType = segment.GetField<CWE>(16);
-        this.DiagnosisCodeFT1 = segment.GetRepField<CWE>(17);
-        this.PerformedByCode = segment.GetRepField<XCN>(18);
-        this.OrderedByCode = segment.GetRepField<XCN>(19);
-        this.UnitCost = segment.GetField<CP>(20);
-        this.FillerOrderNumber = segment.GetField<EI>(21);
-        this.EnteredByCode = segment.GetRepField<XCN>(22);
-        this.ProcedureCode = segment.GetField<CNE>(23);
-        this.ProcedureCodeModifier = segment.GetRepField<CNE>(24);
-        this.AdvancedBeneficiaryNoticeCode = segment.GetField<CWE>(25);
-        this.MedicallyNecessaryDuplicateProcedureReason = segment.GetField<CWE>(26);
-        this.NDCCode = segment.GetField<CWE>(27);
-        this.PaymentReferenceID = segment.GetField<CX>(28);
-        this.TransactionReferenceKey = segment.GetRepField<SI>(29);
-        this.PerformingFacility = segment.GetRepField<XON>(30);
-        this.OrderingFacility = segment.GetField<XON>(31);
-        this.ItemNumber = segment.GetField<CWE>(32);
-        this.ModelNumber = segment.GetField<ST>(33);
-        this.SpecialProcessingCode = segment.GetRepField<CWE>(34);
-        this.ClinicCode = segment.GetField<CWE>(35);
-        this.ReferralNumber = segment.GetField<CX>(36);
-        this.AuthorizationNumber = segment.GetField<CX>(37);
-        this.ServiceProviderTaxonomyCode = segment.GetField<CWE>(38);
-        this.RevenueCode = segment.GetField<CWE>(39);
-        this.PrescriptionNumber = segment.GetField<ST>(40);
-        this.NDCQtyandUOM = segment.GetField<CQ>(41);
-        this.DMECertificateofMedicalNecessityTransmissionCode = segment.GetField<CWE>(42);
-        this.DMECertificationTypeCode = segment.GetField<CWE>(43);
-        this.DMEDurationValue = segment.GetField<NM>(44);
-        this.DMECertificationRevisionDate = segment.GetField<DT>(45);
-        this.DMEInitialCertificationDate = segment.GetField<DT>(46);
-        this.DMELastCertificationDate = segment.GetField<DT>(47);
-        this.DMELengthofMedicalNecessityDays = segment.GetField<NM>(48);
-        this.DMERentalPrice = segment.GetField<MO>(49);
-        this.DMEPurchasePrice = segment.GetField<MO>(50);
-        this.DMEFrequencyCode = segment.GetField<CWE>(51);
-        this.DMECertificationConditionIndicator = segment.GetField<ID>(52);
-        this.DMEConditionIndicatorCode = segment.GetField<CWE>(53);
-        this.ServiceReasonCode = segment.GetField<CWE>(54);
+        this.TransactionDescription = segment.GetField<ST>(8);
+        this.TransactionDescriptionAlt = segment.GetField<ST>(9);
+        this.TransactionQuantity = segment.GetField<NM>(10);
+        this.TransactionAmountExtended = segment.GetField<CP>(11);
+        this.TransactionAmountUnit = segment.GetField<CP>(12);
+        this.DepartmentCode = segment.GetField<CWE>(13);
+        this.HealthPlanID = segment.GetField<CWE>(14);
+        this.InsuranceAmount = segment.GetField<CP>(15);
+        this.AssignedPatientLocation = segment.GetField<PL>(16);
+        this.FeeSchedule = segment.GetField<CWE>(17);
+        this.PatientType = segment.GetField<CWE>(18);
+        this.DiagnosisCodeFT1 = segment.GetRepField<CWE>(19);
+        this.PerformedByCode = segment.GetRepField<XCN>(20);
+        this.OrderedByCode = segment.GetRepField<XCN>(21);
+        this.UnitCost = segment.GetField<CP>(22);
+        this.FillerOrderNumber = segment.GetField<EI>(23);
+        this.EnteredByCode = segment.GetRepField<XCN>(24);
+        this.ProcedureCode = segment.GetField<CNE>(25);
+        this.ProcedureCodeModifier = segment.GetRepField<CNE>(26);
+        this.AdvancedBeneficiaryNoticeCode = segment.GetField<CWE>(27);
+        this.MedicallyNecessaryDuplicateProcedureReason = segment.GetField<CWE>(28);
+        this.NDCCode = segment.GetField<CWE>(29);
+        this.PaymentReferenceID = segment.GetField<CX>(30);
+        this.TransactionReferenceKey = segment.GetRepField<SI>(31);
+        this.PerformingFacility = segment.GetRepField<XON>(32);
+        this.OrderingFacility = segment.GetField<XON>(33);
+        this.ItemNumber = segment.GetField<CWE>(34);
+        this.ModelNumber = segment.GetField<ST>(35);
+        this.SpecialProcessingCode = segment.GetRepField<CWE>(36);
+        this.ClinicCode = segment.GetField<CWE>(37);
+        this.ReferralNumber = segment.GetField<CX>(38);
+        this.AuthorizationNumber = segment.GetField<CX>(39);
+        this.ServiceProviderTaxonomyCode = segment.GetField<CWE>(40);
+        this.RevenueCode = segment.GetField<CWE>(41);
+        this.PrescriptionNumber = segment.GetField<ST>(42);
+        this.NDCQtyandUOM = segment.GetField<CQ>(43);
+        this.DMECertificateofMedicalNecessityTransmissionCode = segment.GetField<CWE>(44);
+        this.DMECertificationTypeCode = segment.GetField<CWE>(45);
+        this.DMEDurationValue = segment.GetField<NM>(46);
+        this.DMECertificationRevisionDate = segment.GetField<DT>(47);
+        this.DMEInitialCertificationDate = segment.GetField<DT>(48);
+        this.DMELastCertificationDate = segment.GetField<DT>(49);
+        this.DMELengthofMedicalNecessityDays = segment.GetField<NM>(50);
+        this.DMERentalPrice = segment.GetField<MO>(51);
+        this.DMEPurchasePrice = segment.GetField<MO>(52);
+        this.DMEFrequencyCode = segment.GetField<CWE>(53);
+        this.DMECertificationConditionIndicator = segment.GetField<ID>(54);
+        this.DMEConditionIndicatorCode = segment.GetField<CWE>(55);
+        this.ServiceReasonCode = segment.GetField<CWE>(56);
     }
 }
 
@@ -1673,6 +1691,7 @@ public sealed record GOL : Hl7Segment {
     public DTM? CurrentGoalReviewDateTime { get; }
     public DTM? NextGoalReviewDateTime { get; }
     public DTM? PreviousGoalReviewDateTime { get; }
+    public ST? GoalReviewInterval { get; }
     public CWE? GoalEvaluation { get; }
     public ICollection<ST>? GoalEvaluationComment { get; }
     public CWE? GoalLifeCycleStatus { get; }
@@ -1696,13 +1715,14 @@ public sealed record GOL : Hl7Segment {
         this.CurrentGoalReviewDateTime = segment.GetField<DTM>(12);
         this.NextGoalReviewDateTime = segment.GetField<DTM>(13);
         this.PreviousGoalReviewDateTime = segment.GetField<DTM>(14);
-        this.GoalEvaluation = segment.GetField<CWE>(15);
-        this.GoalEvaluationComment = segment.GetRepField<ST>(16);
-        this.GoalLifeCycleStatus = segment.GetField<CWE>(17);
-        this.GoalLifeCycleStatusDateTime = segment.GetField<DTM>(18);
-        this.GoalTargetType = segment.GetRepField<CWE>(19);
-        this.GoalTargetName = segment.GetRepField<XPN>(20);
-        this.MoodCode = segment.GetField<CNE>(21);
+        this.GoalReviewInterval = segment.GetField<ST>(15);
+        this.GoalEvaluation = segment.GetField<CWE>(16);
+        this.GoalEvaluationComment = segment.GetRepField<ST>(17);
+        this.GoalLifeCycleStatus = segment.GetField<CWE>(18);
+        this.GoalLifeCycleStatusDateTime = segment.GetField<DTM>(19);
+        this.GoalTargetType = segment.GetRepField<CWE>(20);
+        this.GoalTargetName = segment.GetRepField<XPN>(21);
+        this.MoodCode = segment.GetField<CNE>(22);
     }
 }
 
@@ -2062,7 +2082,10 @@ public sealed record IN1 : Hl7Segment {
     public CWE? CompanyPlanCode { get; }
     public ST? PolicyNumber { get; }
     public CP? PolicyDeductible { get; }
+    public ST? PolicyLimitAmount { get; }
     public NM? PolicyLimitDays { get; }
+    public ST? RoomRateSemiPrivate { get; }
+    public ST? RoomRatePrivate { get; }
     public CWE? InsuredsEmploymentStatus { get; }
     public CWE? InsuredsAdministrativeSex { get; }
     public ICollection<XAD>? InsuredsEmployersAddress { get; }
@@ -2116,21 +2139,24 @@ public sealed record IN1 : Hl7Segment {
         this.CompanyPlanCode = segment.GetField<CWE>(35);
         this.PolicyNumber = segment.GetField<ST>(36);
         this.PolicyDeductible = segment.GetField<CP>(37);
-        this.PolicyLimitDays = segment.GetField<NM>(38);
-        this.InsuredsEmploymentStatus = segment.GetField<CWE>(39);
-        this.InsuredsAdministrativeSex = segment.GetField<CWE>(40);
-        this.InsuredsEmployersAddress = segment.GetRepField<XAD>(41);
-        this.VerificationStatus = segment.GetField<ST>(42);
-        this.PriorInsurancePlanID = segment.GetField<CWE>(43);
-        this.CoverageType = segment.GetField<CWE>(44);
-        this.Handicap = segment.GetField<CWE>(45);
-        this.InsuredsIDNumber = segment.GetRepField<CX>(46);
-        this.SignatureCode = segment.GetField<CWE>(47);
-        this.SignatureCodeDate = segment.GetField<DT>(48);
-        this.InsuredsBirthPlace = segment.GetField<ST>(49);
-        this.VIPIndicator = segment.GetField<CWE>(50);
-        this.ExternalHealthPlanIdentifiers = segment.GetRepField<CX>(51);
-        this.InsuranceActionCode = segment.GetField<ID>(52);
+        this.PolicyLimitAmount = segment.GetField<ST>(38);
+        this.PolicyLimitDays = segment.GetField<NM>(39);
+        this.RoomRateSemiPrivate = segment.GetField<ST>(40);
+        this.RoomRatePrivate = segment.GetField<ST>(41);
+        this.InsuredsEmploymentStatus = segment.GetField<CWE>(42);
+        this.InsuredsAdministrativeSex = segment.GetField<CWE>(43);
+        this.InsuredsEmployersAddress = segment.GetRepField<XAD>(44);
+        this.VerificationStatus = segment.GetField<ST>(45);
+        this.PriorInsurancePlanID = segment.GetField<CWE>(46);
+        this.CoverageType = segment.GetField<CWE>(47);
+        this.Handicap = segment.GetField<CWE>(48);
+        this.InsuredsIDNumber = segment.GetRepField<CX>(49);
+        this.SignatureCode = segment.GetField<CWE>(50);
+        this.SignatureCodeDate = segment.GetField<DT>(51);
+        this.InsuredsBirthPlace = segment.GetField<ST>(52);
+        this.VIPIndicator = segment.GetField<CWE>(53);
+        this.ExternalHealthPlanIdentifiers = segment.GetRepField<CX>(54);
+        this.InsuranceActionCode = segment.GetField<ID>(55);
     }
 }
 
@@ -2368,6 +2394,7 @@ public sealed record INV : Hl7Segment {
     public CWE? QuantityUnits { get; }
     public DTM? ExpirationDateTime { get; }
     public DTM? FirstUsedDateTime { get; }
+    public ST? OnBoardStabilityDuration { get; }
     public ICollection<CWE>? TestFluidIdentifiers { get; }
     public ST? ManufacturerLotNumber { get; }
     public CWE? ManufacturerIdentifier { get; }
@@ -2391,14 +2418,15 @@ public sealed record INV : Hl7Segment {
         this.QuantityUnits = segment.GetField<CWE>(11);
         this.ExpirationDateTime = segment.GetField<DTM>(12);
         this.FirstUsedDateTime = segment.GetField<DTM>(13);
-        this.TestFluidIdentifiers = segment.GetRepField<CWE>(14);
-        this.ManufacturerLotNumber = segment.GetField<ST>(15);
-        this.ManufacturerIdentifier = segment.GetField<CWE>(16);
-        this.SupplierIdentifier = segment.GetField<CWE>(17);
-        this.OnBoardStabilityTime = segment.GetField<CQ>(18);
-        this.TargetValue = segment.GetField<CQ>(19);
-        this.EquipmentStateIndicatorTypeCode = segment.GetField<CWE>(20);
-        this.EquipmentStateIndicatorValue = segment.GetField<CQ>(21);
+        this.OnBoardStabilityDuration = segment.GetField<ST>(14);
+        this.TestFluidIdentifiers = segment.GetRepField<CWE>(15);
+        this.ManufacturerLotNumber = segment.GetField<ST>(16);
+        this.ManufacturerIdentifier = segment.GetField<CWE>(17);
+        this.SupplierIdentifier = segment.GetField<CWE>(18);
+        this.OnBoardStabilityTime = segment.GetField<CQ>(19);
+        this.TargetValue = segment.GetField<CQ>(20);
+        this.EquipmentStateIndicatorTypeCode = segment.GetField<CWE>(21);
+        this.EquipmentStateIndicatorValue = segment.GetField<CQ>(22);
     }
 }
 
@@ -2858,33 +2886,43 @@ public sealed record MFI : Hl7Segment {
 
 public sealed record MRG : Hl7Segment {
     public ICollection<CX> PriorPatientIdentifierList { get; }
+    public ST? PriorAlternatePatientID { get; }
     public CX? PriorPatientAccountNumber { get; }
+    public ST? PriorPatientID { get; }
     public CX? PriorVisitNumber { get; }
     public ICollection<CX>? PriorAlternateVisitID { get; }
     public ICollection<XPN>? PriorPatientName { get; }
 
     public MRG(Segment segment) : base(typeof(MRG), segment) {
         this.PriorPatientIdentifierList = segment.GetRequiredRepField<CX>(1);
-        this.PriorPatientAccountNumber = segment.GetField<CX>(2);
-        this.PriorVisitNumber = segment.GetField<CX>(3);
-        this.PriorAlternateVisitID = segment.GetRepField<CX>(4);
-        this.PriorPatientName = segment.GetRepField<XPN>(5);
+        this.PriorAlternatePatientID = segment.GetField<ST>(2);
+        this.PriorPatientAccountNumber = segment.GetField<CX>(3);
+        this.PriorPatientID = segment.GetField<ST>(4);
+        this.PriorVisitNumber = segment.GetField<CX>(5);
+        this.PriorAlternateVisitID = segment.GetRepField<CX>(6);
+        this.PriorPatientName = segment.GetRepField<XPN>(7);
     }
 }
 
 public sealed record MSA : Hl7Segment {
     public ID AcknowledgmentCode { get; }
     public ST MessageControlID { get; }
+    public ST? TextMessage { get; }
     public NM? ExpectedSequenceNumber { get; }
+    public ST? DelayedAcknowledgmentType { get; }
+    public ST? ErrorCondition { get; }
     public NM? MessageWaitingNumber { get; }
     public ID? MessageWaitingPriority { get; }
 
     public MSA(Segment segment) : base(typeof(MSA), segment) {
         this.AcknowledgmentCode = segment.GetRequiredField<ID>(1);
         this.MessageControlID = segment.GetRequiredField<ST>(2);
-        this.ExpectedSequenceNumber = segment.GetField<NM>(3);
-        this.MessageWaitingNumber = segment.GetField<NM>(4);
-        this.MessageWaitingPriority = segment.GetField<ID>(5);
+        this.TextMessage = segment.GetField<ST>(3);
+        this.ExpectedSequenceNumber = segment.GetField<NM>(4);
+        this.DelayedAcknowledgmentType = segment.GetField<ST>(5);
+        this.ErrorCondition = segment.GetField<ST>(6);
+        this.MessageWaitingNumber = segment.GetField<NM>(7);
+        this.MessageWaitingPriority = segment.GetField<ID>(8);
     }
 }
 
@@ -3097,6 +3135,8 @@ public sealed record OBR : Hl7Segment {
     public EI? PlacerOrderNumber { get; }
     public EI? FillerOrderNumber { get; }
     public CWE UniversalServiceIdentifier { get; }
+    public ST? Priority { get; }
+    public ST? RequestedDateTime { get; }
     public DTM? ObservationDateTime { get; }
     public DTM? ObservationEndDateTime { get; }
     public CQ? CollectionVolume { get; }
@@ -3105,6 +3145,8 @@ public sealed record OBR : Hl7Segment {
     public CWE? DangerCode { get; }
     public ICollection<CWE>? RelevantClinicalInformation { get; }
     public DTM? SpecimenReceivedDateTime { get; }
+    public ST? SpecimenSource { get; }
+    public ST? OrderingProvider { get; }
     public XTN? OrderCallbackPhoneNumber { get; }
     public ST? PlacerField1 { get; }
     public ST? PlacerField2 { get; }
@@ -3115,9 +3157,15 @@ public sealed record OBR : Hl7Segment {
     public ID? DiagnosticServSectID { get; }
     public ID? ResultStatus { get; }
     public PRL? ParentResult { get; }
+    public ST? QuantityTiming { get; }
+    public ST? ResultCopiesTo { get; }
     public EIP? ParentResultsObservationIdentifier { get; }
     public ID? TransportationMode { get; }
     public ICollection<CWE>? ReasonforStudy { get; }
+    public ST? PrincipalResultInterpreter { get; }
+    public ST? AssistantResultInterpreter { get; }
+    public ST? Technician { get; }
+    public ST? Transcriptionist { get; }
     public DTM? ScheduledDateTime { get; }
     public NM? NumberofSampleContainers { get; }
     public ICollection<CWE>? TransportLogisticsofCollectedSample { get; }
@@ -3132,6 +3180,7 @@ public sealed record OBR : Hl7Segment {
     public ICollection<CWE>? FillerSupplementalServiceInformation { get; }
     public CWE? MedicallyNecessaryDuplicateProcedureReason { get; }
     public CWE? ResultHandling { get; }
+    public ST? ParentUniversalServiceIdentifier { get; }
     public EI? ObservationGroupID { get; }
     public EI? ParentObservationGroupID { get; }
     public ICollection<CX>? AlternatePlacerOrderNumber { get; }
@@ -3143,46 +3192,57 @@ public sealed record OBR : Hl7Segment {
         this.PlacerOrderNumber = segment.GetField<EI>(2);
         this.FillerOrderNumber = segment.GetField<EI>(3);
         this.UniversalServiceIdentifier = segment.GetRequiredField<CWE>(4);
-        this.ObservationDateTime = segment.GetField<DTM>(5);
-        this.ObservationEndDateTime = segment.GetField<DTM>(6);
-        this.CollectionVolume = segment.GetField<CQ>(7);
-        this.CollectorIdentifier = segment.GetRepField<XCN>(8);
-        this.SpecimenActionCode = segment.GetField<ID>(9);
-        this.DangerCode = segment.GetField<CWE>(10);
-        this.RelevantClinicalInformation = segment.GetRepField<CWE>(11);
-        this.SpecimenReceivedDateTime = segment.GetField<DTM>(12);
-        this.OrderCallbackPhoneNumber = segment.GetField<XTN>(13);
-        this.PlacerField1 = segment.GetField<ST>(14);
-        this.PlacerField2 = segment.GetField<ST>(15);
-        this.FillerField1 = segment.GetField<ST>(16);
-        this.FillerField2 = segment.GetField<ST>(17);
-        this.ResultsRptStatusChngDateTime = segment.GetField<DTM>(18);
-        this.ChargetoPractice = segment.GetField<MOC>(19);
-        this.DiagnosticServSectID = segment.GetField<ID>(20);
-        this.ResultStatus = segment.GetField<ID>(21);
-        this.ParentResult = segment.GetField<PRL>(22);
-        this.ParentResultsObservationIdentifier = segment.GetField<EIP>(23);
-        this.TransportationMode = segment.GetField<ID>(24);
-        this.ReasonforStudy = segment.GetRepField<CWE>(25);
-        this.ScheduledDateTime = segment.GetField<DTM>(26);
-        this.NumberofSampleContainers = segment.GetField<NM>(27);
-        this.TransportLogisticsofCollectedSample = segment.GetRepField<CWE>(28);
-        this.CollectorsComment = segment.GetRepField<CWE>(29);
-        this.TransportArrangementResponsibility = segment.GetField<CWE>(30);
-        this.TransportArranged = segment.GetField<ID>(31);
-        this.EscortRequired = segment.GetField<ID>(32);
-        this.PlannedPatientTransportComment = segment.GetRepField<CWE>(33);
-        this.ProcedureCode = segment.GetField<CNE>(34);
-        this.ProcedureCodeModifier = segment.GetRepField<CNE>(35);
-        this.PlacerSupplementalServiceInformation = segment.GetRepField<CWE>(36);
-        this.FillerSupplementalServiceInformation = segment.GetRepField<CWE>(37);
-        this.MedicallyNecessaryDuplicateProcedureReason = segment.GetField<CWE>(38);
-        this.ResultHandling = segment.GetField<CWE>(39);
-        this.ObservationGroupID = segment.GetField<EI>(40);
-        this.ParentObservationGroupID = segment.GetField<EI>(41);
-        this.AlternatePlacerOrderNumber = segment.GetRepField<CX>(42);
-        this.ParentOrder = segment.GetRepField<EIP>(43);
-        this.ActionCode = segment.GetField<ID>(44);
+        this.Priority = segment.GetField<ST>(5);
+        this.RequestedDateTime = segment.GetField<ST>(6);
+        this.ObservationDateTime = segment.GetField<DTM>(7);
+        this.ObservationEndDateTime = segment.GetField<DTM>(8);
+        this.CollectionVolume = segment.GetField<CQ>(9);
+        this.CollectorIdentifier = segment.GetRepField<XCN>(10);
+        this.SpecimenActionCode = segment.GetField<ID>(11);
+        this.DangerCode = segment.GetField<CWE>(12);
+        this.RelevantClinicalInformation = segment.GetRepField<CWE>(13);
+        this.SpecimenReceivedDateTime = segment.GetField<DTM>(14);
+        this.SpecimenSource = segment.GetField<ST>(15);
+        this.OrderingProvider = segment.GetField<ST>(16);
+        this.OrderCallbackPhoneNumber = segment.GetField<XTN>(17);
+        this.PlacerField1 = segment.GetField<ST>(18);
+        this.PlacerField2 = segment.GetField<ST>(19);
+        this.FillerField1 = segment.GetField<ST>(20);
+        this.FillerField2 = segment.GetField<ST>(21);
+        this.ResultsRptStatusChngDateTime = segment.GetField<DTM>(22);
+        this.ChargetoPractice = segment.GetField<MOC>(23);
+        this.DiagnosticServSectID = segment.GetField<ID>(24);
+        this.ResultStatus = segment.GetField<ID>(25);
+        this.ParentResult = segment.GetField<PRL>(26);
+        this.QuantityTiming = segment.GetField<ST>(27);
+        this.ResultCopiesTo = segment.GetField<ST>(28);
+        this.ParentResultsObservationIdentifier = segment.GetField<EIP>(29);
+        this.TransportationMode = segment.GetField<ID>(30);
+        this.ReasonforStudy = segment.GetRepField<CWE>(31);
+        this.PrincipalResultInterpreter = segment.GetField<ST>(32);
+        this.AssistantResultInterpreter = segment.GetField<ST>(33);
+        this.Technician = segment.GetField<ST>(34);
+        this.Transcriptionist = segment.GetField<ST>(35);
+        this.ScheduledDateTime = segment.GetField<DTM>(36);
+        this.NumberofSampleContainers = segment.GetField<NM>(37);
+        this.TransportLogisticsofCollectedSample = segment.GetRepField<CWE>(38);
+        this.CollectorsComment = segment.GetRepField<CWE>(39);
+        this.TransportArrangementResponsibility = segment.GetField<CWE>(40);
+        this.TransportArranged = segment.GetField<ID>(41);
+        this.EscortRequired = segment.GetField<ID>(42);
+        this.PlannedPatientTransportComment = segment.GetRepField<CWE>(43);
+        this.ProcedureCode = segment.GetField<CNE>(44);
+        this.ProcedureCodeModifier = segment.GetRepField<CNE>(45);
+        this.PlacerSupplementalServiceInformation = segment.GetRepField<CWE>(46);
+        this.FillerSupplementalServiceInformation = segment.GetRepField<CWE>(47);
+        this.MedicallyNecessaryDuplicateProcedureReason = segment.GetField<CWE>(48);
+        this.ResultHandling = segment.GetField<CWE>(49);
+        this.ParentUniversalServiceIdentifier = segment.GetField<ST>(50);
+        this.ObservationGroupID = segment.GetField<EI>(51);
+        this.ParentObservationGroupID = segment.GetField<EI>(52);
+        this.AlternatePlacerOrderNumber = segment.GetRepField<CX>(53);
+        this.ParentOrder = segment.GetRepField<EIP>(54);
+        this.ActionCode = segment.GetField<ID>(55);
     }
 }
 
@@ -3713,20 +3773,31 @@ public sealed record ORC : Hl7Segment {
     public EI? PlacerOrderGroupNumber { get; }
     public ID? OrderStatus { get; }
     public ID? ResponseFlag { get; }
+    public ST? QuantityTiming { get; }
     public ICollection<EIP>? ParentOrder { get; }
     public DTM? DateTimeofOrderEvent { get; }
     public XCN? EnteredBy { get; }
+    public ST? VerifiedBy { get; }
+    public ST? OrderingProvider { get; }
     public PL? EnterersLocation { get; }
     public XTN? CallBackPhoneNumber { get; }
     public DTM? OrderEffectiveDateTime { get; }
     public CWE? OrderControlCodeReason { get; }
+    public ST? EnteringOrganization { get; }
+    public ST? EnteringDevice { get; }
+    public ST? ActionBy { get; }
     public CWE? AdvancedBeneficiaryNoticeCode { get; }
+    public ST? OrderingFacilityName { get; }
+    public ST? OrderingFacilityAddress { get; }
+    public ST? OrderingFacilityPhoneNumber { get; }
+    public ST? OrderingProviderAddress { get; }
     public CWE? OrderStatusModifier { get; }
     public CWE? AdvancedBeneficiaryNoticeOverrideReason { get; }
     public DTM? FillersExpectedAvailabilityDateTime { get; }
     public CWE? ConfidentialityCode { get; }
     public CWE? OrderType { get; }
     public CNE? EntererAuthorizationMode { get; }
+    public ST? ParentUniversalServiceIdentifier { get; }
     public DT? AdvancedBeneficiaryNoticeDate { get; }
     public ICollection<CX>? AlternatePlacerOrderNumber { get; }
     public ICollection<CWE>? OrderWorkflowProfile { get; }
@@ -3742,27 +3813,38 @@ public sealed record ORC : Hl7Segment {
         this.PlacerOrderGroupNumber = segment.GetField<EI>(4);
         this.OrderStatus = segment.GetField<ID>(5);
         this.ResponseFlag = segment.GetField<ID>(6);
-        this.ParentOrder = segment.GetRepField<EIP>(7);
-        this.DateTimeofOrderEvent = segment.GetField<DTM>(8);
-        this.EnteredBy = segment.GetField<XCN>(9);
-        this.EnterersLocation = segment.GetField<PL>(10);
-        this.CallBackPhoneNumber = segment.GetField<XTN>(11);
-        this.OrderEffectiveDateTime = segment.GetField<DTM>(12);
-        this.OrderControlCodeReason = segment.GetField<CWE>(13);
-        this.AdvancedBeneficiaryNoticeCode = segment.GetField<CWE>(14);
-        this.OrderStatusModifier = segment.GetField<CWE>(15);
-        this.AdvancedBeneficiaryNoticeOverrideReason = segment.GetField<CWE>(16);
-        this.FillersExpectedAvailabilityDateTime = segment.GetField<DTM>(17);
-        this.ConfidentialityCode = segment.GetField<CWE>(18);
-        this.OrderType = segment.GetField<CWE>(19);
-        this.EntererAuthorizationMode = segment.GetField<CNE>(20);
-        this.AdvancedBeneficiaryNoticeDate = segment.GetField<DT>(21);
-        this.AlternatePlacerOrderNumber = segment.GetRepField<CX>(22);
-        this.OrderWorkflowProfile = segment.GetRepField<CWE>(23);
-        this.ActionCode = segment.GetField<ID>(24);
-        this.OrderStatusDateRange = segment.GetField<DR>(25);
-        this.OrderCreationDateTime = segment.GetField<DTM>(26);
-        this.FillerOrderGroupNumber = segment.GetField<EI>(27);
+        this.QuantityTiming = segment.GetField<ST>(7);
+        this.ParentOrder = segment.GetRepField<EIP>(8);
+        this.DateTimeofOrderEvent = segment.GetField<DTM>(9);
+        this.EnteredBy = segment.GetField<XCN>(10);
+        this.VerifiedBy = segment.GetField<ST>(11);
+        this.OrderingProvider = segment.GetField<ST>(12);
+        this.EnterersLocation = segment.GetField<PL>(13);
+        this.CallBackPhoneNumber = segment.GetField<XTN>(14);
+        this.OrderEffectiveDateTime = segment.GetField<DTM>(15);
+        this.OrderControlCodeReason = segment.GetField<CWE>(16);
+        this.EnteringOrganization = segment.GetField<ST>(17);
+        this.EnteringDevice = segment.GetField<ST>(18);
+        this.ActionBy = segment.GetField<ST>(19);
+        this.AdvancedBeneficiaryNoticeCode = segment.GetField<CWE>(20);
+        this.OrderingFacilityName = segment.GetField<ST>(21);
+        this.OrderingFacilityAddress = segment.GetField<ST>(22);
+        this.OrderingFacilityPhoneNumber = segment.GetField<ST>(23);
+        this.OrderingProviderAddress = segment.GetField<ST>(24);
+        this.OrderStatusModifier = segment.GetField<CWE>(25);
+        this.AdvancedBeneficiaryNoticeOverrideReason = segment.GetField<CWE>(26);
+        this.FillersExpectedAvailabilityDateTime = segment.GetField<DTM>(27);
+        this.ConfidentialityCode = segment.GetField<CWE>(28);
+        this.OrderType = segment.GetField<CWE>(29);
+        this.EntererAuthorizationMode = segment.GetField<CNE>(30);
+        this.ParentUniversalServiceIdentifier = segment.GetField<ST>(31);
+        this.AdvancedBeneficiaryNoticeDate = segment.GetField<DT>(32);
+        this.AlternatePlacerOrderNumber = segment.GetRepField<CX>(33);
+        this.OrderWorkflowProfile = segment.GetRepField<CWE>(34);
+        this.ActionCode = segment.GetField<ID>(35);
+        this.OrderStatusDateRange = segment.GetField<DR>(36);
+        this.OrderCreationDateTime = segment.GetField<DTM>(37);
+        this.FillerOrderGroupNumber = segment.GetField<EI>(38);
     }
 }
 
@@ -3908,6 +3990,7 @@ public sealed record PD1 : Hl7Segment {
     public ICollection<CWE>? LivingDependency { get; }
     public CWE? LivingArrangement { get; }
     public ICollection<XON>? PatientPrimaryFacility { get; }
+    public ST? PatientPrimaryCareProviderNameIDNo { get; }
     public CWE? StudentIndicator { get; }
     public CWE? Handicap { get; }
     public CWE? LivingWillCode { get; }
@@ -3932,25 +4015,26 @@ public sealed record PD1 : Hl7Segment {
         this.LivingDependency = segment.GetRepField<CWE>(1);
         this.LivingArrangement = segment.GetField<CWE>(2);
         this.PatientPrimaryFacility = segment.GetRepField<XON>(3);
-        this.StudentIndicator = segment.GetField<CWE>(4);
-        this.Handicap = segment.GetField<CWE>(5);
-        this.LivingWillCode = segment.GetField<CWE>(6);
-        this.OrganDonorCode = segment.GetField<CWE>(7);
-        this.SeparateBill = segment.GetField<ID>(8);
-        this.DuplicatePatient = segment.GetRepField<CX>(9);
-        this.PublicityCode = segment.GetField<CWE>(10);
-        this.ProtectionIndicator = segment.GetField<ID>(11);
-        this.ProtectionIndicatorEffectiveDate = segment.GetField<DT>(12);
-        this.PlaceofWorship = segment.GetRepField<XON>(13);
-        this.AdvanceDirectiveCode = segment.GetField<CWE>(14);
-        this.ImmunizationRegistryStatus = segment.GetField<CWE>(15);
-        this.ImmunizationRegistryStatusEffectiveDate = segment.GetField<DT>(16);
-        this.PublicityCodeEffectiveDate = segment.GetField<DT>(17);
-        this.MilitaryBranch = segment.GetField<CWE>(18);
-        this.MilitaryRankGrade = segment.GetField<CWE>(19);
-        this.MilitaryStatus = segment.GetField<CWE>(20);
-        this.AdvanceDirectiveLastVerifiedDate = segment.GetField<DT>(21);
-        this.RetirementDate = segment.GetField<DT>(22);
+        this.PatientPrimaryCareProviderNameIDNo = segment.GetField<ST>(4);
+        this.StudentIndicator = segment.GetField<CWE>(5);
+        this.Handicap = segment.GetField<CWE>(6);
+        this.LivingWillCode = segment.GetField<CWE>(7);
+        this.OrganDonorCode = segment.GetField<CWE>(8);
+        this.SeparateBill = segment.GetField<ID>(9);
+        this.DuplicatePatient = segment.GetRepField<CX>(10);
+        this.PublicityCode = segment.GetField<CWE>(11);
+        this.ProtectionIndicator = segment.GetField<ID>(12);
+        this.ProtectionIndicatorEffectiveDate = segment.GetField<DT>(13);
+        this.PlaceofWorship = segment.GetRepField<XON>(14);
+        this.AdvanceDirectiveCode = segment.GetField<CWE>(15);
+        this.ImmunizationRegistryStatus = segment.GetField<CWE>(16);
+        this.ImmunizationRegistryStatusEffectiveDate = segment.GetField<DT>(17);
+        this.PublicityCodeEffectiveDate = segment.GetField<DT>(18);
+        this.MilitaryBranch = segment.GetField<CWE>(19);
+        this.MilitaryRankGrade = segment.GetField<CWE>(20);
+        this.MilitaryStatus = segment.GetField<CWE>(21);
+        this.AdvanceDirectiveLastVerifiedDate = segment.GetField<DT>(22);
+        this.RetirementDate = segment.GetField<DT>(23);
     }
 }
 
@@ -4104,19 +4188,25 @@ public sealed record PES : Hl7Segment {
 
 public sealed record PID : Hl7Segment {
     public SI? SetIDPID { get; }
+    public ST? PatientID { get; }
     public ICollection<CX> PatientIdentifierList { get; }
+    public ST? AlternatePatientIDPID { get; }
     public ICollection<XPN> PatientName { get; }
     public ICollection<XPN>? MothersMaidenName { get; }
     public DTM? DateTimeofBirth { get; }
     public CWE? AdministrativeSex { get; }
+    public ST? PatientAlias { get; }
     public ICollection<CWE>? Race { get; }
     public ICollection<XAD>? PatientAddress { get; }
+    public ST? CountyCode { get; }
     public XTN? PhoneNumberHome { get; }
     public XTN? PhoneNumberBusiness { get; }
     public CWE? PrimaryLanguage { get; }
     public CWE? MaritalStatus { get; }
     public CWE? Religion { get; }
     public CX? PatientAccountNumber { get; }
+    public ST? SSNNumberPatient { get; }
+    public ST? DriversLicenseNumberPatient { get; }
     public ICollection<CX>? MothersIdentifier { get; }
     public ICollection<CWE>? EthnicGroup { get; }
     public ST? BirthPlace { get; }
@@ -4140,39 +4230,45 @@ public sealed record PID : Hl7Segment {
 
     public PID(Segment segment) : base(typeof(PID), segment) {
         this.SetIDPID = segment.GetField<SI>(1);
-        this.PatientIdentifierList = segment.GetRequiredRepField<CX>(2);
-        this.PatientName = segment.GetRequiredRepField<XPN>(3);
-        this.MothersMaidenName = segment.GetRepField<XPN>(4);
-        this.DateTimeofBirth = segment.GetField<DTM>(5);
-        this.AdministrativeSex = segment.GetField<CWE>(6);
-        this.Race = segment.GetRepField<CWE>(7);
-        this.PatientAddress = segment.GetRepField<XAD>(8);
-        this.PhoneNumberHome = segment.GetField<XTN>(9);
-        this.PhoneNumberBusiness = segment.GetField<XTN>(10);
-        this.PrimaryLanguage = segment.GetField<CWE>(11);
-        this.MaritalStatus = segment.GetField<CWE>(12);
-        this.Religion = segment.GetField<CWE>(13);
-        this.PatientAccountNumber = segment.GetField<CX>(14);
-        this.MothersIdentifier = segment.GetRepField<CX>(15);
-        this.EthnicGroup = segment.GetRepField<CWE>(16);
-        this.BirthPlace = segment.GetField<ST>(17);
-        this.MultipleBirthIndicator = segment.GetField<ID>(18);
-        this.BirthOrder = segment.GetField<NM>(19);
-        this.Citizenship = segment.GetRepField<CWE>(20);
-        this.VeteransMilitaryStatus = segment.GetField<CWE>(21);
-        this.Nationality = segment.GetField<CWE>(22);
-        this.PatientDeathDateandTime = segment.GetField<DTM>(23);
-        this.PatientDeathIndicator = segment.GetField<ID>(24);
-        this.IdentityUnknownIndicator = segment.GetField<ID>(25);
-        this.IdentityReliabilityCode = segment.GetRepField<CWE>(26);
-        this.LastUpdateDateTime = segment.GetField<DTM>(27);
-        this.LastUpdateFacility = segment.GetField<HD>(28);
-        this.TaxonomicClassificationCode = segment.GetField<CWE>(29);
-        this.BreedCode = segment.GetField<CWE>(30);
-        this.Strain = segment.GetField<ST>(31);
-        this.ProductionClassCode = segment.GetField<CWE>(32);
-        this.TribalCitizenship = segment.GetRepField<CWE>(33);
-        this.PatientTelecommunicationInformation = segment.GetRepField<XTN>(34);
+        this.PatientID = segment.GetField<ST>(2);
+        this.PatientIdentifierList = segment.GetRequiredRepField<CX>(3);
+        this.AlternatePatientIDPID = segment.GetField<ST>(4);
+        this.PatientName = segment.GetRequiredRepField<XPN>(5);
+        this.MothersMaidenName = segment.GetRepField<XPN>(6);
+        this.DateTimeofBirth = segment.GetField<DTM>(7);
+        this.AdministrativeSex = segment.GetField<CWE>(8);
+        this.PatientAlias = segment.GetField<ST>(9);
+        this.Race = segment.GetRepField<CWE>(10);
+        this.PatientAddress = segment.GetRepField<XAD>(11);
+        this.CountyCode = segment.GetField<ST>(12);
+        this.PhoneNumberHome = segment.GetField<XTN>(13);
+        this.PhoneNumberBusiness = segment.GetField<XTN>(14);
+        this.PrimaryLanguage = segment.GetField<CWE>(15);
+        this.MaritalStatus = segment.GetField<CWE>(16);
+        this.Religion = segment.GetField<CWE>(17);
+        this.PatientAccountNumber = segment.GetField<CX>(18);
+        this.SSNNumberPatient = segment.GetField<ST>(19);
+        this.DriversLicenseNumberPatient = segment.GetField<ST>(20);
+        this.MothersIdentifier = segment.GetRepField<CX>(21);
+        this.EthnicGroup = segment.GetRepField<CWE>(22);
+        this.BirthPlace = segment.GetField<ST>(23);
+        this.MultipleBirthIndicator = segment.GetField<ID>(24);
+        this.BirthOrder = segment.GetField<NM>(25);
+        this.Citizenship = segment.GetRepField<CWE>(26);
+        this.VeteransMilitaryStatus = segment.GetField<CWE>(27);
+        this.Nationality = segment.GetField<CWE>(28);
+        this.PatientDeathDateandTime = segment.GetField<DTM>(29);
+        this.PatientDeathIndicator = segment.GetField<ID>(30);
+        this.IdentityUnknownIndicator = segment.GetField<ID>(31);
+        this.IdentityReliabilityCode = segment.GetRepField<CWE>(32);
+        this.LastUpdateDateTime = segment.GetField<DTM>(33);
+        this.LastUpdateFacility = segment.GetField<HD>(34);
+        this.TaxonomicClassificationCode = segment.GetField<CWE>(35);
+        this.BreedCode = segment.GetField<CWE>(36);
+        this.Strain = segment.GetField<ST>(37);
+        this.ProductionClassCode = segment.GetField<CWE>(38);
+        this.TribalCitizenship = segment.GetRepField<CWE>(39);
+        this.PatientTelecommunicationInformation = segment.GetRepField<XTN>(40);
     }
 }
 
@@ -4290,12 +4386,17 @@ public sealed record PMT : Hl7Segment {
 
 public sealed record PR1 : Hl7Segment {
     public SI SetIDPR1 { get; }
+    public ST? ProcedureCodingMethod { get; }
     public CNE ProcedureCode { get; }
+    public ST? ProcedureDescription { get; }
     public DTM ProcedureDateTime { get; }
     public CWE? ProcedureFunctionalType { get; }
     public NM? ProcedureMinutes { get; }
+    public ST? Anesthesiologist { get; }
     public CWE? AnesthesiaCode { get; }
     public NM? AnesthesiaMinutes { get; }
+    public ST? Surgeon { get; }
+    public ST? ProcedurePractitioner { get; }
     public CWE? ConsentCode { get; }
     public NM? ProcedurePriority { get; }
     public CWE? AssociatedDiagnosisCode { get; }
@@ -4312,25 +4413,30 @@ public sealed record PR1 : Hl7Segment {
 
     public PR1(Segment segment) : base(typeof(PR1), segment) {
         this.SetIDPR1 = segment.GetRequiredField<SI>(1);
-        this.ProcedureCode = segment.GetRequiredField<CNE>(2);
-        this.ProcedureDateTime = segment.GetRequiredField<DTM>(3);
-        this.ProcedureFunctionalType = segment.GetField<CWE>(4);
-        this.ProcedureMinutes = segment.GetField<NM>(5);
-        this.AnesthesiaCode = segment.GetField<CWE>(6);
-        this.AnesthesiaMinutes = segment.GetField<NM>(7);
-        this.ConsentCode = segment.GetField<CWE>(8);
-        this.ProcedurePriority = segment.GetField<NM>(9);
-        this.AssociatedDiagnosisCode = segment.GetField<CWE>(10);
-        this.ProcedureCodeModifier = segment.GetRepField<CNE>(11);
-        this.ProcedureDRGType = segment.GetField<CWE>(12);
-        this.TissueTypeCode = segment.GetRepField<CWE>(13);
-        this.ProcedureIdentifier = segment.GetField<EI>(14);
-        this.ProcedureActionCode = segment.GetField<ID>(15);
-        this.DRGProcedureDeterminationStatus = segment.GetField<CWE>(16);
-        this.DRGProcedureRelevance = segment.GetField<CWE>(17);
-        this.TreatingOrganizationalUnit = segment.GetRepField<PL>(18);
-        this.RespiratoryWithinSurgery = segment.GetField<ID>(19);
-        this.ParentProcedureID = segment.GetField<EI>(20);
+        this.ProcedureCodingMethod = segment.GetField<ST>(2);
+        this.ProcedureCode = segment.GetRequiredField<CNE>(3);
+        this.ProcedureDescription = segment.GetField<ST>(4);
+        this.ProcedureDateTime = segment.GetRequiredField<DTM>(5);
+        this.ProcedureFunctionalType = segment.GetField<CWE>(6);
+        this.ProcedureMinutes = segment.GetField<NM>(7);
+        this.Anesthesiologist = segment.GetField<ST>(8);
+        this.AnesthesiaCode = segment.GetField<CWE>(9);
+        this.AnesthesiaMinutes = segment.GetField<NM>(10);
+        this.Surgeon = segment.GetField<ST>(11);
+        this.ProcedurePractitioner = segment.GetField<ST>(12);
+        this.ConsentCode = segment.GetField<CWE>(13);
+        this.ProcedurePriority = segment.GetField<NM>(14);
+        this.AssociatedDiagnosisCode = segment.GetField<CWE>(15);
+        this.ProcedureCodeModifier = segment.GetRepField<CNE>(16);
+        this.ProcedureDRGType = segment.GetField<CWE>(17);
+        this.TissueTypeCode = segment.GetRepField<CWE>(18);
+        this.ProcedureIdentifier = segment.GetField<EI>(19);
+        this.ProcedureActionCode = segment.GetField<ID>(20);
+        this.DRGProcedureDeterminationStatus = segment.GetField<CWE>(21);
+        this.DRGProcedureRelevance = segment.GetField<CWE>(22);
+        this.TreatingOrganizationalUnit = segment.GetRepField<PL>(23);
+        this.RespiratoryWithinSurgery = segment.GetField<ID>(24);
+        this.ParentProcedureID = segment.GetField<EI>(25);
     }
 }
 
@@ -4798,6 +4904,7 @@ public sealed record PV1 : Hl7Segment {
     public NM? TotalPayments { get; }
     public ICollection<CX>? AlternateVisitID { get; }
     public CWE? VisitIndicator { get; }
+    public ST? OtherHealthcareProvider { get; }
     public ST? ServiceEpisodeDescription { get; }
     public CX? ServiceEpisodeIdentifier { get; }
 
@@ -4853,8 +4960,9 @@ public sealed record PV1 : Hl7Segment {
         this.TotalPayments = segment.GetField<NM>(49);
         this.AlternateVisitID = segment.GetRepField<CX>(50);
         this.VisitIndicator = segment.GetField<CWE>(51);
-        this.ServiceEpisodeDescription = segment.GetField<ST>(52);
-        this.ServiceEpisodeIdentifier = segment.GetField<CX>(53);
+        this.OtherHealthcareProvider = segment.GetField<ST>(52);
+        this.ServiceEpisodeDescription = segment.GetField<ST>(53);
+        this.ServiceEpisodeIdentifier = segment.GetField<CX>(54);
     }
 }
 
@@ -5272,6 +5380,8 @@ public sealed record RXA : Hl7Segment {
     public CWE? AdministeredUnits { get; }
     public CWE? AdministeredDosageForm { get; }
     public ICollection<CWE>? AdministrationNotes { get; }
+    public ST? AdministeringProvider { get; }
+    public ST? AdministeredatLocation { get; }
     public ST? AdministeredPer { get; }
     public NM? AdministeredStrength { get; }
     public CWE? AdministeredStrengthUnits { get; }
@@ -5301,24 +5411,26 @@ public sealed record RXA : Hl7Segment {
         this.AdministeredUnits = segment.GetField<CWE>(7);
         this.AdministeredDosageForm = segment.GetField<CWE>(8);
         this.AdministrationNotes = segment.GetRepField<CWE>(9);
-        this.AdministeredPer = segment.GetField<ST>(10);
-        this.AdministeredStrength = segment.GetField<NM>(11);
-        this.AdministeredStrengthUnits = segment.GetField<CWE>(12);
-        this.SubstanceLotNumber = segment.GetRepField<ST>(13);
-        this.SubstanceExpirationDate = segment.GetRepField<DTM>(14);
-        this.SubstanceManufacturerName = segment.GetRepField<CWE>(15);
-        this.SubstanceTreatmentRefusalReason = segment.GetRepField<CWE>(16);
-        this.Indication = segment.GetRepField<CWE>(17);
-        this.CompletionStatus = segment.GetField<ID>(18);
-        this.ActionCodeRXA = segment.GetField<ID>(19);
-        this.SystemEntryDateTime = segment.GetField<DTM>(20);
-        this.AdministeredDrugStrengthVolume = segment.GetField<NM>(21);
-        this.AdministeredDrugStrengthVolumeUnits = segment.GetField<CWE>(22);
-        this.AdministeredBarcodeIdentifier = segment.GetField<CWE>(23);
-        this.PharmacyOrderType = segment.GetField<ID>(24);
-        this.Administerat = segment.GetField<PL>(25);
-        this.AdministeredatAddress = segment.GetField<XAD>(26);
-        this.AdministeredTagIdentifier = segment.GetRepField<EI>(27);
+        this.AdministeringProvider = segment.GetField<ST>(10);
+        this.AdministeredatLocation = segment.GetField<ST>(11);
+        this.AdministeredPer = segment.GetField<ST>(12);
+        this.AdministeredStrength = segment.GetField<NM>(13);
+        this.AdministeredStrengthUnits = segment.GetField<CWE>(14);
+        this.SubstanceLotNumber = segment.GetRepField<ST>(15);
+        this.SubstanceExpirationDate = segment.GetRepField<DTM>(16);
+        this.SubstanceManufacturerName = segment.GetRepField<CWE>(17);
+        this.SubstanceTreatmentRefusalReason = segment.GetRepField<CWE>(18);
+        this.Indication = segment.GetRepField<CWE>(19);
+        this.CompletionStatus = segment.GetField<ID>(20);
+        this.ActionCodeRXA = segment.GetField<ID>(21);
+        this.SystemEntryDateTime = segment.GetField<DTM>(22);
+        this.AdministeredDrugStrengthVolume = segment.GetField<NM>(23);
+        this.AdministeredDrugStrengthVolumeUnits = segment.GetField<CWE>(24);
+        this.AdministeredBarcodeIdentifier = segment.GetField<CWE>(25);
+        this.PharmacyOrderType = segment.GetField<ID>(26);
+        this.Administerat = segment.GetField<PL>(27);
+        this.AdministeredatAddress = segment.GetField<XAD>(28);
+        this.AdministeredTagIdentifier = segment.GetRepField<EI>(29);
     }
 }
 
@@ -5363,6 +5475,7 @@ public sealed record RXD : Hl7Segment {
     public ICollection<XCN>? DispensingProvider { get; }
     public ID? SubstitutionStatus { get; }
     public CQ? TotalDailyDose { get; }
+    public ST? DispensetoLocation { get; }
     public ID? NeedsHumanReview { get; }
     public ICollection<CWE>? SpecialDispensingInstructions { get; }
     public NM? ActualStrength { get; }
@@ -5399,38 +5512,41 @@ public sealed record RXD : Hl7Segment {
         this.DispensingProvider = segment.GetRepField<XCN>(10);
         this.SubstitutionStatus = segment.GetField<ID>(11);
         this.TotalDailyDose = segment.GetField<CQ>(12);
-        this.NeedsHumanReview = segment.GetField<ID>(13);
-        this.SpecialDispensingInstructions = segment.GetRepField<CWE>(14);
-        this.ActualStrength = segment.GetField<NM>(15);
-        this.ActualStrengthUnit = segment.GetField<CWE>(16);
-        this.SubstanceLotNumber = segment.GetRepField<ST>(17);
-        this.SubstanceExpirationDate = segment.GetRepField<DTM>(18);
-        this.SubstanceManufacturerName = segment.GetRepField<CWE>(19);
-        this.Indication = segment.GetRepField<CWE>(20);
-        this.DispensePackageSize = segment.GetField<NM>(21);
-        this.DispensePackageSizeUnit = segment.GetField<CWE>(22);
-        this.DispensePackageMethod = segment.GetField<ID>(23);
-        this.SupplementaryCode = segment.GetRepField<CWE>(24);
-        this.InitiatingLocation = segment.GetField<CWE>(25);
-        this.PackagingAssemblyLocation = segment.GetField<CWE>(26);
-        this.ActualDrugStrengthVolume = segment.GetField<NM>(27);
-        this.ActualDrugStrengthVolumeUnits = segment.GetField<CWE>(28);
-        this.DispensetoPharmacy = segment.GetField<CWE>(29);
-        this.DispensetoPharmacyAddress = segment.GetField<XAD>(30);
-        this.PharmacyOrderType = segment.GetField<ID>(31);
-        this.DispenseType = segment.GetField<CWE>(32);
-        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(33);
-        this.DispenseTagIdentifier = segment.GetRepField<EI>(34);
+        this.DispensetoLocation = segment.GetField<ST>(13);
+        this.NeedsHumanReview = segment.GetField<ID>(14);
+        this.SpecialDispensingInstructions = segment.GetRepField<CWE>(15);
+        this.ActualStrength = segment.GetField<NM>(16);
+        this.ActualStrengthUnit = segment.GetField<CWE>(17);
+        this.SubstanceLotNumber = segment.GetRepField<ST>(18);
+        this.SubstanceExpirationDate = segment.GetRepField<DTM>(19);
+        this.SubstanceManufacturerName = segment.GetRepField<CWE>(20);
+        this.Indication = segment.GetRepField<CWE>(21);
+        this.DispensePackageSize = segment.GetField<NM>(22);
+        this.DispensePackageSizeUnit = segment.GetField<CWE>(23);
+        this.DispensePackageMethod = segment.GetField<ID>(24);
+        this.SupplementaryCode = segment.GetRepField<CWE>(25);
+        this.InitiatingLocation = segment.GetField<CWE>(26);
+        this.PackagingAssemblyLocation = segment.GetField<CWE>(27);
+        this.ActualDrugStrengthVolume = segment.GetField<NM>(28);
+        this.ActualDrugStrengthVolumeUnits = segment.GetField<CWE>(29);
+        this.DispensetoPharmacy = segment.GetField<CWE>(30);
+        this.DispensetoPharmacyAddress = segment.GetField<XAD>(31);
+        this.PharmacyOrderType = segment.GetField<ID>(32);
+        this.DispenseType = segment.GetField<CWE>(33);
+        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(34);
+        this.DispenseTagIdentifier = segment.GetRepField<EI>(35);
     }
 }
 
 public sealed record RXE : Hl7Segment {
+    public ST? QuantityTiming { get; }
     public CWE GiveCode { get; }
     public NM GiveAmountMinimum { get; }
     public NM? GiveAmountMaximum { get; }
     public CWE GiveUnits { get; }
     public CWE? GiveDosageForm { get; }
     public ICollection<CWE>? ProvidersAdministrationInstructions { get; }
+    public ST? DeliverToLocation { get; }
     public ID? SubstitutionStatus { get; }
     public NM? DispenseAmount { get; }
     public CWE? DispenseUnits { get; }
@@ -5470,55 +5586,58 @@ public sealed record RXE : Hl7Segment {
     public ICollection<XTN>? PharmacyPhoneNumber { get; }
 
     public RXE(Segment segment) : base(typeof(RXE), segment) {
-        this.GiveCode = segment.GetRequiredField<CWE>(1);
-        this.GiveAmountMinimum = segment.GetRequiredField<NM>(2);
-        this.GiveAmountMaximum = segment.GetField<NM>(3);
-        this.GiveUnits = segment.GetRequiredField<CWE>(4);
-        this.GiveDosageForm = segment.GetField<CWE>(5);
-        this.ProvidersAdministrationInstructions = segment.GetRepField<CWE>(6);
-        this.SubstitutionStatus = segment.GetField<ID>(7);
-        this.DispenseAmount = segment.GetField<NM>(8);
-        this.DispenseUnits = segment.GetField<CWE>(9);
-        this.NumberOfRefills = segment.GetField<NM>(10);
-        this.OrderingProvidersDEANumber = segment.GetRepField<XCN>(11);
-        this.PharmacistTreatmentSuppliersVerifierID = segment.GetRepField<XCN>(12);
-        this.PrescriptionNumber = segment.GetField<ST>(13);
-        this.NumberofRefillsRemaining = segment.GetField<NM>(14);
-        this.NumberofRefillsDosesDispensed = segment.GetField<NM>(15);
-        this.DTofMostRecentRefillorDoseDispensed = segment.GetField<DTM>(16);
-        this.TotalDailyDose = segment.GetField<CQ>(17);
-        this.NeedsHumanReview = segment.GetField<ID>(18);
-        this.SpecialDispensingInstructions = segment.GetRepField<CWE>(19);
-        this.GivePer = segment.GetField<ST>(20);
-        this.GiveRateAmount = segment.GetField<ST>(21);
-        this.GiveRateUnits = segment.GetField<CWE>(22);
-        this.GiveStrength = segment.GetField<NM>(23);
-        this.GiveStrengthUnits = segment.GetField<CWE>(24);
-        this.GiveIndication = segment.GetRepField<CWE>(25);
-        this.DispensePackageSize = segment.GetField<NM>(26);
-        this.DispensePackageSizeUnit = segment.GetField<CWE>(27);
-        this.DispensePackageMethod = segment.GetField<ID>(28);
-        this.SupplementaryCode = segment.GetRepField<CWE>(29);
-        this.OriginalOrderDateTime = segment.GetField<DTM>(30);
-        this.GiveDrugStrengthVolume = segment.GetField<NM>(31);
-        this.GiveDrugStrengthVolumeUnits = segment.GetField<CWE>(32);
-        this.ControlledSubstanceSchedule = segment.GetField<CWE>(33);
-        this.FormularyStatus = segment.GetField<ID>(34);
-        this.PharmaceuticalSubstanceAlternative = segment.GetRepField<CWE>(35);
-        this.PharmacyofMostRecentFill = segment.GetField<CWE>(36);
-        this.InitialDispenseAmount = segment.GetField<NM>(37);
-        this.DispensingPharmacy = segment.GetField<CWE>(38);
-        this.DispensingPharmacyAddress = segment.GetField<XAD>(39);
-        this.DelivertoPatientLocation = segment.GetField<PL>(40);
-        this.DelivertoAddress = segment.GetField<XAD>(41);
-        this.PharmacyOrderType = segment.GetField<ID>(42);
-        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(43);
+        this.QuantityTiming = segment.GetField<ST>(1);
+        this.GiveCode = segment.GetRequiredField<CWE>(2);
+        this.GiveAmountMinimum = segment.GetRequiredField<NM>(3);
+        this.GiveAmountMaximum = segment.GetField<NM>(4);
+        this.GiveUnits = segment.GetRequiredField<CWE>(5);
+        this.GiveDosageForm = segment.GetField<CWE>(6);
+        this.ProvidersAdministrationInstructions = segment.GetRepField<CWE>(7);
+        this.DeliverToLocation = segment.GetField<ST>(8);
+        this.SubstitutionStatus = segment.GetField<ID>(9);
+        this.DispenseAmount = segment.GetField<NM>(10);
+        this.DispenseUnits = segment.GetField<CWE>(11);
+        this.NumberOfRefills = segment.GetField<NM>(12);
+        this.OrderingProvidersDEANumber = segment.GetRepField<XCN>(13);
+        this.PharmacistTreatmentSuppliersVerifierID = segment.GetRepField<XCN>(14);
+        this.PrescriptionNumber = segment.GetField<ST>(15);
+        this.NumberofRefillsRemaining = segment.GetField<NM>(16);
+        this.NumberofRefillsDosesDispensed = segment.GetField<NM>(17);
+        this.DTofMostRecentRefillorDoseDispensed = segment.GetField<DTM>(18);
+        this.TotalDailyDose = segment.GetField<CQ>(19);
+        this.NeedsHumanReview = segment.GetField<ID>(20);
+        this.SpecialDispensingInstructions = segment.GetRepField<CWE>(21);
+        this.GivePer = segment.GetField<ST>(22);
+        this.GiveRateAmount = segment.GetField<ST>(23);
+        this.GiveRateUnits = segment.GetField<CWE>(24);
+        this.GiveStrength = segment.GetField<NM>(25);
+        this.GiveStrengthUnits = segment.GetField<CWE>(26);
+        this.GiveIndication = segment.GetRepField<CWE>(27);
+        this.DispensePackageSize = segment.GetField<NM>(28);
+        this.DispensePackageSizeUnit = segment.GetField<CWE>(29);
+        this.DispensePackageMethod = segment.GetField<ID>(30);
+        this.SupplementaryCode = segment.GetRepField<CWE>(31);
+        this.OriginalOrderDateTime = segment.GetField<DTM>(32);
+        this.GiveDrugStrengthVolume = segment.GetField<NM>(33);
+        this.GiveDrugStrengthVolumeUnits = segment.GetField<CWE>(34);
+        this.ControlledSubstanceSchedule = segment.GetField<CWE>(35);
+        this.FormularyStatus = segment.GetField<ID>(36);
+        this.PharmaceuticalSubstanceAlternative = segment.GetRepField<CWE>(37);
+        this.PharmacyofMostRecentFill = segment.GetField<CWE>(38);
+        this.InitialDispenseAmount = segment.GetField<NM>(39);
+        this.DispensingPharmacy = segment.GetField<CWE>(40);
+        this.DispensingPharmacyAddress = segment.GetField<XAD>(41);
+        this.DelivertoPatientLocation = segment.GetField<PL>(42);
+        this.DelivertoAddress = segment.GetField<XAD>(43);
+        this.PharmacyOrderType = segment.GetField<ID>(44);
+        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(45);
     }
 }
 
 public sealed record RXG : Hl7Segment {
     public NM GiveSubIDCounter { get; }
     public NM? DispenseSubIDCounter { get; }
+    public ST? QuantityTiming { get; }
     public CWE GiveCode { get; }
     public NM GiveAmountMinimum { get; }
     public NM? GiveAmountMaximum { get; }
@@ -5526,6 +5645,7 @@ public sealed record RXG : Hl7Segment {
     public CWE? GiveDosageForm { get; }
     public ICollection<CWE>? AdministrationNotes { get; }
     public ID? SubstitutionStatus { get; }
+    public ST? DispensetoLocation { get; }
     public ID? NeedsHumanReview { get; }
     public ICollection<CWE>? SpecialAdministrationInstructions { get; }
     public ST? GivePer { get; }
@@ -5552,35 +5672,37 @@ public sealed record RXG : Hl7Segment {
     public RXG(Segment segment) : base(typeof(RXG), segment) {
         this.GiveSubIDCounter = segment.GetRequiredField<NM>(1);
         this.DispenseSubIDCounter = segment.GetField<NM>(2);
-        this.GiveCode = segment.GetRequiredField<CWE>(3);
-        this.GiveAmountMinimum = segment.GetRequiredField<NM>(4);
-        this.GiveAmountMaximum = segment.GetField<NM>(5);
-        this.GiveUnits = segment.GetRequiredField<CWE>(6);
-        this.GiveDosageForm = segment.GetField<CWE>(7);
-        this.AdministrationNotes = segment.GetRepField<CWE>(8);
-        this.SubstitutionStatus = segment.GetField<ID>(9);
-        this.NeedsHumanReview = segment.GetField<ID>(10);
-        this.SpecialAdministrationInstructions = segment.GetRepField<CWE>(11);
-        this.GivePer = segment.GetField<ST>(12);
-        this.GiveRateAmount = segment.GetField<ST>(13);
-        this.GiveRateUnits = segment.GetField<CWE>(14);
-        this.GiveStrength = segment.GetField<NM>(15);
-        this.GiveStrengthUnits = segment.GetField<CWE>(16);
-        this.SubstanceLotNumber = segment.GetRepField<ST>(17);
-        this.SubstanceExpirationDate = segment.GetRepField<DTM>(18);
-        this.SubstanceManufacturerName = segment.GetRepField<CWE>(19);
-        this.Indication = segment.GetRepField<CWE>(20);
-        this.GiveDrugStrengthVolume = segment.GetField<NM>(21);
-        this.GiveDrugStrengthVolumeUnits = segment.GetField<CWE>(22);
-        this.GiveBarcodeIdentifier = segment.GetField<CWE>(23);
-        this.PharmacyOrderType = segment.GetField<ID>(24);
-        this.DispensetoPharmacy = segment.GetField<CWE>(25);
-        this.DispensetoPharmacyAddress = segment.GetField<XAD>(26);
-        this.DelivertoPatientLocation = segment.GetField<PL>(27);
-        this.DelivertoAddress = segment.GetField<XAD>(28);
-        this.GiveTagIdentifier = segment.GetRepField<EI>(29);
-        this.DispenseAmount = segment.GetField<NM>(30);
-        this.DispenseUnits = segment.GetField<CWE>(31);
+        this.QuantityTiming = segment.GetField<ST>(3);
+        this.GiveCode = segment.GetRequiredField<CWE>(4);
+        this.GiveAmountMinimum = segment.GetRequiredField<NM>(5);
+        this.GiveAmountMaximum = segment.GetField<NM>(6);
+        this.GiveUnits = segment.GetRequiredField<CWE>(7);
+        this.GiveDosageForm = segment.GetField<CWE>(8);
+        this.AdministrationNotes = segment.GetRepField<CWE>(9);
+        this.SubstitutionStatus = segment.GetField<ID>(10);
+        this.DispensetoLocation = segment.GetField<ST>(11);
+        this.NeedsHumanReview = segment.GetField<ID>(12);
+        this.SpecialAdministrationInstructions = segment.GetRepField<CWE>(13);
+        this.GivePer = segment.GetField<ST>(14);
+        this.GiveRateAmount = segment.GetField<ST>(15);
+        this.GiveRateUnits = segment.GetField<CWE>(16);
+        this.GiveStrength = segment.GetField<NM>(17);
+        this.GiveStrengthUnits = segment.GetField<CWE>(18);
+        this.SubstanceLotNumber = segment.GetRepField<ST>(19);
+        this.SubstanceExpirationDate = segment.GetRepField<DTM>(20);
+        this.SubstanceManufacturerName = segment.GetRepField<CWE>(21);
+        this.Indication = segment.GetRepField<CWE>(22);
+        this.GiveDrugStrengthVolume = segment.GetField<NM>(23);
+        this.GiveDrugStrengthVolumeUnits = segment.GetField<CWE>(24);
+        this.GiveBarcodeIdentifier = segment.GetField<CWE>(25);
+        this.PharmacyOrderType = segment.GetField<ID>(26);
+        this.DispensetoPharmacy = segment.GetField<CWE>(27);
+        this.DispensetoPharmacyAddress = segment.GetField<XAD>(28);
+        this.DelivertoPatientLocation = segment.GetField<PL>(29);
+        this.DelivertoAddress = segment.GetField<XAD>(30);
+        this.GiveTagIdentifier = segment.GetRepField<EI>(31);
+        this.DispenseAmount = segment.GetField<NM>(32);
+        this.DispenseUnits = segment.GetField<CWE>(33);
     }
 }
 
@@ -5592,6 +5714,7 @@ public sealed record RXO : Hl7Segment {
     public CWE? RequestedDosageForm { get; }
     public ICollection<CWE>? ProvidersPharmacyTreatmentInstructions { get; }
     public ICollection<CWE>? ProvidersAdministrationInstructions { get; }
+    public ST? DeliverToLocation { get; }
     public ID? AllowSubstitutions { get; }
     public CWE? RequestedDispenseCode { get; }
     public NM? RequestedDispenseAmount { get; }
@@ -5629,34 +5752,35 @@ public sealed record RXO : Hl7Segment {
         this.RequestedDosageForm = segment.GetField<CWE>(5);
         this.ProvidersPharmacyTreatmentInstructions = segment.GetRepField<CWE>(6);
         this.ProvidersAdministrationInstructions = segment.GetRepField<CWE>(7);
-        this.AllowSubstitutions = segment.GetField<ID>(8);
-        this.RequestedDispenseCode = segment.GetField<CWE>(9);
-        this.RequestedDispenseAmount = segment.GetField<NM>(10);
-        this.RequestedDispenseUnits = segment.GetField<CWE>(11);
-        this.NumberOfRefills = segment.GetField<NM>(12);
-        this.OrderingProvidersDEANumber = segment.GetField<XCN>(13);
-        this.PharmacistTreatmentSuppliersVerifierID = segment.GetField<XCN>(14);
-        this.NeedsHumanReview = segment.GetField<ID>(15);
-        this.RequestedGivePer = segment.GetField<ST>(16);
-        this.RequestedGiveStrength = segment.GetField<NM>(17);
-        this.RequestedGiveStrengthUnits = segment.GetField<CWE>(18);
-        this.Indication = segment.GetRepField<CWE>(19);
-        this.RequestedGiveRateAmount = segment.GetField<ST>(20);
-        this.RequestedGiveRateUnits = segment.GetField<CWE>(21);
-        this.TotalDailyDose = segment.GetField<CQ>(22);
-        this.SupplementaryCode = segment.GetRepField<CWE>(23);
-        this.RequestedDrugStrengthVolume = segment.GetField<NM>(24);
-        this.RequestedDrugStrengthVolumeUnits = segment.GetField<CWE>(25);
-        this.PharmacyOrderType = segment.GetField<ID>(26);
-        this.DispensingInterval = segment.GetField<NM>(27);
-        this.MedicationInstanceIdentifier = segment.GetField<EI>(28);
-        this.SegmentInstanceIdentifier = segment.GetField<EI>(29);
-        this.MoodCode = segment.GetField<CNE>(30);
-        this.DispensingPharmacy = segment.GetField<CWE>(31);
-        this.DispensingPharmacyAddress = segment.GetField<XAD>(32);
-        this.DelivertoPatientLocation = segment.GetField<PL>(33);
-        this.DelivertoAddress = segment.GetField<XAD>(34);
-        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(35);
+        this.DeliverToLocation = segment.GetField<ST>(8);
+        this.AllowSubstitutions = segment.GetField<ID>(9);
+        this.RequestedDispenseCode = segment.GetField<CWE>(10);
+        this.RequestedDispenseAmount = segment.GetField<NM>(11);
+        this.RequestedDispenseUnits = segment.GetField<CWE>(12);
+        this.NumberOfRefills = segment.GetField<NM>(13);
+        this.OrderingProvidersDEANumber = segment.GetField<XCN>(14);
+        this.PharmacistTreatmentSuppliersVerifierID = segment.GetField<XCN>(15);
+        this.NeedsHumanReview = segment.GetField<ID>(16);
+        this.RequestedGivePer = segment.GetField<ST>(17);
+        this.RequestedGiveStrength = segment.GetField<NM>(18);
+        this.RequestedGiveStrengthUnits = segment.GetField<CWE>(19);
+        this.Indication = segment.GetRepField<CWE>(20);
+        this.RequestedGiveRateAmount = segment.GetField<ST>(21);
+        this.RequestedGiveRateUnits = segment.GetField<CWE>(22);
+        this.TotalDailyDose = segment.GetField<CQ>(23);
+        this.SupplementaryCode = segment.GetRepField<CWE>(24);
+        this.RequestedDrugStrengthVolume = segment.GetField<NM>(25);
+        this.RequestedDrugStrengthVolumeUnits = segment.GetField<CWE>(26);
+        this.PharmacyOrderType = segment.GetField<ID>(27);
+        this.DispensingInterval = segment.GetField<NM>(28);
+        this.MedicationInstanceIdentifier = segment.GetField<EI>(29);
+        this.SegmentInstanceIdentifier = segment.GetField<EI>(30);
+        this.MoodCode = segment.GetField<CNE>(31);
+        this.DispensingPharmacy = segment.GetField<CWE>(32);
+        this.DispensingPharmacyAddress = segment.GetField<XAD>(33);
+        this.DelivertoPatientLocation = segment.GetField<PL>(34);
+        this.DelivertoAddress = segment.GetField<XAD>(35);
+        this.PharmacyPhoneNumber = segment.GetRepField<XTN>(36);
     }
 }
 
@@ -5734,6 +5858,7 @@ public sealed record SAC : Hl7Segment {
     public EI? ContainerIdentifier { get; }
     public EI? Primary { get; }
     public EI? EquipmentContainerIdentifier { get; }
+    public ST? SpecimenSource { get; }
     public DTM? RegistrationDateTime { get; }
     public CWE? ContainerStatus { get; }
     public CWE? CarrierType { get; }
@@ -5784,49 +5909,50 @@ public sealed record SAC : Hl7Segment {
         this.ContainerIdentifier = segment.GetField<EI>(3);
         this.Primary = segment.GetField<EI>(4);
         this.EquipmentContainerIdentifier = segment.GetField<EI>(5);
-        this.RegistrationDateTime = segment.GetField<DTM>(6);
-        this.ContainerStatus = segment.GetField<CWE>(7);
-        this.CarrierType = segment.GetField<CWE>(8);
-        this.CarrierIdentifier = segment.GetField<EI>(9);
-        this.PositioninCarrier = segment.GetField<NA>(10);
-        this.TrayTypeSAC = segment.GetField<CWE>(11);
-        this.TrayIdentifier = segment.GetField<EI>(12);
-        this.PositioninTray = segment.GetField<NA>(13);
-        this.Location = segment.GetRepField<CWE>(14);
-        this.ContainerHeight = segment.GetField<NM>(15);
-        this.ContainerDiameter = segment.GetField<NM>(16);
-        this.BarrierDelta = segment.GetField<NM>(17);
-        this.BottomDelta = segment.GetField<NM>(18);
-        this.ContainerHeightDiameterDeltaUnits = segment.GetField<CWE>(19);
-        this.ContainerVolume = segment.GetField<NM>(20);
-        this.AvailableSpecimenVolume = segment.GetField<NM>(21);
-        this.InitialSpecimenVolume = segment.GetField<NM>(22);
-        this.VolumeUnits = segment.GetField<CWE>(23);
-        this.SeparatorType = segment.GetField<CWE>(24);
-        this.CapType = segment.GetField<CWE>(25);
-        this.Additive = segment.GetRepField<CWE>(26);
-        this.SpecimenComponent = segment.GetField<CWE>(27);
-        this.DilutionFactor = segment.GetField<SN>(28);
-        this.Treatment = segment.GetField<CWE>(29);
-        this.Temperature = segment.GetField<SN>(30);
-        this.HemolysisIndex = segment.GetField<NM>(31);
-        this.HemolysisIndexUnits = segment.GetField<CWE>(32);
-        this.LipemiaIndex = segment.GetField<NM>(33);
-        this.LipemiaIndexUnits = segment.GetField<CWE>(34);
-        this.IcterusIndex = segment.GetField<NM>(35);
-        this.IcterusIndexUnits = segment.GetField<CWE>(36);
-        this.FibrinIndex = segment.GetField<NM>(37);
-        this.FibrinIndexUnits = segment.GetField<CWE>(38);
-        this.SystemInducedContaminants = segment.GetRepField<CWE>(39);
-        this.DrugInterference = segment.GetRepField<CWE>(40);
-        this.ArtificialBlood = segment.GetField<CWE>(41);
-        this.SpecialHandlingCode = segment.GetRepField<CWE>(42);
-        this.OtherEnvironmentalFactors = segment.GetRepField<CWE>(43);
-        this.ContainerLength = segment.GetField<CQ>(44);
-        this.ContainerWidth = segment.GetField<CQ>(45);
-        this.ContainerForm = segment.GetField<CWE>(46);
-        this.ContainerMaterial = segment.GetField<CWE>(47);
-        this.ContainerCommonName = segment.GetField<CWE>(48);
+        this.SpecimenSource = segment.GetField<ST>(6);
+        this.RegistrationDateTime = segment.GetField<DTM>(7);
+        this.ContainerStatus = segment.GetField<CWE>(8);
+        this.CarrierType = segment.GetField<CWE>(9);
+        this.CarrierIdentifier = segment.GetField<EI>(10);
+        this.PositioninCarrier = segment.GetField<NA>(11);
+        this.TrayTypeSAC = segment.GetField<CWE>(12);
+        this.TrayIdentifier = segment.GetField<EI>(13);
+        this.PositioninTray = segment.GetField<NA>(14);
+        this.Location = segment.GetRepField<CWE>(15);
+        this.ContainerHeight = segment.GetField<NM>(16);
+        this.ContainerDiameter = segment.GetField<NM>(17);
+        this.BarrierDelta = segment.GetField<NM>(18);
+        this.BottomDelta = segment.GetField<NM>(19);
+        this.ContainerHeightDiameterDeltaUnits = segment.GetField<CWE>(20);
+        this.ContainerVolume = segment.GetField<NM>(21);
+        this.AvailableSpecimenVolume = segment.GetField<NM>(22);
+        this.InitialSpecimenVolume = segment.GetField<NM>(23);
+        this.VolumeUnits = segment.GetField<CWE>(24);
+        this.SeparatorType = segment.GetField<CWE>(25);
+        this.CapType = segment.GetField<CWE>(26);
+        this.Additive = segment.GetRepField<CWE>(27);
+        this.SpecimenComponent = segment.GetField<CWE>(28);
+        this.DilutionFactor = segment.GetField<SN>(29);
+        this.Treatment = segment.GetField<CWE>(30);
+        this.Temperature = segment.GetField<SN>(31);
+        this.HemolysisIndex = segment.GetField<NM>(32);
+        this.HemolysisIndexUnits = segment.GetField<CWE>(33);
+        this.LipemiaIndex = segment.GetField<NM>(34);
+        this.LipemiaIndexUnits = segment.GetField<CWE>(35);
+        this.IcterusIndex = segment.GetField<NM>(36);
+        this.IcterusIndexUnits = segment.GetField<CWE>(37);
+        this.FibrinIndex = segment.GetField<NM>(38);
+        this.FibrinIndexUnits = segment.GetField<CWE>(39);
+        this.SystemInducedContaminants = segment.GetRepField<CWE>(40);
+        this.DrugInterference = segment.GetRepField<CWE>(41);
+        this.ArtificialBlood = segment.GetField<CWE>(42);
+        this.SpecialHandlingCode = segment.GetRepField<CWE>(43);
+        this.OtherEnvironmentalFactors = segment.GetRepField<CWE>(44);
+        this.ContainerLength = segment.GetField<CQ>(45);
+        this.ContainerWidth = segment.GetField<CQ>(46);
+        this.ContainerForm = segment.GetField<CWE>(47);
+        this.ContainerMaterial = segment.GetField<CWE>(48);
+        this.ContainerCommonName = segment.GetField<CWE>(49);
     }
 }
 
@@ -5921,6 +6047,7 @@ public sealed record SCH : Hl7Segment {
     public CWE? AppointmentType { get; }
     public NM? AppointmentDuration { get; }
     public CNE? AppointmentDurationUnits { get; }
+    public ST? AppointmentTimingQuantity { get; }
     public ICollection<XCN>? PlacerContactPerson { get; }
     public XTN? PlacerContactPhoneNumber { get; }
     public ICollection<XAD>? PlacerContactAddress { get; }
@@ -5950,23 +6077,24 @@ public sealed record SCH : Hl7Segment {
         this.AppointmentType = segment.GetField<CWE>(8);
         this.AppointmentDuration = segment.GetField<NM>(9);
         this.AppointmentDurationUnits = segment.GetField<CNE>(10);
-        this.PlacerContactPerson = segment.GetRepField<XCN>(11);
-        this.PlacerContactPhoneNumber = segment.GetField<XTN>(12);
-        this.PlacerContactAddress = segment.GetRepField<XAD>(13);
-        this.PlacerContactLocation = segment.GetField<PL>(14);
-        this.FillerContactPerson = segment.GetRequiredRepField<XCN>(15);
-        this.FillerContactPhoneNumber = segment.GetField<XTN>(16);
-        this.FillerContactAddress = segment.GetRepField<XAD>(17);
-        this.FillerContactLocation = segment.GetField<PL>(18);
-        this.EnteredByPerson = segment.GetRequiredRepField<XCN>(19);
-        this.EnteredByPhoneNumber = segment.GetRepField<XTN>(20);
-        this.EnteredByLocation = segment.GetField<PL>(21);
-        this.ParentPlacerAppointmentID = segment.GetField<EI>(22);
-        this.ParentFillerAppointmentID = segment.GetField<EI>(23);
-        this.FillerStatusCode = segment.GetField<CWE>(24);
-        this.PlacerOrderNumber = segment.GetField<EI>(25);
-        this.FillerOrderNumber = segment.GetField<EI>(26);
-        this.AlternatePlacerOrderGroupNumber = segment.GetField<EIP>(27);
+        this.AppointmentTimingQuantity = segment.GetField<ST>(11);
+        this.PlacerContactPerson = segment.GetRepField<XCN>(12);
+        this.PlacerContactPhoneNumber = segment.GetField<XTN>(13);
+        this.PlacerContactAddress = segment.GetRepField<XAD>(14);
+        this.PlacerContactLocation = segment.GetField<PL>(15);
+        this.FillerContactPerson = segment.GetRequiredRepField<XCN>(16);
+        this.FillerContactPhoneNumber = segment.GetField<XTN>(17);
+        this.FillerContactAddress = segment.GetRepField<XAD>(18);
+        this.FillerContactLocation = segment.GetField<PL>(19);
+        this.EnteredByPerson = segment.GetRequiredRepField<XCN>(20);
+        this.EnteredByPhoneNumber = segment.GetRepField<XTN>(21);
+        this.EnteredByLocation = segment.GetField<PL>(22);
+        this.ParentPlacerAppointmentID = segment.GetField<EI>(23);
+        this.ParentFillerAppointmentID = segment.GetField<EI>(24);
+        this.FillerStatusCode = segment.GetField<CWE>(25);
+        this.PlacerOrderNumber = segment.GetField<EI>(26);
+        this.FillerOrderNumber = segment.GetField<EI>(27);
+        this.AlternatePlacerOrderGroupNumber = segment.GetField<EIP>(28);
     }
 }
 
@@ -6291,6 +6419,7 @@ public sealed record STZ : Hl7Segment {
 public sealed record TCC : Hl7Segment {
     public CWE UniversalServiceIdentifier { get; }
     public EI EquipmentTestApplicationIdentifier { get; }
+    public ST? SpecimenSource { get; }
     public SN? AutoDilutionFactorDefault { get; }
     public SN? RerunDilutionFactorDefault { get; }
     public SN? PreDilutionFactorDefault { get; }
@@ -6307,18 +6436,19 @@ public sealed record TCC : Hl7Segment {
     public TCC(Segment segment) : base(typeof(TCC), segment) {
         this.UniversalServiceIdentifier = segment.GetRequiredField<CWE>(1);
         this.EquipmentTestApplicationIdentifier = segment.GetRequiredField<EI>(2);
-        this.AutoDilutionFactorDefault = segment.GetField<SN>(3);
-        this.RerunDilutionFactorDefault = segment.GetField<SN>(4);
-        this.PreDilutionFactorDefault = segment.GetField<SN>(5);
-        this.EndogenousContentofPreDilutionDiluent = segment.GetField<SN>(6);
-        this.InventoryLimitsWarningLevel = segment.GetField<NM>(7);
-        this.AutomaticRerunAllowed = segment.GetField<ID>(8);
-        this.AutomaticRepeatAllowed = segment.GetField<ID>(9);
-        this.AutomaticReflexAllowed = segment.GetField<ID>(10);
-        this.EquipmentDynamicRange = segment.GetField<SN>(11);
-        this.Units = segment.GetField<CWE>(12);
-        this.ProcessingType = segment.GetField<CWE>(13);
-        this.TestCriticality = segment.GetField<CWE>(14);
+        this.SpecimenSource = segment.GetField<ST>(3);
+        this.AutoDilutionFactorDefault = segment.GetField<SN>(4);
+        this.RerunDilutionFactorDefault = segment.GetField<SN>(5);
+        this.PreDilutionFactorDefault = segment.GetField<SN>(6);
+        this.EndogenousContentofPreDilutionDiluent = segment.GetField<SN>(7);
+        this.InventoryLimitsWarningLevel = segment.GetField<NM>(8);
+        this.AutomaticRerunAllowed = segment.GetField<ID>(9);
+        this.AutomaticRepeatAllowed = segment.GetField<ID>(10);
+        this.AutomaticReflexAllowed = segment.GetField<ID>(11);
+        this.EquipmentDynamicRange = segment.GetField<SN>(12);
+        this.Units = segment.GetField<CWE>(13);
+        this.ProcessingType = segment.GetField<CWE>(14);
+        this.TestCriticality = segment.GetField<CWE>(15);
     }
 }
 
@@ -6484,9 +6614,53 @@ public sealed record UAC : Hl7Segment {
 
 public sealed record UB1 : Hl7Segment {
     public SI? SetIDUB1 { get; }
+    public ST? BloodDeductible { get; }
+    public ST? BloodFurnishedPints { get; }
+    public ST? BloodReplacedPints { get; }
+    public ST? BloodNotReplacedPints { get; }
+    public ST? CoInsuranceDays { get; }
+    public ST? ConditionCode { get; }
+    public ST? CoveredDays { get; }
+    public ST? NonCoveredDays { get; }
+    public ST? ValueAmountCode { get; }
+    public ST? NumberOfGraceDays { get; }
+    public ST? SpecialProgramIndicator { get; }
+    public ST? PSROURApprovalIndicator { get; }
+    public ST? PSROURApprovedStayFm { get; }
+    public ST? PSROURApprovedStayTo { get; }
+    public ST? Occurrence { get; }
+    public ST? OccurrenceSpan { get; }
+    public ST? OccurSpanStartDate { get; }
+    public ST? OccurSpanEndDate { get; }
+    public ST? UB82Locator2 { get; }
+    public ST? UB82Locator9 { get; }
+    public ST? UB82Locator27 { get; }
+    public ST? UB82Locator45 { get; }
 
     public UB1(Segment segment) : base(typeof(UB1), segment) {
         this.SetIDUB1 = segment.GetField<SI>(1);
+        this.BloodDeductible = segment.GetField<ST>(2);
+        this.BloodFurnishedPints = segment.GetField<ST>(3);
+        this.BloodReplacedPints = segment.GetField<ST>(4);
+        this.BloodNotReplacedPints = segment.GetField<ST>(5);
+        this.CoInsuranceDays = segment.GetField<ST>(6);
+        this.ConditionCode = segment.GetField<ST>(7);
+        this.CoveredDays = segment.GetField<ST>(8);
+        this.NonCoveredDays = segment.GetField<ST>(9);
+        this.ValueAmountCode = segment.GetField<ST>(10);
+        this.NumberOfGraceDays = segment.GetField<ST>(11);
+        this.SpecialProgramIndicator = segment.GetField<ST>(12);
+        this.PSROURApprovalIndicator = segment.GetField<ST>(13);
+        this.PSROURApprovedStayFm = segment.GetField<ST>(14);
+        this.PSROURApprovedStayTo = segment.GetField<ST>(15);
+        this.Occurrence = segment.GetField<ST>(16);
+        this.OccurrenceSpan = segment.GetField<ST>(17);
+        this.OccurSpanStartDate = segment.GetField<ST>(18);
+        this.OccurSpanEndDate = segment.GetField<ST>(19);
+        this.UB82Locator2 = segment.GetField<ST>(20);
+        this.UB82Locator9 = segment.GetField<ST>(21);
+        this.UB82Locator27 = segment.GetField<ST>(22);
+        this.UB82Locator45 = segment.GetField<ST>(23);
     }
 }
 
