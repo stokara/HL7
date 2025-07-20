@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HL7;
@@ -35,24 +36,46 @@ public class SamplesTests {
     }
 
     [Fact]
-    public void Convert_All_SampleFiles_Into_HL7Data() {
+    public void Roundtrip_All_SampleFiles_Into_HL7Data() {
         var sampleFilesPath = Path.Combine(Directory.GetCurrentDirectory(), "Sample Files");
-        var files = Directory.GetFiles(sampleFilesPath, "*.*");
+        var filenames = Directory.GetFiles(sampleFilesPath, "*.*");
 
-        foreach (var file in files) {
-            var hl7Text = File.ReadAllText(file);
+        foreach (var filename in filenames) {
+            var sampleText = File.ReadAllText(filename);
+            var hl7Data = Hl7Message.Create(sampleText) ?? throw new Hl7Exception("Unable to Parse Message", Hl7Exception.ParsingError);
+            var str = hl7Data.Serialize();
+            var equivalence = areEquivalent(sampleText, str);
 
-            try {
-                var hl7Data = Hl7Message.Create(hl7Text) ?? throw new Hl7Exception("Unable to Parse Message", Hl7Exception.ParsingError);
-                var typeCounts = hl7Data.AllSegments
-                    .GroupBy(seg => seg.GetType())
-                    .Select(g => new { TypeName = g.Key.Name, Count = g.Count() })
-                    .OrderBy(x => x.TypeName);
-                var summary = string.Join(", ", typeCounts.Select(entry => $"{entry.TypeName}: {entry.Count}"));
-                testOutputHelper.WriteLine($"Converted {Path.GetFileName(file)} {summary}");
-            } catch (Exception ex) {
-                testOutputHelper.WriteLine($"Exception converting {Path.GetFileName(file)}: {ex.Message}");
+            if (!equivalence.areEquvalent) {
+                var segDiff = equivalence.failedSegmentNum == 0 ? "number of segments." : $"Segment {equivalence.failedSegmentNum + 1} ";
+                testOutputHelper.WriteLine($"File: {Path.GetFileName(filename)} differ at {segDiff}");
+                testOutputHelper.WriteLine($"Expected:\n{sampleText}");
+                testOutputHelper.WriteLine($"Actual:\n{str}");
             }
+            Assert.True(equivalence.areEquvalent);
         }
     }
+
+
+    private static (bool areEquvalent, int failedSegmentNum) areEquivalent(string expected, string sut) {
+        string[] lineEndings = ["\r\n", "\n", "\r"];
+        var expectedLines = expected.Split(lineEndings, StringSplitOptions.RemoveEmptyEntries);
+        var sutLines = sut.Split(lineEndings, StringSplitOptions.None);
+
+        if (expectedLines.Length != sutLines.Length) return (false, 0);
+
+        for (int i = 0; i < expectedLines.Length; i++) {
+            if (!compareSegmentLine(expectedLines[i], sutLines[i])) return (false, i+1);
+        }
+        return (true, -1);
+
+        bool compareSegmentLine(string expectedLine, string sutLine) {
+            if (sutLine.Length < expectedLine.Length) return false;
+            if (!sutLine.StartsWith(expectedLine)) return false;
+
+            var extra = sutLine[expectedLine.Length..];
+            return extra.Length <= 0 || extra.All(c => c == '|');
+        }
+    }
+
 }
