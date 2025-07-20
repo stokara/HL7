@@ -19,7 +19,7 @@ public record RawField {
         ReadOnlyCollection<RawComponent> splitRepeatedFields() =>
             rawFieldString
                 .Split(encoding.RepeatDelimiter)
-                .Select(f => new RawComponent(f, encoding, Hl7Structure.Hl7Component))
+                .Select(f => new RawComponent(f, encoding, Hl7Structure.Hl7Field))
                 .ToList()
                 .AsReadOnly();
     }

@@ -19,10 +19,10 @@ public record Segment {
         if (Name == "MSH") throw new Hl7Exception("Use MshSegment for MSH", Hl7Exception.BadMessage);
 
         this.Encoding = encoding;
-        this.RawFieldStrings = SplitFields(rawSegmentString);
+        this.RawFieldStrings = SplitFields(rawSegmentString, encoding.FieldDelimiter);
     }
 
-    protected List<string> SplitFields(string value) {
+    protected List<string> SplitFields(string value, char splitOn) {
         var fields = new List<string>();
         var sb = new StringBuilder();
         var inEscape = false;
@@ -34,8 +34,8 @@ public record Segment {
                 sb.Append(c);
                 continue;
             }
-
-            if (c == Encoding.FieldDelimiter && !inEscape) {
+           
+            if (c == splitOn && !inEscape) {
                 fields.Add(sb.ToString());
                 sb.Clear();
             } else {
@@ -60,17 +60,15 @@ public record Segment {
     public ICollection<T>? GetRepField<T>(int fieldNumber) where T : class, IHl7DataType {
         var fieldString = GetRawFieldString(fieldNumber);
         if (string.IsNullOrEmpty(fieldString)) return null;
-        var fieldStrings = SplitFields(fieldString);
+        var fieldStrings = SplitFields(fieldString, Encoding.RepeatDelimiter);
         return fieldStrings.Select(s => parseFieldString<T>(s)).ToList()!;
     }
 
     public ICollection<T> GetRequiredRepField<T>(int fieldNumber) where T : class, IHl7DataType {
         var fieldString = GetRawFieldString(fieldNumber, true);
-        var fieldStrings = SplitFields(fieldString!);
+        var fieldStrings = SplitFields(fieldString!, Encoding.RepeatDelimiter);
         return fieldStrings.Select(s => parseFieldString<T>(s)).ToList()!;
     }
-
-
 
     public virtual string? GetRawFieldString(int fieldNumber, bool isRequired = false) {
         // HL7 rawFields are 1-based after the segment name (Components[0] is the segment name)
@@ -91,7 +89,6 @@ public record Segment {
         return parseField<T>(rawField);
     }
     private static T? parseField<T>(RawField rawField) where T : class, IHl7DataType => rawField.Component?.Parse<T>(Hl7Structure.Hl7Component);
-      
 }
 
 public sealed record MshSegment : Segment {
@@ -108,7 +105,7 @@ public sealed record MshSegment : Segment {
 
         Encoding = Hl7Encoding.FromString(rawSegmentString[3..delimiterFieldEnd]);
         var fields = new List<string> { "MSH" };
-        fields.AddRange(SplitFields(rawSegmentString[(delimiterFieldEnd + 1)..]));
+        fields.AddRange(SplitFields(rawSegmentString[(delimiterFieldEnd + 1)..], Encoding.FieldDelimiter));
         RawFieldStrings = fields;
     }
 }
