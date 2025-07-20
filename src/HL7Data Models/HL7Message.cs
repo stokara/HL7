@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace HL7;
 
-public record Hl7Message : Hl7DataType{
+public record Hl7Message {
     private readonly List<Hl7Segment> allSegments = [];
 
     public MSH MSH => allSegments.OfType<MSH>().Single();
@@ -44,11 +44,12 @@ public record Hl7Message : Hl7DataType{
         }
     }
 
-    public string Serialize() => Serialize(MSH.Encoding, Hl7Structure.Hl7Message);
+   // public string Serialize() => Serialize(MSH.Encoding, Hl7Structure.Hl7Message);
 
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure sourceStructure) {
+    public string Serialize() {
         try {
-            return string.Join(encoding.SegmentDelimiter, AllSegments.Select(seg => seg.Serialize(encoding, Hl7Structure.Hl7Segment)));
+            var encoding = MSH.Encoding;
+            return string.Join(encoding.SegmentDelimiter, AllSegments.Select(segment => segment.Serialize(encoding)));
 
         } catch (Exception? ex) {
             throw new Hl7Exception("Failed to serialize the message with error - " + ex.Message, Hl7Exception.SerializationError, ex);

@@ -6,10 +6,9 @@ using System.Reflection;
 namespace HL7;
 
 public enum Hl7Structure {
-    Hl7Message,
     Hl7Segment,
-    Hl7Field,
     Hl7RepField,
+    Hl7Field,
     Hl7Component,
     Hl7SubComponent,
     Hl7None
@@ -24,7 +23,7 @@ public enum Complexity {
 public interface IHl7DataType {
     Hl7Structure? Structure { get; }
     Complexity? Complexity { get; }
-    public string Serialize(Hl7Encoding encoding, Hl7Structure sourceStructure);
+    public string Serialize(Hl7Encoding encoding, Hl7Structure structure);
     public static Hl7Structure GetChildStructure(Hl7Structure structure) {
         var next = (int)structure + 1;
         return Enum.IsDefined(typeof(Hl7Structure), next) ? (Hl7Structure)next : Hl7Structure.Hl7None;
@@ -43,7 +42,37 @@ public abstract record Hl7DataType : IHl7DataType {
 
     protected Hl7DataType() { }
 
-    public abstract string Serialize(Hl7Encoding encoding, Hl7Structure hl7Structure);
+    public abstract string Serialize(Hl7Encoding encoding, Hl7Structure structure);
+}
+
+public abstract record Hl7SimpleType : Hl7DataType {
+    protected Hl7SimpleType(Hl7Structure structure) : base(structure) {
+        Complexity = HL7.Complexity.Simple;
+    }
+
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure structure ) => StringValue ?? "";
+}
+
+public abstract record Hl7ComplexType : Hl7DataType {
+    protected Hl7ComplexType(Hl7Structure structure) : base(structure) {
+        Complexity = HL7.Complexity.Complex;
+    }
+
+    protected Hl7ComplexType() { }
+
+    public override string Serialize(Hl7Encoding encoding, Hl7Structure structure) {
+        if (this.Complexity == HL7.Complexity.Simple) return StringValue ?? "";
+        
+        var delimiter = encoding.GetDelimiter(structure);
+        var childStructure = IHl7DataType.GetChildStructure(structure);
+        var props = this.GetProperties().Select(p => p.GetValue(this)).ToArray();
+        return string.Join(delimiter, props.Select(v => (v as Hl7DataType)?.Serialize(encoding, childStructure) ?? string.Empty));
+    }
+
+    public override int GetHashCode() {
+        var components = GetProperties();
+        return components.Aggregate(0, (current, prop) => HashCode.Combine(current, prop.GetValue(this)?.GetHashCode() ?? 0));
+    }
 
     private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new();
 
@@ -55,35 +84,5 @@ public abstract record Hl7DataType : IHl7DataType {
         }
 
         return props;
-    }
-}
-
-public abstract record Hl7SimpleType : Hl7DataType {
-    protected Hl7SimpleType(Hl7Structure structure) : base(structure) {
-        Complexity = HL7.Complexity.Simple;
-    }
-
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure _ ) => StringValue ?? "";
-}
-
-public abstract record Hl7ComplexType : Hl7DataType {
-    protected Hl7ComplexType(Hl7Structure structure) : base(structure) {
-        Complexity = HL7.Complexity.Complex;
-    }
-
-    protected Hl7ComplexType() { }
-
-    public override string Serialize(Hl7Encoding encoding, Hl7Structure sourceStructure) {
-        if (this.Complexity == HL7.Complexity.Simple) return StringValue ?? "";
-        
-        var delimiter = encoding.GetDelimiter(sourceStructure);
-        var childStructure = IHl7DataType.GetChildStructure(sourceStructure);
-        var props = this.GetProperties().Select(p => p.GetValue(this)).ToArray();
-        return string.Join(delimiter, props.Select(v => (v as Hl7DataType)?.Serialize(encoding, childStructure) ?? string.Empty));
-    }
-
-    public override int GetHashCode() {
-        var components = GetProperties();
-        return components.Aggregate(0, (current, prop) => HashCode.Combine(current, prop.GetValue(this)?.GetHashCode() ?? 0));
     }
 }
