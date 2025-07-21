@@ -10,20 +10,20 @@ public record Hl7Encoding {
     public char RepeatDelimiter { get; init; }
     public char EscapeCharacter { get; init; }
     public char SubComponentDelimiter { get; init; }
+    public char? TruncationDelimiter { get; init; }
     public string SegmentDelimiter { get; init; }
-    public string PresentButNull { get; init; }
 
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
     public Hl7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
-        char subComponentDelimiter, string segmentDelimiter = "\r", string presentButNull = "\"\"") {
+        char subComponentDelimiter, string segmentDelimiter = "\r",  char? truncationDelimiter = null) {
         FieldDelimiter = fieldDelimiter;
         ComponentDelimiter = componentDelimiter;
         RepeatDelimiter = repeatDelimiter;
         EscapeCharacter = escapeCharacter;
         SubComponentDelimiter = subComponentDelimiter;
         SegmentDelimiter = segmentDelimiter;
-        PresentButNull = presentButNull;
+        TruncationDelimiter = truncationDelimiter;
     }
     
     public string GetDelimiter(Hl7Structure structure) {
@@ -39,14 +39,9 @@ public record Hl7Encoding {
     }
     
     public static Hl7Encoding FromString(string delimiters) {
-        var fieldDelimiter = delimiters[0];
-        var componentDelimiter = delimiters[1];
-        var repeatDelimiter = delimiters[2];
-        var escapeCharacter = delimiters[3];
-        var subComponentDelimiter = delimiters[4];
+        var truncationDelimiter = (delimiters.Length >= 6) ? delimiters[5] : (char?)null;
         var segmentDelimiter = SegmentDelimiters.FirstOrDefault(delimiters.Contains) ?? "\r\n";
-        return new Hl7Encoding(fieldDelimiter, componentDelimiter, repeatDelimiter, escapeCharacter,
-            subComponentDelimiter, segmentDelimiter);
+        return new Hl7Encoding(delimiters[0], delimiters[1], delimiters[2], delimiters[3], delimiters[4], segmentDelimiter, truncationDelimiter: truncationDelimiter);
     }
 
     public string Encode(string? val) {
@@ -198,7 +193,7 @@ public record Hl7Encoding {
     }
 
     //  |^~\&
-    public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}";
+    public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}{(TruncationDelimiter is null ? "" : TruncationDelimiter)}";
 }
 
 public static class HL7EncodingExtensions {

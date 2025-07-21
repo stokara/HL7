@@ -41,11 +41,11 @@ public record RawComponent {
         try {
             switch (Structure) {
                 case Hl7Structure.Hl7SubComponent:
-                    return ParseDataType<T>(this, Hl7Structure.Hl7Component);
+                    return ParseDataType<T>(this);
                 case Hl7Structure.Hl7Component: {
                     var str = getComponentString(index);
                     var rawComponent = new RawComponent(str, Encoding, Hl7Structure.Hl7SubComponent);
-                    return ParseDataType<T>(rawComponent, Hl7Structure.Hl7SubComponent);
+                    return ParseDataType<T>(rawComponent);
                 }
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -64,9 +64,9 @@ public record RawComponent {
         }
     }
 
-    public T Parse<T>(Hl7Structure sourceStructure) where T : class, IHl7DataType => ParseDataType<T>(this, sourceStructure);
-
-    public static T ParseDataType<T>(RawComponent rawComponent, Hl7Structure structure) where T : class, IHl7DataType {
+    public T Parse<T>() where T : class, IHl7DataType => ParseDataType<T>(this);
+    
+    public static T ParseDataType<T>(RawComponent rawComponent) where T : class, IHl7DataType {
         var type = typeof(T);
 
         if (constructorCache.TryGetValue(type, out var ctor) && ctor != null) {
@@ -75,19 +75,6 @@ public record RawComponent {
                 var paramType = valueParam.ParameterType;
                 object? value = paramType switch {
                     Type t when t == typeof(RawComponent) => rawComponent,
-                    Type t when t == typeof(string) => rawComponent.ComponentValue,
-                    Type t when t == typeof(IReadOnlyList<string>) => rawComponent.SubComponents,
-                    Type t when t == typeof(Instant?) => Hl7DateParser.ParseInstant(rawComponent.ComponentValue),
-                    Type t when t == typeof(decimal?) => decimal.TryParse(rawComponent.ComponentValue, out var d) ? d : null,
-                    Type t when t == typeof(int?) => int.TryParse(rawComponent.ComponentValue, out var i) ? i : null,
-                    _ => throw new NotSupportedException($"Unsupported parameter type {paramType.Name} for {type.Name}.")
-                };
-                return ctor.Invoke([value]) as T ?? throw new InvalidCastException($"Failed to cast {type.Name} from constructor result.");
-            }
-
-            if (parameters is [var singleParam]) {
-                var paramType = singleParam.ParameterType;
-                object? value = paramType switch {
                     Type t when t == typeof(string) => rawComponent.ComponentValue,
                     Type t when t == typeof(IReadOnlyList<string>) => rawComponent.SubComponents,
                     Type t when t == typeof(Instant?) => Hl7DateParser.ParseInstant(rawComponent.ComponentValue),

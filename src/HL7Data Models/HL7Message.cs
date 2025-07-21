@@ -8,6 +8,7 @@ public record Hl7Message {
     private readonly List<Hl7Segment> allSegments = [];
 
     public MSH MSH => allSegments.OfType<MSH>().Single();
+    public Hl7Encoding Encoding => MSH.Encoding;
 
     private Hl7Message() { }
 

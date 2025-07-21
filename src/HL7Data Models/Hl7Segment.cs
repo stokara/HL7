@@ -16,15 +16,15 @@ public abstract record Hl7Segment  {
     public string Serialize(Hl7Encoding encoding) {
         var props = this.GetProperties().ToArray();
         var type = this.GetType();
-        var initialString = $"{type.Name}{(type == typeof(MSH) ? encoding : encoding.FieldDelimiter)}";
+        var initialString = $"{type.Name}{(type == typeof(MSH) ? encoding.ToString() : encoding.FieldDelimiter)}";
         return initialString + string.Join(encoding.FieldDelimiter, props.Select(p => serializeProperty(p)));
 
         string serializeProperty(PropertyInfo propertyInfo) {
             if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)) {
                 var collection = propertyInfo.GetValue(this) as System.Collections.IEnumerable;
                 if (collection == null) return string.Empty;
-                var serializedItems = collection.OfType<Hl7DataType>().Select(hl7Item => hl7Item.Serialize(encoding, Hl7Structure.Hl7RepField));
-                return string.Join(encoding.FieldDelimiter.ToString(), serializedItems);
+                var serializedItems = collection.Cast<object?>().Select(item => (item as Hl7DataType)?.Serialize(encoding, Hl7Structure.Hl7RepField) ?? "");
+                return string.Join(encoding.RepeatDelimiter.ToString(), serializedItems);
             }
 
             var h = (propertyInfo.GetValue(this) as Hl7DataType);

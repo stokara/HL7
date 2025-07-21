@@ -47,24 +47,24 @@ public record Segment {
         return fields;
     }
 
-    public T? GetField<T>(int fieldNumber) where T : class, IHl7DataType {
+    public T? GetField<T>(int fieldNumber) where T : Hl7DataType {
         var fieldString = GetRawFieldString(fieldNumber);
         return parseFieldString<T>(fieldString);
     }
 
-    public T GetRequiredField<T>(int fieldNumber) where T : class, IHl7DataType {
+    public T GetRequiredField<T>(int fieldNumber) where T : Hl7DataType {
         var fieldString = GetRawFieldString(fieldNumber, isRequired: true);
         return parseFieldString<T>(fieldString)!;
     }
 
-    public ICollection<T>? GetRepField<T>(int fieldNumber) where T : class, IHl7DataType {
+    public ICollection<T>? GetRepField<T>(int fieldNumber) where T : Hl7DataType {
         var fieldString = GetRawFieldString(fieldNumber);
         if (string.IsNullOrEmpty(fieldString)) return null;
         var fieldStrings = SplitFields(fieldString, Encoding.RepeatDelimiter);
         return fieldStrings.Select(s => parseFieldString<T>(s)).ToList()!;
     }
 
-    public ICollection<T> GetRequiredRepField<T>(int fieldNumber) where T : class, IHl7DataType {
+    public ICollection<T> GetRequiredRepField<T>(int fieldNumber) where T : Hl7DataType {
         var fieldString = GetRawFieldString(fieldNumber, true);
         var fieldStrings = SplitFields(fieldString!, Encoding.RepeatDelimiter);
         return fieldStrings.Select(s => parseFieldString<T>(s)).ToList()!;
@@ -83,12 +83,12 @@ public record Segment {
         return result;
     }
 
-    private T? parseFieldString<T>(string? fieldString) where T : class, IHl7DataType {
+    private T? parseFieldString<T>(string? fieldString) where T : Hl7DataType {
         if (string.IsNullOrEmpty(fieldString)) return null;
-        var rawField = new RawField(fieldString, Encoding);
-        return parseField<T>(rawField);
+        var structure = (typeof(T).IsSubclassOf(typeof(Hl7SimpleType))) ? Hl7Structure.Hl7None : Hl7Structure.Hl7Field;
+        var fieldComponent = new RawComponent(fieldString, Encoding, structure);
+        return fieldComponent.Parse<T>();
     }
-    private static T? parseField<T>(RawField rawField) where T : class, IHl7DataType => rawField.Component?.Parse<T>(Hl7Structure.Hl7Component);
 }
 
 public sealed record MshSegment : Segment {
