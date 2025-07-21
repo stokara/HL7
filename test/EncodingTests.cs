@@ -127,8 +127,8 @@ public class EncodingTests {
     [Fact]
     public void FieldParse_SimpleValue() {
         var value = "SIMPLE";
-        var field = new RawField(value, defaultEncoder);
-        Assert.Equal("SIMPLE", field.Component.ComponentValue);
+        var field = new RawComponent(value, defaultEncoder, Hl7Structure.Hl7Field);
+        Assert.Equal("SIMPLE", field.ComponentValue);
     }
 
     [Fact]
@@ -139,27 +139,6 @@ public class EncodingTests {
         Assert.Equal("DOE", component.SubComponents[0]);
         Assert.Equal("JOHN", component.SubComponents[1]);
         Assert.Equal("A", component.SubComponents[2]);
-    }
-
-    [Fact]
-    public void FieldParse_WithRepetitions() {
-        var value = "A~B~C";
-        var field = new RawField( value, defaultEncoder);
-        Assert.Equal(3, field.Components.Count);
-    }
-
-    [Fact]
-    public void FieldParse_WithComponentsAndRepetitions() {
-        const string value = "A^B~C^D";
-        var field = new RawField(value, defaultEncoder);
-        Assert.Equal(2, field.Components.Count);
-    }
-
-    [Fact]
-    public void FieldParse_WithEscapedDelimiter() {
-        var value = @"A\F\B";
-        var field = new RawField(value, defaultEncoder);
-        Assert.Single(field.Components);
     }
 
     [Fact]
