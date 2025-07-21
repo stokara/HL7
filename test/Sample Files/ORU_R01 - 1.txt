@@ -10,4 +10,3 @@ OBX|5|ST|CO2IN||3|mm(hg)|||||R
 OBX|6|ST|CO2RR||14|breaths/min|||||R
 OBX|7|ST|SPO2R||71|/min|||||R
 OBX|8|ST|SPO2P||100|%|||||R
-
