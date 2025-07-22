@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -45,69 +46,93 @@ public record Hl7Encoding {
     }
 
     public string Encode(string? val) {
-        if (string.IsNullOrEmpty(val)) return ""; //May need a value for PresentButNull
+        if (string.IsNullOrEmpty(val)) return "";
 
         var sb = new StringBuilder();
 
         for (var i = 0; i < val.Length; i++) {
             var c = val[i];
 
-            if (c == EscapeCharacter) {
-                int end = val.IndexOf(EscapeCharacter, i + 1);
-                if (end > i + 1) {
-                    // Copy the escape sequence as-is
-                    sb.Append(val, i, end - i + 1);
-                    i = end;
-                    continue;
-                }
+            if (isEscapeSequence(val, i, out int end)) {
+                sb.Append(val, i, end - i + 1);
+                i = end;
+                continue;
             }
 
-            var continueEncoding = true;
-            if (c == '<') {
-                continueEncoding = false;
-                // special case <B>
-                if (val.Length >= i + 3 && val[i + 1] == 'B' && val[i + 2] == '>') {
-                    appendUsingEscape("H");
-                    i += 2;
-                }
-                // special case </B>
-                else if (val.Length >= i + 4 && val[i + 1] == '/' && val[i + 2] == 'B' && val[i + 3] == '>') {
-                    appendUsingEscape("N");
-                    i += 3;
-                }
-                // special case <BR>
-                else if (val.Length >= i + 4 && val[i + 1] == 'B' && val[i + 2] == 'R' && val[i + 3] == '>') {
-                    appendUsingEscape(".br");
-                    i += 3;
-                } else {
-                    continueEncoding = true;
-                }
+            if (tryEncodeSpecialTag(val, i, sb, out int skip)) {
+                i += skip;
+                continue;
             }
 
-            if (!continueEncoding) continue;
-
-            if (c == ComponentDelimiter) appendUsingEscape("S");
-            else if (c == EscapeCharacter) appendUsingEscape("E");
-            else if (c == FieldDelimiter) appendUsingEscape("F");
-            else if (c == RepeatDelimiter) appendUsingEscape("R");
-            else if (c == SubComponentDelimiter) appendUsingEscape("T");
-            else if (c == 10 || c == 13) // All other non-visible characters will be preserved
-            {
-                var v = $"{(int)c:X2}";
-                if ((v.Length % 2) != 0)
-                    v = "0" + v; // make number of digits even, this test would only be needed for values > 0xFF
-                sb.Append($"{this.EscapeCharacter}X{v}{this.EscapeCharacter}");
-            } else if (c < 32 || c > 126) {
-                // non-printable or non-ASCII
-                var bytes = Encoding.UTF8.GetBytes(new[] { c });
-                var hex = BitConverter.ToString(bytes).Replace("-", "");
-                appendUsingEscape("X" + hex);
-            } else sb.Append(c);
+            if (tryEncodeDelimiter(c, sb)) continue;
+            if (tryEncodeControlChar(c, sb)) continue;
+            if (tryEncodeNonAscii(c, sb)) continue;
+            sb.Append(c);
         }
 
         return sb.ToString();
 
-        void appendUsingEscape(string code) {
+        bool isEscapeSequence(string val, int index, out int end) {
+            end = -1;
+            if (val[index] == EscapeCharacter) {
+                end = val.IndexOf(EscapeCharacter, index + 1);
+                return end > index + 1;
+            }
+            return false;
+        }
+
+        bool tryEncodeSpecialTag(string val, int index, StringBuilder sb, out int skip) {
+            skip = 0;
+            if (val[index] != '<') return false;
+
+            if (val.Length >= index + 3 && val[index + 1] == 'B' && val[index + 2] == '>') {
+                appendUsingEscape(sb, "H");
+                skip = 2;
+                return true;
+            }
+            if (val.Length >= index + 4 && val[index + 1] == '/' && val[index + 2] == 'B' && val[index + 3] == '>') {
+                appendUsingEscape(sb, "N");
+                skip = 3;
+                return true;
+            }
+            if (val.Length >= index + 4 && val[index + 1] == 'B' && val[index + 2] == 'R' && val[index + 3] == '>') {
+                appendUsingEscape(sb, ".br");
+                skip = 3;
+                return true;
+            }
+            return false;
+        }
+
+        bool tryEncodeDelimiter(char c, StringBuilder sb) {
+            if (c == ComponentDelimiter) { appendUsingEscape(sb, "S"); return true; }
+            if (c == EscapeCharacter)    { appendUsingEscape(sb, "E"); return true; }
+            if (c == FieldDelimiter)     { appendUsingEscape(sb, "F"); return true; }
+            if (c == RepeatDelimiter)    { appendUsingEscape(sb, "R"); return true; }
+            if (c == SubComponentDelimiter) { appendUsingEscape(sb, "T"); return true; }
+            return false;
+        }
+
+        bool tryEncodeControlChar(char c, StringBuilder sb) {
+            if (c == 10 || c == 13) {
+                var v = $"{(int)c:X2}";
+                if ((v.Length % 2) != 0) v = "0" + v;
+                sb.Append($"{EscapeCharacter}X{v}{EscapeCharacter}");
+                return true;
+            }
+            return false;
+        }
+
+        bool tryEncodeNonAscii(char c, StringBuilder sb) {
+            if (c < 32 || c > 126) {
+                var bytes = Encoding.UTF8.GetBytes(new[] { c });
+                var hex = BitConverter.ToString(bytes).Replace("-", "");
+                appendUsingEscape(sb, "X" + hex);
+                return true;
+            }
+            return false;
+        }
+
+        void appendUsingEscape(StringBuilder sb, string code) {
             sb.Append(EscapeCharacter);
             sb.Append(code);
             sb.Append(EscapeCharacter);
@@ -115,10 +140,12 @@ public record Hl7Encoding {
     }
 
     public string? Decode(string? encodedValue) {
-        if (string.IsNullOrWhiteSpace(encodedValue) || !encodedValue.Contains(EscapeCharacter)) return encodedValue;
+        if (string.IsNullOrWhiteSpace(encodedValue) || !encodedValue.Contains(EscapeCharacter))
+            return encodedValue;
 
         var result = new StringBuilder(encodedValue.Length);
         var i = 0;
+
         while (i < encodedValue.Length) {
             var c = encodedValue[i];
 
@@ -128,10 +155,8 @@ public record Hl7Encoding {
                 continue;
             }
 
-            // Find the next escape character
             var end = encodedValue.IndexOf(EscapeCharacter, i + 1);
             if (end == -1) {
-                // Malformed escape, append the rest as-is
                 result.Append(encodedValue, i, encodedValue.Length - i);
                 break;
             }
@@ -141,41 +166,39 @@ public record Hl7Encoding {
 
             if (seq.Length == 0) continue;
 
-            switch (seq) {
-                case "H":
-                    result.Append("<B>");
-                    break;
-                case "N":
-                    result.Append("</B>");
-                    break;
-                case "F":
-                    result.Append(FieldDelimiter);
-                    break;
-                case "S":
-                    result.Append(ComponentDelimiter);
-                    break;
-                case "T":
-                    result.Append(SubComponentDelimiter);
-                    break;
-                case "R":
-                    result.Append(RepeatDelimiter);
-                    break;
-                case "E":
-                    result.Append(EscapeCharacter);
-                    break;
-                case ".br":
-                    result.Append("<BR>");
-                    break;
-                default:
-                    if (seq.Length > 1 && seq[0] == 'X')
-                        result.Append(DecodeHexString(seq.Substring(1)));
-                    else
-                        result.Append(seq);
-                    break;
+            if (!tryHandleEscapeSequence(seq, result)) {
+                // Unknown escape sequence, append as-is
+                result.Append(EscapeCharacter).Append(seq).Append(EscapeCharacter);
             }
         }
 
         return result.ToString();
+    }
+
+    private bool tryHandleEscapeSequence(string seq, StringBuilder result) {
+        // Dictionary for simple escape codes
+        var escapeActions = new Dictionary<string, Action> {
+            ["H"]    = () => result.Append("<B>"),
+            ["N"]    = () => result.Append("</B>"),
+            ["F"]    = () => result.Append(FieldDelimiter),
+            ["S"]    = () => result.Append(ComponentDelimiter),
+            ["T"]    = () => result.Append(SubComponentDelimiter),
+            ["R"]    = () => result.Append(RepeatDelimiter),
+            ["E"]    = () => result.Append(EscapeCharacter),
+            [".br"]  = () => result.Append("<BR>")
+        };
+
+        if (escapeActions.TryGetValue(seq, out var action)) {
+            action();
+            return true;
+        }
+
+        if (seq.Length > 1 && seq[0] == 'X') {
+            result.Append(DecodeHexString(seq.Substring(1)));
+            return true;
+        }
+
+        return false;
     }
 
     public static string DecodeHexString(string hex) {
@@ -194,8 +217,4 @@ public record Hl7Encoding {
 
     //  |^~\&
     public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}{(TruncationDelimiter is null ? "" : TruncationDelimiter)}";
-}
-
-public static class HL7EncodingExtensions {
-    public static string GetDelimiter(this Hl7Encoding encoding, Hl7Structure structure) => encoding.GetDelimiter(structure);
 }
