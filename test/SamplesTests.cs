@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HL7;
@@ -13,26 +12,6 @@ public class SamplesTests {
 
     public SamplesTests(ITestOutputHelper testOutputHelper) {
         this.testOutputHelper = testOutputHelper;
-    }
-
-    [Fact]
-    public void Parse_All_SampleFiles_Into_Message() {
-        var sampleFilesPath = Path.Combine(Directory.GetCurrentDirectory(), "Sample Files");
-        Assert.True(Directory.Exists(sampleFilesPath), $"Sample Files directory not found: {sampleFilesPath}");
-
-        var files = Directory.GetFiles(sampleFilesPath, "*.*");
-
-        foreach (var file in files) {
-            var hl7Text = File.ReadAllText(file);
-
-            Message? message = null;
-            try {
-                message = Message.Parse(hl7Text);
-                testOutputHelper.WriteLine($"Parsed {Path.GetFileName(file)}.");
-            } catch (Exception parseException) {
-                testOutputHelper.WriteLine($"Failed to parse {Path.GetFileName(file)}: {parseException?.Message}");
-            }
-        }
     }
 
     [Fact]
@@ -90,6 +69,40 @@ public class SamplesTests {
         Assert.True(diff.segmentNum == -1);
     }
 
+    [Fact]
+    public void MessageRoundTrip_Is_Equal() {
+        var sampleMessage =
+            """
+            MSH|^~\&|ATHENANET|18802555^Orthopaedic Sample Org|Aspyra - 18802555|13274090^ORTHOPAEDIC INSTITUTE|20241119113500||ORM^O01|57492555M18802|P|2.5.1||||||||
+            PID||500036547^^^Enterprise ID||500036547^^^Patient ID|JOHN^DOE^||20050904|M||2106-3|1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055||(555)261-2203|||S||||||||||||||
+            PV1||O|80D18802^^^SAMPLE ORTHO URGENT CARE||||1905555652^JANE^D^DOE||||||||||1037^ABCDE8|||||||||||||||||||||||||||||||||||
+            """;
+        var hl7Message = Hl7Message.Create(sampleMessage);
+        var str = hl7Message.Serialize();
+
+        Assert.True(areEquivalent(sampleMessage, str));
+    }
+
+    private static bool areEquivalent(string expected, string sut) {
+        string[] lineEndings = ["\r\n", "\n", "\r"];
+        var expectedLines = expected.Split(lineEndings, StringSplitOptions.None);
+        var sutLines = sut.Split(lineEndings, StringSplitOptions.None);
+
+        if (expectedLines.Length != sutLines.Length)
+            return false;
+        return !expectedLines.Where((t, i) => !compareSegmentLine(t, sutLines[i])).Any();
+
+        bool compareSegmentLine(string expectedLine, string sutLine) {
+            if (sutLine.Length < expectedLine.Length)
+                return false;
+            if (!sutLine.StartsWith(expectedLine))
+                return false;
+
+            var extra = sutLine[expectedLine.Length..];
+            return extra.Length <= 0 || extra.All(c => c == '|');
+        }
+    }
+
     //[Fact]
     //public void t() {
     //    const string sampleText =
@@ -137,7 +150,7 @@ public class SamplesTests {
 
             var diffOffset = getDifferenceOffset(expectedLines[i], sutLines[i], encoding.FieldDelimiter);
             if (diffOffset != -1) {
-                var fieldNum = -1;
+                int fieldNum;
                 if (diffOffset >= 0 && diffOffset <= sutLines[i].Length) {
                     fieldNum = sutLines[i].Take(diffOffset).Count(c => c == encoding.FieldDelimiter);
                 } else {

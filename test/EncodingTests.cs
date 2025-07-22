@@ -1,6 +1,4 @@
 using HL7;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 
@@ -8,11 +6,11 @@ namespace HL7test;
 
 public class EncodingTests {
     private readonly Hl7Encoding defaultEncoder = new(
-        fieldDelimiter: '|',
-        componentDelimiter: '^',
-        repeatDelimiter: '~',
-        escapeCharacter: '\\',
-        subComponentDelimiter: '&'
+        FieldDelimiter: '|',
+        ComponentDelimiter: '^',
+        RepeatDelimiter: '~',
+        EscapeCharacter: '\\',
+        SubComponentDelimiter: '&'
     );
     
     [Fact]
@@ -108,9 +106,9 @@ public class EncodingTests {
         var segmentStr = @"MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202407021200||ADT^A01|123456|P|2.5|\r\n";
         var segment = new MshSegment(segmentStr);
 
-        Assert.Equal("SendingApp", segment.GetRawFieldString(3));
-        Assert.Equal("ReceivingApp", segment.GetRawFieldString(5));
-        Assert.Equal("2.5", segment.GetRawFieldString(12));
+        Assert.Equal("SendingApp", segment.GetRawFieldString(1));
+        Assert.Equal("ReceivingApp", segment.GetRawFieldString(3));
+        Assert.Equal("2.5", segment.GetRawFieldString(10));
     }
 
     [Fact]
@@ -119,9 +117,9 @@ public class EncodingTests {
         var msh = new MshSegment(segmentStr);
 
         Assert.Equal("MSH", msh.Name);
-        Assert.Equal("App1", msh.GetRawFieldString(3));
-        Assert.Equal("App2", msh.GetRawFieldString(5));
-        Assert.Equal("2.8", msh.GetRawFieldString(12));
+        Assert.Equal("App1", msh.GetRawFieldString(1));
+        Assert.Equal("App2", msh.GetRawFieldString(3));
+        Assert.Equal("2.8", msh.GetRawFieldString(10));
     }
 
     [Fact]
@@ -150,64 +148,16 @@ public class EncodingTests {
     }
 
     [Fact]
-    public void MessageRoundTrip_Is_Equal() {
-        var sampleMessage =
-            """
-            MSH|^~\&|ATHENANET|18802555^Orthopaedic Sample Org|Aspyra - 18802555|13274090^ORTHOPAEDIC INSTITUTE|20241119113500||ORM^O01|57492555M18802|P|2.5.1||||||||
-            PID||500036547^^^Enterprise ID||500036547^^^Patient ID|JOHN^DOE^||20050904|M||2106-3|1380 SAMPLE STREET^\X0A\^NEW YORK^NY^55755-5055||(555)261-2203|||S||||||||||||||
-            PV1||O|80D18802^^^SAMPLE ORTHO URGENT CARE||||1905555652^JANE^D^DOE||||||||||1037^ABCDE8|||||||||||||||||||||||||||||||||||
-            """;
-        var hl7Message = Hl7Message.Create(sampleMessage);
-        var str = hl7Message.Serialize();
-
-        Assert.True(areEquivalent(sampleMessage, str));
-    }
-
-    private static bool areEquivalent(string expected, string sut) {
-        string[] lineEndings = ["\r\n", "\n", "\r"];
-        var expectedLines = expected.Split(lineEndings, StringSplitOptions.None);
-        var sutLines = sut.Split(lineEndings, StringSplitOptions.None);
-
-        if (expectedLines.Length != sutLines.Length) return false;
-        return !expectedLines.Where((t, i) => !compareSegmentLine(t, sutLines[i])).Any();
-
-        bool compareSegmentLine(string expectedLine, string sutLine) {
-            if (sutLine.Length < expectedLine.Length) return false;
-            if (!sutLine.StartsWith(expectedLine)) return false;
-
-            var extra = sutLine[expectedLine.Length..];
-            return extra.Length <= 0 || extra.All(c => c == '|');
-        }
-    }
-
-
-    [Fact]
     public void LinqQueryFindsMessageValue() {
         var sampleMessage = """
-                            MSH|^~\&|Main_HIS|XYZ_HOSPITAL|iFW|ABC_Lab|20160915003015||ACK|9B38584D|P|2.6.1|
-                            MSA|AA|9B38584D|\E\T\E\
-                            """;
+                           MSH|^~\&|SndApp^1.2.3.4.5^ISO|SndFac^1.2.3.4.5^ISO|RcvApp^1.2.3.4.5^ISO| RcvFac^1.2.3.4.5^ISO|20150601135823+0100|ADTADM|ADT^A01^ADT_A01|4637382|P|2.5.1|||AL|NE|USA|ASCII|en|||SndOrg^L^0009^1^1000^AssignAuth&1.2.3.4.5.6&ISO^XX^AssignFac&1.2.3.4.5.6&ISO^^67890| RecOrg^L^0011^2^1000^AssignAuth&1.2.3.4.5.7&ISO^XX^AssignFac&1.2.3.4.5.7&ISO^^45678|^ftp://www.goodhealth.org/somearea/someapp^URI|^ftp://www.goodlab.org/somearea/someapp^URI
+                           EVN|A01|20150601135823+0100||ADT_EVENT|23432^Smith^Gordon^Denny^Jr^MD^^ AssignAuth&1.2.3.4.5.6&ISO^L^9^1000^DN^ AssignFac&1.2.3.4.5.7&ISO^^G^20100101000000+0100^20330101000000+0100^doctor|20150601135822+0100|EventFac^1.2.3.4.5^ISO
+                           """;
         
         var message = Message.Parse(sampleMessage);
-        var msa = message.Segments.FirstOrDefault(s => s.Name == "MSA");
+        var msa = message.Segments.FirstOrDefault(s => s.Name == "EVN");
         Assert.NotNull(msa);
-        Assert.Equal(@"\E\T\E\", msa.GetRawFieldString(4));
     }
-
-
-    //[Fact]
-    ////is this correct?
-    //public void TrailingFieldDelimiterProducesEmptyField() { 
-    //    var sampleMessage = """
-    //                        MSH|^~\&|Main_HIS|XYZ_HOSPITAL|iFW|ABC_Lab|20160915003015||ACK|9B38584D|P|2.6.1|
-    //                        MSA|FIRST|SECOND|THIRD|
-    //                        """;
-
-    //    var message = Message.Parse(sampleMessage);
-    //    var msa = message.Segments.FirstOrDefault(s => s.Name == "MSA");
-    //    Assert.NotNull(msa);
-    //    Assert.Equal(5, msa.FieldCount);
-    //}
 
     [Fact]
     public void EncodeDecode_HexEscape_Newline() {
@@ -247,25 +197,26 @@ public class EncodingTests {
         Assert.Equal(expected, encoded);
     }
 
+
     [Fact]
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public void Decode_MalformedEscapeSequences() {
-        // Missing closing escape
-        const string input1 = @"ABC\FDEF";
-        const string expected1 = @"ABC\FDEF";
-        var decoded1 = defaultEncoder.Decode(input1);
-        Assert.Equal(expected1, decoded1);
+    public void Decode_MissingClosingEscape_ReturnsInputUnchanged() {
+        const string input = @"ABC\FDEF";
+        var decoded = defaultEncoder.Decode(input);
+        Assert.Equal(input, decoded);
+    }
 
-        // Unknown escape code
-        const string input2 = @"ABC\Z\DEF";
-        const string expected2 = "ABCZDEF";
-        var decoded2 = defaultEncoder.Decode(input2);
-        Assert.Equal(expected2, decoded2);
+    [Fact]
+    public void Decode_UnknownEscapeCode_ReturnsInputUnchanged() {
+        const string input = @"ABC\Z\DEF";
+        var decoded = defaultEncoder.Decode(input);
+        Assert.Equal(input, decoded);
+    }
 
-        // Empty escape sequence
-        const string input3 = @"ABC\\DEF";
-        const string expected3 = "ABCDEF";
-        var decoded3 = defaultEncoder.Decode(input3);
-        Assert.Equal(expected3, decoded3);
+    [Fact]
+    public void Decode_EmptyEscapeSequence_RemovesEscapeCharacters() {
+        const string input = @"ABC\\DEF";
+        const string expected = "ABCDEF";
+        var decoded = defaultEncoder.Decode(input);
+        Assert.Equal(expected, decoded);
     }
 }

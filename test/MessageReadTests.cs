@@ -21,7 +21,7 @@ public class MessageReadTests {
         // Invalid HL7 message (missing MSH)
         const string message = "FT1|1|20250101|20250101|||CG|1234^ProcedureDesc|1|100|USD||||Provider1";
 
-        Assert.Throws<Hl7Exception>(() => Hl7Message.TryCreate(message, out var hl7Message));
+        Assert.Throws<Hl7Exception>(() => Hl7Message.Create(message));
     }
 
     [Fact]
@@ -34,10 +34,10 @@ public class MessageReadTests {
         var result = Hl7Message.TryCreate(message, out var hl7Message);
 
         var msh = hl7Message.MSH;
-        Assert.Equal("Healthmatics", msh.SendingApplication?.ToString());
-        Assert.Equal("Healthmatics EHR", msh.SendingFacility?.ToString());
-        Assert.Equal("DFT_P03", msh.MessageType.ToString());
-        Assert.Equal("1477-3", msh.MessageControlID.ToString());
-        Assert.Equal("2.3", msh.VersionID.ToString());
+        Assert.Equal("Healthmatics", msh.SendingApplication?.StringValue);
+        Assert.Equal("Healthmatics EHR", msh.SendingFacility?.StringValue);
+        Assert.Equal("DFT^P03", msh.MessageType.StringValue);
+        Assert.Equal("1477-3", msh.MessageControlID.StringValue);
+        Assert.Equal("2.3", msh.VersionID.StringValue);
     }
 }

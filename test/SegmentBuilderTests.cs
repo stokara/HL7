@@ -5,11 +5,11 @@ namespace HL7test;
 
 public class SegmentBuilderTests {
     private readonly Hl7Encoding defaultEncoder = new(
-        fieldDelimiter: '|',
-        componentDelimiter: '^',
-        repeatDelimiter: '~',
-        escapeCharacter: '\\',
-        subComponentDelimiter: '&'
+        FieldDelimiter: '|',
+        ComponentDelimiter: '^',
+        RepeatDelimiter: '~',
+        EscapeCharacter: '\\',
+        SubComponentDelimiter: '&'
     );
 
     [Fact]
@@ -33,7 +33,7 @@ public class SegmentBuilderTests {
         var segStr = "IN1|1|BLUECROSS|BLUE CROSS|PO BOX 5678^CITY^ST^67890||(800)555-1111|987654321|WHITE^CAROL^E|SELF|19780322|F|||987654321|123-45-6789\r\n";
          var segment = new Segment(segStr, defaultEncoder);   
         var in1 = new IN1(segment);
-        Assert.Equal("BLUECROSS", in1.HealthPlanID.Text.Value);
+        Assert.Equal("BLUECROSS", in1.HealthPlanID.StringValue);
     }
 
 }
