@@ -37,7 +37,7 @@ public record RawComponent {
         ComponentValue = stringValue;
     }
 
-    public T? Get<T>(int index, bool isRequired = false) where T : class, IHl7DataType {
+    public T? Get<T>(int index, bool isRequired = false) where T : Hl7DataType {
         try {
             switch (Structure) {
                 case Hl7Structure.Hl7SubComponent:
@@ -64,9 +64,9 @@ public record RawComponent {
         }
     }
 
-    public T Parse<T>() where T : class, IHl7DataType => ParseDataType<T>(this);
+    public T Parse<T>() where T : Hl7DataType => ParseDataType<T>(this);
     
-    public static T ParseDataType<T>(RawComponent rawComponent) where T : class, IHl7DataType {
+    public static T ParseDataType<T>(RawComponent rawComponent) where T : Hl7DataType {
         var type = typeof(T);
 
         if (constructorCache.TryGetValue(type, out var ctor) && ctor != null) {
