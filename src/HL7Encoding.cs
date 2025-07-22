@@ -5,28 +5,20 @@ using System.Text;
 
 namespace HL7;
 
-public record Hl7Encoding {
-    public char FieldDelimiter { get; init; }
-    public char ComponentDelimiter { get; init; }
-    public char RepeatDelimiter { get; init; }
-    public char EscapeCharacter { get; init; }
-    public char SubComponentDelimiter { get; init; }
-    public char? TruncationDelimiter { get; init; }
-    public string SegmentDelimiter { get; init; }
-
+public record Hl7Encoding(
+    char FieldDelimiter,
+    char ComponentDelimiter,
+    char RepeatDelimiter,
+    char EscapeCharacter,
+    char SubComponentDelimiter,
+    string SegmentDelimiter = "\r",
+    char? TruncationDelimiter = null) {
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
-    public Hl7Encoding(char fieldDelimiter, char componentDelimiter, char repeatDelimiter, char escapeCharacter,
-        char subComponentDelimiter, string segmentDelimiter = "\r",  char? truncationDelimiter = null) {
-        FieldDelimiter = fieldDelimiter;
-        ComponentDelimiter = componentDelimiter;
-        RepeatDelimiter = repeatDelimiter;
-        EscapeCharacter = escapeCharacter;
-        SubComponentDelimiter = subComponentDelimiter;
-        SegmentDelimiter = segmentDelimiter;
-        TruncationDelimiter = truncationDelimiter;
-    }
-    
+    public Hl7Encoding(string delimiters) : this(delimiters[0], delimiters[1], delimiters[2], delimiters[3], delimiters[4], 
+                                                SegmentDelimiters.FirstOrDefault(delimiters.Contains) ?? "\r\n", 
+                                                (delimiters.Length >= 6) ? delimiters[5] : null) { }
+
     public string GetDelimiter(Hl7Structure structure) {
         return structure switch {
             Hl7Structure.Hl7Segment => SegmentDelimiter,
@@ -38,41 +30,32 @@ public record Hl7Encoding {
             _ => throw new ArgumentOutOfRangeException(nameof(structure), structure, null)
         };
     }
-    
-    public static Hl7Encoding FromString(string delimiters) {
-        var truncationDelimiter = (delimiters.Length >= 6) ? delimiters[5] : (char?)null;
-        var segmentDelimiter = SegmentDelimiters.FirstOrDefault(delimiters.Contains) ?? "\r\n";
-        return new Hl7Encoding(delimiters[0], delimiters[1], delimiters[2], delimiters[3], delimiters[4], segmentDelimiter, truncationDelimiter: truncationDelimiter);
-    }
 
     public string Encode(string? val) {
         if (string.IsNullOrEmpty(val)) return "";
-
         var sb = new StringBuilder();
+        var index = 0;
+        for (; index < val.Length; index++) {
+            var c = val[index];
 
-        for (var i = 0; i < val.Length; i++) {
-            var c = val[i];
-
-            if (isEscapeSequence(val, i, out int end)) {
-                sb.Append(val, i, end - i + 1);
-                i = end;
+            if (isEscapeSequence(out int end)) {
+                sb.Append(val, index, end - index + 1);
+                index = end;
                 continue;
             }
-
-            if (tryEncodeSpecialTag(val, i, sb, out int skip)) {
-                i += skip;
+            if (tryEncodeSpecialTag(out int skip)) {
+                index += skip;
                 continue;
             }
+            if (tryEncodeDelimiter(c)) continue;
+            if (tryEncodeControlChar(c)) continue;
+            if (tryEncodeNonAscii(c)) continue;
 
-            if (tryEncodeDelimiter(c, sb)) continue;
-            if (tryEncodeControlChar(c, sb)) continue;
-            if (tryEncodeNonAscii(c, sb)) continue;
             sb.Append(c);
         }
-
         return sb.ToString();
 
-        bool isEscapeSequence(string val, int index, out int end) {
+        bool isEscapeSequence(out int end) {
             end = -1;
             if (val[index] == EscapeCharacter) {
                 end = val.IndexOf(EscapeCharacter, index + 1);
@@ -81,58 +64,81 @@ public record Hl7Encoding {
             return false;
         }
 
-        bool tryEncodeSpecialTag(string val, int index, StringBuilder sb, out int skip) {
+        bool tryEncodeSpecialTag(out int skip) {
             skip = 0;
             if (val[index] != '<') return false;
 
             if (val.Length >= index + 3 && val[index + 1] == 'B' && val[index + 2] == '>') {
-                appendUsingEscape(sb, "H");
+                appendUsingEscape("H");
                 skip = 2;
                 return true;
             }
+
             if (val.Length >= index + 4 && val[index + 1] == '/' && val[index + 2] == 'B' && val[index + 3] == '>') {
-                appendUsingEscape(sb, "N");
+                appendUsingEscape("N");
                 skip = 3;
                 return true;
             }
+
             if (val.Length >= index + 4 && val[index + 1] == 'B' && val[index + 2] == 'R' && val[index + 3] == '>') {
-                appendUsingEscape(sb, ".br");
+                appendUsingEscape(".br");
                 skip = 3;
                 return true;
             }
             return false;
         }
 
-        bool tryEncodeDelimiter(char c, StringBuilder sb) {
-            if (c == ComponentDelimiter) { appendUsingEscape(sb, "S"); return true; }
-            if (c == EscapeCharacter)    { appendUsingEscape(sb, "E"); return true; }
-            if (c == FieldDelimiter)     { appendUsingEscape(sb, "F"); return true; }
-            if (c == RepeatDelimiter)    { appendUsingEscape(sb, "R"); return true; }
-            if (c == SubComponentDelimiter) { appendUsingEscape(sb, "T"); return true; }
+        bool tryEncodeDelimiter(char c) {
+            if (c == ComponentDelimiter) {
+                appendUsingEscape("S");
+                return true;
+            }
+
+            if (c == EscapeCharacter) {
+                appendUsingEscape("E");
+                return true;
+            }
+
+            if (c == FieldDelimiter) {
+                appendUsingEscape("F");
+                return true;
+            }
+
+            if (c == RepeatDelimiter) {
+                appendUsingEscape("R");
+                return true;
+            }
+
+            if (c == SubComponentDelimiter) {
+                appendUsingEscape("T");
+                return true;
+            }
+
             return false;
         }
 
-        bool tryEncodeControlChar(char c, StringBuilder sb) {
+        bool tryEncodeControlChar(char c) {
             if (c == 10 || c == 13) {
                 var v = $"{(int)c:X2}";
                 if ((v.Length % 2) != 0) v = "0" + v;
                 sb.Append($"{EscapeCharacter}X{v}{EscapeCharacter}");
                 return true;
             }
+
             return false;
         }
 
-        bool tryEncodeNonAscii(char c, StringBuilder sb) {
+        bool tryEncodeNonAscii(char c) {
             if (c < 32 || c > 126) {
                 var bytes = Encoding.UTF8.GetBytes(new[] { c });
                 var hex = BitConverter.ToString(bytes).Replace("-", "");
-                appendUsingEscape(sb, "X" + hex);
+                appendUsingEscape("X" + hex);
                 return true;
             }
             return false;
         }
 
-        void appendUsingEscape(StringBuilder sb, string code) {
+        void appendUsingEscape(string code) {
             sb.Append(EscapeCharacter);
             sb.Append(code);
             sb.Append(EscapeCharacter);
@@ -160,7 +166,6 @@ public record Hl7Encoding {
                 result.Append(encodedValue, i, encodedValue.Length - i);
                 break;
             }
-
             var seq = encodedValue.Substring(i + 1, end - i - 1);
             i = end + 1;
 
@@ -178,14 +183,14 @@ public record Hl7Encoding {
     private bool tryHandleEscapeSequence(string seq, StringBuilder result) {
         // Dictionary for simple escape codes
         var escapeActions = new Dictionary<string, Action> {
-            ["H"]    = () => result.Append("<B>"),
-            ["N"]    = () => result.Append("</B>"),
-            ["F"]    = () => result.Append(FieldDelimiter),
-            ["S"]    = () => result.Append(ComponentDelimiter),
-            ["T"]    = () => result.Append(SubComponentDelimiter),
-            ["R"]    = () => result.Append(RepeatDelimiter),
-            ["E"]    = () => result.Append(EscapeCharacter),
-            [".br"]  = () => result.Append("<BR>")
+            ["H"] = () => result.Append("<B>"),
+            ["N"] = () => result.Append("</B>"),
+            ["F"] = () => result.Append(FieldDelimiter),
+            ["S"] = () => result.Append(ComponentDelimiter),
+            ["T"] = () => result.Append(SubComponentDelimiter),
+            ["R"] = () => result.Append(RepeatDelimiter),
+            ["E"] = () => result.Append(EscapeCharacter),
+            [".br"] = () => result.Append("<BR>")
         };
 
         if (escapeActions.TryGetValue(seq, out var action)) {
@@ -216,5 +221,6 @@ public record Hl7Encoding {
     }
 
     //  |^~\&
-    public override string ToString() => $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}{(TruncationDelimiter is null ? "" : TruncationDelimiter)}";
+    public override string ToString() =>
+        $"{FieldDelimiter}{ComponentDelimiter}{RepeatDelimiter}{EscapeCharacter}{SubComponentDelimiter}{(TruncationDelimiter is null ? "" : TruncationDelimiter)}";
 }

@@ -13,8 +13,8 @@ public record Segment {
 
     public Hl7Encoding Encoding { get; protected init; }
 
-    protected Segment() { }  //used by MshSegment
-    
+    protected Segment() { } //used by MshSegment
+
     public Segment(string rawSegmentString, Hl7Encoding encoding) {
         Name = rawSegmentString[..3];
         if (Name == "MSH") throw new Hl7Exception("Use MshSegment for MSH", Hl7Exception.BadMessage);
@@ -35,7 +35,7 @@ public record Segment {
                 sb.Append(c);
                 continue;
             }
-           
+
             if (c == splitOn && !inEscape) {
                 fields.Add(sb.ToString());
                 sb.Clear();
@@ -61,6 +61,7 @@ public record Segment {
     public ICollection<T>? GetRepField<T>(int fieldNumber) where T : Hl7DataType {
         var fieldString = GetRawFieldString(fieldNumber);
         if (string.IsNullOrEmpty(fieldString)) return null;
+
         var fieldStrings = SplitFields(fieldString, Encoding.RepeatDelimiter);
         return fieldStrings.Select(s => parseFieldString<T>(s)).ToList()!;
     }
@@ -75,6 +76,7 @@ public record Segment {
         // HL7 rawFields are 1-based after the segment name (Components[0] is the segment name)
         if (fieldNumber < 1 || fieldNumber >= RawFieldStrings.Count) {
             if (isRequired) throw new Hl7Exception($"Field {fieldNumber} is out of range for segment {Name}.", Hl7Exception.ParsingError);
+
             return null;
         }
 
@@ -86,6 +88,7 @@ public record Segment {
 
     private T? parseFieldString<T>(string? fieldString) where T : Hl7DataType {
         if (string.IsNullOrEmpty(fieldString)) return null;
+
         var structure = (typeof(T).IsSubclassOf(typeof(Hl7SimpleType))) ? Hl7Structure.Hl7None : Hl7Structure.Hl7Field;
         var fieldComponent = new RawComponent(fieldString, Encoding, structure);
         return fieldComponent.Parse<T>();
@@ -93,43 +96,17 @@ public record Segment {
 }
 
 public sealed record MshSegment : Segment {
-    public char FieldDelimiter { get; }
-   
     public MshSegment(string rawSegmentString) {
         Name = rawSegmentString[..3];
         if (Name != "MSH") throw new Hl7Exception("MSH not found at the beginning of the rawSegmentString", Hl7Exception.BadMessage);
 
-        FieldDelimiter = rawSegmentString[3];
-        var delimiterFieldEnd = rawSegmentString.IndexOf(FieldDelimiter, 4);
+        var fieldDelimiter = rawSegmentString[3];
+        var delimiterFieldEnd = rawSegmentString.IndexOf(fieldDelimiter, 4);
         if (delimiterFieldEnd < 0) throw new Hl7Exception("Invalid MSH segment: delimiter field not terminated", Hl7Exception.BadMessage);
 
-        Encoding = Hl7Encoding.FromString(rawSegmentString[3..delimiterFieldEnd]);
+        Encoding = new Hl7Encoding(rawSegmentString[3..delimiterFieldEnd]);
         var fields = new List<string> { "MSH" };
         fields.AddRange(SplitFields(rawSegmentString[(delimiterFieldEnd + 1)..], Encoding.FieldDelimiter));
         RawFieldStrings = fields;
     }
-
-    public Message.MetaData GetMetaData() {
-        if (FieldCount < 11) throw new Hl7Exception("MSH segment doesn't contain all the required fields", Hl7Exception.BadMessage);
-
-        Instant? messageDateTime = null;
-
-        var version = Encoding.Decode(GetRawFieldString(10, true))!;
-        var processingId = Encoding.Decode(GetRawFieldString(9, true))!;
-        var msh9 = Encoding.Decode(GetRawFieldString(7));
-        var rawComponent = new RawComponent(msh9, Encoding, Hl7Structure.Hl7Component);
-        var msg = new MSG(rawComponent);
-
-        // ParseField MSH-7 (Date/Time of Message) if present
-        try {
-            var msh7Raw = Encoding.Decode(GetRawFieldString(5));
-            if (!string.IsNullOrWhiteSpace(msh7Raw))
-                messageDateTime = Hl7DateParser.ParseInstant(msh7Raw);
-        } catch {
-            // If parsing fails, leave messageDateTime as null (optionally log or handle as needed)
-        }
-
-        return new Message.MetaData(version, msg.MessageCode.StringValue, msg.TriggerEvent.StringValue, processingId, messageDateTime);
-    }
-
 }

@@ -8,33 +8,14 @@ namespace HL7;
 public sealed record Message {
     public MshSegment MshSegment { get; }
     public IReadOnlyList<Segment> Segments { get; init; }
-    public string Version { get; init; }
-    public Instant? MessageDateTime { get; init; }
-    public string MessageType { get; init; }
-    public string MessageControlId { get; init; }
-    public string ProcessingId { get; init; }
     public Hl7Encoding Encoding { get; init; }
 
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
-    public record MetaData(
-        string Version,
-        string MessageType,
-        string MessageControlId,
-        string ProcessingId,
-        Instant? MessageDateTime
-    );
-
     private Message(MshSegment mshSegment, IReadOnlyList<Segment> Segments) {
         this.MshSegment = mshSegment;
         this.Segments = Segments;
-        var meta = mshSegment.GetMetaData();
-        this.Version = meta.Version;
-        this.MessageType = meta.MessageType;
-        this.MessageControlId = meta.MessageControlId;
-        this.ProcessingId = meta.ProcessingId;
         this.Encoding = mshSegment.Encoding;
-        this.MessageDateTime = meta.MessageDateTime;
     }
 
     public static Message Parse(string rawMessage) {
