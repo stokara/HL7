@@ -53,20 +53,13 @@ public abstract record Hl7ComplexType : Hl7DataType {
         return string.Join(delimiter, props.Select(v => (v as Hl7DataType)?.Serialize(encoding, childStructure) ?? string.Empty));
     }
 
-    public override int GetHashCode() {
-        var components = GetProperties();
-        return components.Aggregate(0, (current, prop) => HashCode.Combine(current, prop.GetValue(this)?.GetHashCode() ?? 0));
-    }
-
-    private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new();
-
+    private static readonly Dictionary<Type, PropertyInfo[]> propertyCache = new();
     internal PropertyInfo[] GetProperties() {
         var type = GetType();
-        if (!PropertyCache.TryGetValue(type, out var props)) {
+        if (!propertyCache.TryGetValue(type, out var props)) {
             props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            PropertyCache[type] = props;
+            propertyCache[type] = props;
         }
-
         return props;
     }
 }
