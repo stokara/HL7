@@ -6,10 +6,10 @@ namespace HL7;
 
 public interface IHl7Value { }
 
-public abstract record Hl7Value<T> : Hl7ComplexType, IHl7Value where T : class, IHl7DataType {
+public abstract record Hl7Value<T> : Hl7ComplexType, IHl7Value where T : Hl7DataType {
     public T Value { get; init; } = null!;
-    protected Hl7Value(Hl7Structure structure) : base(structure) { }
-    protected Hl7Value(T value, Hl7Structure structure) : this(structure) => Value = value;
+    protected Hl7Value()  { }
+    protected Hl7Value(T value) => Value = value;
 
     public override string Serialize(Hl7Encoding encoding, Hl7Structure structure) {
         var props = this.GetProperties()
@@ -35,11 +35,11 @@ public abstract record Hl7Value<T> : Hl7ComplexType, IHl7Value where T : class, 
     }
 }
 
-public sealed record Hl7RepField<T> : Hl7Value<T> where T : class, IHl7DataType {
+public sealed record Hl7RepField<T> : Hl7Value<T> where T : Hl7DataType {
     public IReadOnlyList<T> Repetitions { get; }
     public bool HasRepetitions => Repetitions.Count > 0;
 
-    public Hl7RepField(IReadOnlyList<T> repetitions) : base(Hl7Structure.Hl7Field) {
+    public Hl7RepField(IReadOnlyList<T> repetitions) {
         Repetitions = repetitions ?? throw new ArgumentNullException(nameof(repetitions));
     }
     
