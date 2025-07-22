@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NodaTime;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -12,7 +13,7 @@ public record Segment {
 
     public Hl7Encoding Encoding { get; protected init; }
 
-    protected Segment() { }
+    protected Segment() { }  //used by MshSegment
     
     public Segment(string rawSegmentString, Hl7Encoding encoding) {
         Name = rawSegmentString[..3];
@@ -94,7 +95,6 @@ public record Segment {
 public sealed record MshSegment : Segment {
     public char FieldDelimiter { get; }
    
-
     public MshSegment(string rawSegmentString) {
         Name = rawSegmentString[..3];
         if (Name != "MSH") throw new Hl7Exception("MSH not found at the beginning of the rawSegmentString", Hl7Exception.BadMessage);
@@ -108,4 +108,28 @@ public sealed record MshSegment : Segment {
         fields.AddRange(SplitFields(rawSegmentString[(delimiterFieldEnd + 1)..], Encoding.FieldDelimiter));
         RawFieldStrings = fields;
     }
+
+    public Message.MetaData GetMetaData() {
+        if (FieldCount < 11) throw new Hl7Exception("MSH segment doesn't contain all the required fields", Hl7Exception.BadMessage);
+
+        Instant? messageDateTime = null;
+
+        var version = Encoding.Decode(GetRawFieldString(10, true))!;
+        var processingId = Encoding.Decode(GetRawFieldString(9, true))!;
+        var msh9 = Encoding.Decode(GetRawFieldString(7));
+        var rawComponent = new RawComponent(msh9, Encoding, Hl7Structure.Hl7Component);
+        var msg = new MSG(rawComponent);
+
+        // ParseField MSH-7 (Date/Time of Message) if present
+        try {
+            var msh7Raw = Encoding.Decode(GetRawFieldString(5));
+            if (!string.IsNullOrWhiteSpace(msh7Raw))
+                messageDateTime = Hl7DateParser.ParseInstant(msh7Raw);
+        } catch {
+            // If parsing fails, leave messageDateTime as null (optionally log or handle as needed)
+        }
+
+        return new Message.MetaData(version, msg.MessageCode.StringValue, msg.TriggerEvent.StringValue, processingId, messageDateTime);
+    }
+
 }

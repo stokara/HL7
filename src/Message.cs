@@ -17,7 +17,7 @@ public sealed record Message {
 
     private static readonly string[] SegmentDelimiters = ["\r\n", "\n\r", "\r", "\n"];
 
-    private record MetaData(
+    public record MetaData(
         string Version,
         string MessageType,
         string MessageControlId,
@@ -28,7 +28,7 @@ public sealed record Message {
     private Message(MshSegment mshSegment, IReadOnlyList<Segment> Segments) {
         this.MshSegment = mshSegment;
         this.Segments = Segments;
-        var meta = getMetaData(mshSegment);
+        var meta = mshSegment.GetMetaData();
         this.Version = meta.Version;
         this.MessageType = meta.MessageType;
         this.MessageControlId = meta.MessageControlId;
@@ -85,29 +85,6 @@ public sealed record Message {
 
             return hl7Message[..firstSegmentEnd];
         }
-    }
-
-    private static MetaData getMetaData(MshSegment mshSegment) {
-        if (mshSegment.Name != "MSH") throw new Hl7Exception("First segment is not MSH", Hl7Exception.BadMessage);
-        if (mshSegment.FieldCount < 11) throw new Hl7Exception("MSH segment doesn't contain all the required fields", Hl7Exception.BadMessage);
-
-        Instant? messageDateTime = null;
-
-        var version = mshSegment.Encoding.Decode(mshSegment.GetRawFieldString(10, true))!;
-        var processingId = mshSegment.Encoding.Decode(mshSegment.GetRawFieldString(9, true))!;
-        var msh9 = mshSegment.Encoding.Decode(mshSegment.GetRawFieldString(7));
-        var rawComponent = new RawComponent(msh9, mshSegment.Encoding, Hl7Structure.Hl7Component);
-        var msg = new MSG(rawComponent);
-
-        // ParseField MSH-7 (Date/Time of Message) if present
-        try {
-            var msh7Raw = mshSegment.Encoding.Decode(mshSegment.GetRawFieldString(5));
-            if (!string.IsNullOrWhiteSpace(msh7Raw)) messageDateTime = Hl7DateParser.ParseInstant(msh7Raw);
-        } catch {
-            // If parsing fails, leave messageDateTime as null (optionally log or handle as needed)
-        }
-
-        return new MetaData(version, msg.MessageCode.StringValue, msg.TriggerEvent.StringValue, processingId, messageDateTime);
     }
 
     public bool Equals(Message? other) {
