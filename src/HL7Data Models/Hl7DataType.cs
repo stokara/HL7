@@ -17,36 +17,22 @@ public enum Hl7Structure {
 public enum Complexity {
     Complex,
     Simple,
-    Primitive
 }
 
-public interface IHl7DataType {
-    Hl7Structure? Structure { get; }
-    Complexity? Complexity { get; }
-    public string Serialize(Hl7Encoding encoding, Hl7Structure structure);
-    public static Hl7Structure GetChildStructure(Hl7Structure structure) {
+public abstract record Hl7DataType {
+    public string? StringValue { get; init; }
+
+    public Complexity? Complexity { get; protected init; }
+
+    public abstract string Serialize(Hl7Encoding encoding, Hl7Structure structure);
+    protected static Hl7Structure GetChildStructure(Hl7Structure structure) {
         var next = (int)structure + 1;
         return Enum.IsDefined(typeof(Hl7Structure), next) ? (Hl7Structure)next : Hl7Structure.Hl7None;
     }
 }
 
-public abstract record Hl7DataType : IHl7DataType {
-    public string? StringValue { get; init; }
-
-    public Hl7Structure? Structure { get; protected init; }
-    public Complexity? Complexity { get; protected init; }
-
-    protected Hl7DataType(Hl7Structure structure) {
-        Structure = structure;
-    }
-
-    protected Hl7DataType() { }
-
-    public abstract string Serialize(Hl7Encoding encoding, Hl7Structure structure);
-}
-
 public abstract record Hl7SimpleType : Hl7DataType {
-    protected Hl7SimpleType(Hl7Structure structure) : base(structure) {
+    protected Hl7SimpleType() {
         Complexity = HL7.Complexity.Simple;
     }
 
@@ -54,17 +40,15 @@ public abstract record Hl7SimpleType : Hl7DataType {
 }
 
 public abstract record Hl7ComplexType : Hl7DataType {
-    protected Hl7ComplexType(Hl7Structure structure) : base(structure) {
+    protected Hl7ComplexType() {
         Complexity = HL7.Complexity.Complex;
     }
-
-    protected Hl7ComplexType() { }
 
     public override string Serialize(Hl7Encoding encoding, Hl7Structure structure) {
         if (this.Complexity == HL7.Complexity.Simple) return StringValue ?? "";
         
         var delimiter = encoding.GetDelimiter(structure);
-        var childStructure = IHl7DataType.GetChildStructure(structure);
+        var childStructure = GetChildStructure(structure);
         var props = this.GetProperties().Select(p => p.GetValue(this)).ToArray();
         return string.Join(delimiter, props.Select(v => (v as Hl7DataType)?.Serialize(encoding, childStructure) ?? string.Empty));
     }
