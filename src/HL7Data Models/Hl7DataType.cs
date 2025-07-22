@@ -35,6 +35,7 @@ public abstract record Hl7SimpleType : Hl7DataType {
     protected Hl7SimpleType() {
         Complexity = HL7.Complexity.Simple;
     }
+    public override string ToString() => StringValue ?? "";
 
     public override string Serialize(Hl7Encoding encoding, Hl7Structure structure ) => StringValue ?? "";
 }
